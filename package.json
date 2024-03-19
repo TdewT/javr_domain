@@ -1,0 +1,11 @@
+{
+  "name": "javr_strona",
+  "version": "0.1.0",
+  "description": "Magnificent JAVR web page",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
