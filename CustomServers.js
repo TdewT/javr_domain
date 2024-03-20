@@ -1,4 +1,4 @@
-const tcpPortUsed = require("tcp-port-used");
+const exec = require('child_process').exec;
 const statuses = {
     "ONLINE": "🟢", "CONNECTION_ERROR": "🟡", "OFFLINE": "🔴",
 }
@@ -19,24 +19,23 @@ class CustomServer {
     }
 
     // Check if port is being used
-    updateStatus(sendFunc) {
-        tcpPortUsed.check(this.port, 'localhost')
-            .then((inUse) => {
-                if (inUse) {
-                    // If status has changed update class value and send info to clients
-                    this.status = statuses.ONLINE;
-                }
-                else {
-                    // If status has changed update class value and send info to clients
-                    this.status = statuses.OFFLINE;
-                }
-            }, function (err) {
-                console.error('Error on check:', err.message);
-            });
+    updateStatus() {
+        exec(`netstat -an | find "${this.port}"`, (error, stdout, stderr) => {
+            if (stderr){
+                console.log(stderr)
+            }
+            if (stdout !== "") {
+                this.status = statuses.ONLINE;
+            }
+            else {
+                this.status = statuses.OFFLINE;
+            }
+        })
     }
 
     // Run check periodically to see if the server is still up
     lastStatus = statuses.OFFLINE
+
     portChecker(emitFunc, socket, servers) {
         setInterval(() => {
             if (this.lastStatus !== this.status) {
