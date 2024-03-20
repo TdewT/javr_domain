@@ -58,8 +58,8 @@ io.on('connection', client => {
         }
     })
 
-    client.on('stop_server_request', (serverID) => {
-    })
+    // client.on('stop_server_request', (serverID) => {
+    // })
 })
 
 // Define all servers

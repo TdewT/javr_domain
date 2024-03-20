@@ -29,14 +29,14 @@ socket.on('status_response', servers => {
             list.append(element)
 
             // Send start request to server on press
-            $(`#${server.htmlID}-button-start`).addEventListener('click', e=>{
+            $(`#${server.htmlID}-button-start`).addEventListener('click', ()=>{
                 if (server.htmlID === 'planetary')
                     socket.emit(`start_server_request`, server.htmlID);
                 else
                     alert("Nie ma")
             })
             // Send stop request to server on press
-            $(`#${server.htmlID}-button-stop`).addEventListener('click', e=>{
+            $(`#${server.htmlID}-button-stop`).addEventListener('click', ()=>{
                     // socket.emit(`stop_server-request`, server.htmlID);
                 alert("Nie ma takich jeszcze")
             })
