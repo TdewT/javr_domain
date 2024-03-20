@@ -1,6 +1,6 @@
 const exec = require('child_process').exec;
 const statuses = {
-    "ONLINE": "🟢", "CONNECTION_ERROR": "🟡", "OFFLINE": "🔴",
+    "ONLINE": "🟢", "LAUNCHING": "🟡", "OFFLINE": "🔴",
 }
 
 class CustomServer {
@@ -28,7 +28,8 @@ class CustomServer {
                 this.status = statuses.ONLINE;
             }
             else {
-                this.status = statuses.OFFLINE;
+                if (this.status !== statuses.LAUNCHING)
+                    this.status = statuses.OFFLINE;
             }
         })
     }
