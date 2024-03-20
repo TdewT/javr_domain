@@ -1,9 +1,7 @@
 const express = require('express');
 const socketIO = require('socket.io');
-const tcpPortUsed = require('tcp-port-used')
 const CustomServers = require('./CustomServers')
 
-const statuses = CustomServers.statuses
 const CustomServer = CustomServers.CustomServer
 
 // Setup express

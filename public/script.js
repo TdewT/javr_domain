@@ -6,7 +6,7 @@ const serverStatus = {
     "argentino-status": 'NaN',
 }
 
-socket.on('connect', client => {
+socket.on('connect', () => {
     socket.emit('status_request')
 })
 
