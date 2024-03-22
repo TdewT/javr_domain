@@ -1,4 +1,3 @@
-const child_process = require("child_process");
 const exec = require('child_process').exec;
 const statuses = {
     "ONLINE": "🟢", "STARTING": "🟡", "OFFLINE": "🔴",
