@@ -1,26 +1,35 @@
 const exec = require('child_process').exec;
 const statuses = {
-    "ONLINE": "🟢", "STARTING": "🟡", "OFFLINE": "🔴",
+    "ONLINE": "online", "STARTING": "starting", "BUSY": "busy", "OFFLINE": "offline",
 }
 
 class CustomServer {
-    constructor(port, htmlID, displayName, path = '', status = statuses.OFFLINE, host = 'localhost'){
+    constructor({
+                    port,
+                    htmlID,
+                    displayName,
+                    path = '',
+                    status = statuses.OFFLINE,
+                }) {
         this.port = port;
         this.htmlID = htmlID;
         this.displayName = displayName;
         this.status = status;
         this.path = path
-        this.host = host
     }
 
     // Check if port is being used
     updateStatus() {
         exec(`netstat -an | find "${this.port}"`, (error, stdout, stderr) => {
-            if (stderr){
+            if (stderr) {
                 console.log(stderr)
             }
             if (stdout !== "") {
-                this.status = statuses.ONLINE;
+                if (stdout.includes("LISTENING"))
+                    this.status = statuses.ONLINE;
+                else
+                    if (this.status !== statuses.STARTING)
+                        this.status = statuses.OFFLINE;
             }
             else {
                 if (this.status !== statuses.STARTING)
@@ -30,6 +39,7 @@ class CustomServer {
     }
 
     // Run check periodically to see if the server is still up
+    // TODO: Make it work with local variable instead
     lastStatus = statuses.OFFLINE
 
     portChecker(emitFunc, socket, event, servers) {
@@ -44,23 +54,29 @@ class CustomServer {
     }
 }
 
-
 class MinecraftServer extends CustomServer {
-    constructor(port, htmlID, displayName, status = statuses.OFFLINE, path = '', host = 'localhost',
-                currProcess = null,
-                currPlayers = [],
-                maxPlayers = 0,
-                startArgs = ["-jar", "minecraft_server.1.12.2.jar", "nogui"]){
-        super(port, htmlID, displayName, status, host, path);
+    constructor({
+                    port,
+                    htmlID,
+                    displayName,
+                    status = statuses.OFFLINE,
+                    path = '',
+                    currProcess = null,
+                    currPlayers = [],
+                    maxPlayers = 0,
+                    startArgs = ["-jar", "minecraft_server.1.12.2.jar", "nogui"]
+                }) {
+        super({port, htmlID, displayName, status, path});
 
         this.currProcess = currProcess;
         this.currPlayers = currPlayers;
         this.maxPlayers = maxPlayers;
-        this.startArgs = startArgs
+        this.startArgs = startArgs;
     }
 
     startServer(emitFunc, socket, servers) {
         const child_process = require('child_process');
+        this.status = statuses.STARTING;
 
         this.currProcess = child_process.spawn(
             "java",
@@ -72,8 +88,8 @@ class MinecraftServer extends CustomServer {
             console.error(error)
         });
 
-        this.currProcess.stderr.on('data', function (data) {
-            console.log(data)
+        this.currProcess.stderr.on('data', (data)=> {
+            console.log(`[${this.htmlID}] [stderr]: `+data)
         });
 
         // Check player count after servers starts
@@ -82,12 +98,12 @@ class MinecraftServer extends CustomServer {
         this.sendCommand('list')
 
         // Server output stream
-        this.currProcess.stdout.on('data', (data) =>{
+        this.currProcess.stdout.on('data', (data) => {
             // Convert output to string
-            let output = data+'';
+            let output = data + '';
 
             // Get maxPlayers when server starts
-            if (firstCheck && output.includes("players online")){
+            if (firstCheck && output.includes("players online")) {
                 // Remove unnecessary information
                 const pureMsg = output.split(':')[3]
                 // Split current and max player
@@ -102,14 +118,14 @@ class MinecraftServer extends CustomServer {
             }
 
             // Add player to current players
-            if (output.includes("joined the game")){
+            if (output.includes("joined the game")) {
                 this.currPlayers.push(this.getPlayerName(output));
 
                 // Send updated servers to client
                 emitFunc(socket, "status_response", servers);
             }
             // Remove player from current players
-            if (output.includes("left the game")){
+            if (output.includes("left the game")) {
                 const index = this.currPlayers.indexOf(this.getPlayerName(output))
                 this.currPlayers.splice(index, 1)
 
@@ -120,19 +136,19 @@ class MinecraftServer extends CustomServer {
     }
 
     sendCommand(command) {
-        if (this.currProcess !== null){
+        if (this.currProcess !== null) {
             this.currProcess.stdin.write(command + " \n");
         }
-        else{
+        else {
             console.log("Command failed: server process is null");
         }
     }
 
-    stopServer(){
+    stopServer() {
         this.sendCommand('stop');
     }
 
-    extractNums(str){
+    extractNums(str) {
         let res = '';
         for (const char of str) {
             if (char >= '0' && char <= '9') {
@@ -142,7 +158,7 @@ class MinecraftServer extends CustomServer {
         return Number(res)
     }
 
-    getPlayerName(outputStr){
+    getPlayerName(outputStr) {
         // Remove unnecessary information
         const filtered = outputStr.split(':')[3]
         // Return player's name

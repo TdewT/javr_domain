@@ -1,60 +1,89 @@
-// const child_process = require('child_process');
-//
-// const minecraftPath = "E:\\Serwery\\AF server"
-// const minecraftStarter = 'java -jar minecraft_server.1.12.2.jar nogui'
-//
-// let runningServer = child_process.spawn(
-//     "java",
-//     ["-jar", "minecraft_server.1.12.2.jar", "nogui"],
-//     {cwd: minecraftPath}
-// );
-//
-// runningServer.stdout.on('data', function (data) {
-//     console.log('' + data);
-// })
-//
-// runningServer.on('error', function (error) {
-//     console.error(error)
-// });
-//
-// runningServer.stderr.on('data', function (data) {
-//     console.log(data)
-// });
-//
-// runningServer.stdin.write('stop \\r')
-// runningServer.stdin.end()
-//
-// function extractNums(str){
-//     let res = '';
-//     for (const char of str) {
-//         if (char >= '0' && char <= '9') {
-//             res += char;
-//         }
+// // Paste into script.js
+// // FIXME: input console
+// const dummyServers = [{
+//     port: 25563,
+//     htmlID: "tesots",
+//     displayName: "do testos",
+//     status: "online",
+//     path: "",
+//     currProcess: null,
+//     currPlayers: [
+//         "TdewT",
+//         "John Cena",
+//         "Luluś"
+//     ],
+//     maxPlayers: 20,
+//     startArgs: [
+//         "-jar",
+//         "minecraft_server.1.12.2.jar",
+//         "nogui"
+//     ]
+// },
+//     {
+//         port: 25565,
+//         htmlID: "domestos",
+//         displayName: "domestos",
+//         status: "online",
+//         path: "",
+//         currProcess: null,
+//         currPlayers: [
+//             "Zraz",
+//             "Wirus",
+//             "Bakterian"
+//         ],
+//         maxPlayers: 15,
+//         startArgs: [
+//             "-jar",
+//             "minecraft_server.1.12.2.jar",
+//             "nogui"
+//         ]
+//     },
+//     {
+//         port: 25566,
+//         htmlID: "frajer",
+//         displayName: "tego nie ma",
+//         status: "offline",
+//         path: "",
+//         currProcess: null,
+//         currPlayers: [],
+//         maxPlayers: 0,
+//         startArgs: [
+//             "-jar",
+//             "minecraft_server.1.12.2.jar",
+//             "nogui"
+//         ]
 //     }
-//     return res
-// }
+// ]
+// setTimeout(() => {
+//     const inputElement = document.createElement('input')
+//     inputElement.id = "dev"
+//     $('body').appendChild(inputElement)
+//     inputElement.addEventListener('keydown', (event) => {
+//         if (event.keyCode === 13) {
+//             console.log(event.target.value)
+//             const input = event.target.value.split(' ');
+//             const index = input[0];
+//             const key = input[1];
+//             let value = input[2]
 //
-// str = "There are 0/20 players online:"
+//             if (input.length >= 3) {
+//                 if (key === 'currPlayers') {
+//                     value = value.split(';')
+//                 }
+//                 dummyServers[index][key] = value
+//                 console.log(dummyServers[index])
+//             }
+//         }
+//     })
+// }, 1000)
 //
-// players = str.split("/")
-// console.log(extractNums(players[0])+"/"+extractNums(players[1]))
-
-const {CustomServer, MinecraftServer} = require("./CustomServers");
-
-const servers = [
-    new MinecraftServer(25565, 'planetary', 'Minecraft: Planetary'),
-    new CustomServer(2344, 'arma', 'Arma 3: Antistasi')
-]
-
-let server = servers[1];
-
-
-console.log(server);
-
-servers[1].status = 'NOPE';
-
-server = servers.filter((s) => {
-    return s.htmlID === server.htmlID
-})
-
-console.log(server);
+//
+// // Paste into script.js socket.on('status_response')
+// //FIXME: Read dummy servers for testing
+// servers = dummyServers
+//
+// // Paste into index.js socket.on('connection')
+// // FIXME: forced refresh for testing
+// setInterval(()=>{
+//     io.emit('status_response', servers)
+// }, 1000)
