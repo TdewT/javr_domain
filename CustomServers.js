@@ -111,7 +111,7 @@ class MinecraftServer extends CustomServer {
             // Remove player from current players
             if (output.includes("left the game")){
                 const index = this.currPlayers.indexOf(this.getPlayerName(output))
-                this.currPlayers.splice(index, 1)
+                this.currPlayers.splice(index, this.currPlayers.length)
 
                 // Send updated servers to client
                 emitFunc(socket, "status_response", servers);
