@@ -1,0 +1,10 @@
+{
+  "planetary": {
+    "path": "D:\\serwery\\Planetary 1.6.8.1",
+    "args": ["-Xmx12G", "-jar", "forge-1.12.2-14.23.5.2860.jar", "nogui"]
+  },
+  "test": {
+    "path": "D:\\serwery\\test",
+    "args": ["-jar", "minecraft_server.1.12.2.jar", "nogui"]
+  }
+}
