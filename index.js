@@ -1,6 +1,6 @@
 const express = require('express');
 const socketIO = require('socket.io');
-const {statuses, ArmaServer, MinecraftServer, CustomServer} = require("./CustomServers");
+const {statuses, types, ArmaServer, MinecraftServer, GenericServer} = require("./CustomServers");
 
 // Import information required to start a server
 const serversInfo = require('./servers_info.json')
@@ -83,7 +83,7 @@ io.on('connection', client => {
         const server = getServerByHtmlID(serverID);
 
         if (server.status === statuses.ONLINE ||
-            (server.status === statuses.STARTING && server.constructor.name === "ArmaServer")
+            (server.status === statuses.STARTING && server.type === types.ARMA)
         ) {
             server.stopServer();
         }
@@ -97,12 +97,20 @@ io.on('connection', client => {
 
 // Define all servers
 const servers = [
+    // Generic Servers
+    new GenericServer({
+        port: 25566,
+        htmlID: "generic",
+        displayName: "Generic Server"
+    }),
+    // Minecraft Servers
     new MinecraftServer(
         serversInfo.minecraft.planetary
     ),
     new MinecraftServer(
         serversInfo.minecraft.test
     ),
+    // Arma Servers
     new ArmaServer(
         serversInfo.arma.test
     )

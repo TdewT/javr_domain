@@ -3,20 +3,27 @@ const exec = require('child_process').exec;
 const statuses = {
     "ONLINE": "online", "STARTING": "starting", "BUSY": "busy", "OFFLINE": "offline",
 }
+const types = {
+    "GENERIC": "generic",
+    "MINECRAFT": "minecraft",
+    "ARMA": "arma",
+}
 
-class CustomServer {
+class GenericServer {
     constructor({
                     port,
                     htmlID,
                     displayName,
                     path = '',
                     status = statuses.OFFLINE,
+                    type = types.GENERIC,
                 }) {
         this.port = port;
         this.htmlID = htmlID;
         this.displayName = displayName;
         this.status = status;
-        this.path = path
+        this.path = path;
+        this.type = type;
     }
 
     // Check if port is being used
@@ -73,20 +80,17 @@ class CustomServer {
     }
 }
 
-class MinecraftServer extends CustomServer {
+class MinecraftServer extends GenericServer {
     constructor({
-                    port,
-                    htmlID,
-                    displayName,
-                    status = statuses.OFFLINE,
-                    path = '',
+                    port, htmlID, displayName, path = '', status = statuses.OFFLINE,
                     currProcess = null,
                     currPlayers = [],
                     maxPlayers = 0,
                     startArgs = ["-jar", "minecraft_server.1.12.2.jar", "nogui"]
                 }) {
-        super({port, htmlID, displayName, status, path});
+        super({port, htmlID, displayName, path, status});
 
+        this.type = types.MINECRAFT;
         this.currProcess = currProcess;
         this.currPlayers = currPlayers;
         this.maxPlayers = maxPlayers;
@@ -203,13 +207,14 @@ class MinecraftServer extends CustomServer {
     }
 }
 
-class ArmaServer extends CustomServer {
+class ArmaServer extends GenericServer {
     constructor({
-                    port, htmlID, displayName, status = statuses.OFFLINE, path = '',
+                    port, htmlID, displayName, path = '', status = statuses.OFFLINE,
                     startArgs, currProcess = null,
                 }) {
-        super({port, htmlID, displayName, status, path});
+        super({port, htmlID, displayName, path, status});
 
+        this.type = types.ARMA;
         this.startArgs = startArgs;
         this.currProcess = currProcess;
     }
@@ -236,7 +241,8 @@ class ArmaServer extends CustomServer {
 
 module.exports = {
     ArmaServer,
-    CustomServer,
+    GenericServer,
     MinecraftServer,
-    statuses
+    statuses,
+    types
 }
