@@ -184,7 +184,7 @@ class MinecraftServer extends GenericServer {
     }
 
     stopServer() {
-        console.log(`${this.htmlID}: Stopping server`);
+        console.log(`[${this.htmlID}]: Stopping server`);
         this.sendCommand('stop');
     }
 
