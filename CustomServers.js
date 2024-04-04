@@ -1,4 +1,4 @@
-const exec = require('child_process').exec;
+const {exec, execFile} = require('child_process');
 const statuses = {
     "ONLINE": "online", "STARTING": "starting", "BUSY": "busy", "OFFLINE": "offline",
 }
@@ -222,7 +222,7 @@ class ArmaServer extends GenericServer {
         console.log(`[${this.htmlID}]: Starting server`)
         this.status = statuses.STARTING;
 
-        this.currProcess = child_process.execFile(
+        this.currProcess = execFile(
             this.path,
             [this.startArgs]
         );
