@@ -1,6 +1,5 @@
 const express = require('express');
 const socketIO = require('socket.io');
-const CustomServers = require('./CustomServers')
 const {statuses, ArmaServer, MinecraftServer, CustomServer} = require("./CustomServers");
 
 // Import information required to start a server
