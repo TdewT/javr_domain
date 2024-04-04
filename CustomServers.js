@@ -33,7 +33,7 @@ class GenericServer {
                 console.log(`[${this.htmlID}] netstat failed: ${stderr}`)
             }
             if (stdout !== "") {
-                if (!stdout.includes("AWAIT"))
+                if (!stdout.includes("WAIT"))
                     this.status = statuses.ONLINE;
                 else {
                     this.status = statuses.OFFLINE;
