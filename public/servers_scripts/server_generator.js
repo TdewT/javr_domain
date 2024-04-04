@@ -4,7 +4,7 @@ function printServer(server) {
         createMinecraftElement(server);
     }
     else if (server.type === "arma") {
-
+        createArmaElement(server)
     }
     else {
         createGenericElement(server);
@@ -17,7 +17,7 @@ function updateServer(server) {
         updateMinecraftServer(server);
     }
     else if (server.type === "arma") {
-
+        updateArmaServer(server)
     }
     else {
         updateGenericServer(server);
@@ -28,13 +28,39 @@ function updateServer(server) {
 
 // Create and add element to DOM
 function createGenericElement(server) {
+    // Generate element with the function
     const serverElement = getGenericElement(server);
 
+    // Add element to DOM
     serverListElement.appendChild(serverElement);
 }
 function createMinecraftElement(server) {
+    // Generate element with the function
     const serverElement = getMinecraftElement(server);
 
+    // Add element to DOM
+    serverListElement.appendChild(serverElement);
+
+    // Add playerList to the server
+    generatePlayerList(server);
+
+    //TODO: Add connection with arma scripts to get info from the server
+
+    // Send start request to server on press
+    $(`#${server.htmlID}-button-start`).addEventListener('click', () => {
+        // If this command is supported for this server send request
+        socket.emit(`start_server_request`, server.htmlID);
+    })
+    // Send stop request to server on press
+    $(`#${server.htmlID}-button-stop`).addEventListener('click', () => {
+        socket.emit('stop_server_request', server.htmlID);
+    })
+}
+function createArmaElement(server) {
+    // Generate element with the function
+    const serverElement = getArmaServer(server);
+
+    // Add element to DOM
     serverListElement.appendChild(serverElement);
 
     // Send start request to server on press
@@ -46,6 +72,9 @@ function createMinecraftElement(server) {
     $(`#${server.htmlID}-button-stop`).addEventListener('click', () => {
         socket.emit('stop_server_request', server.htmlID);
     })
+
+
+    //TODO: Add connection with arma scripts to get info from the server
 }
 
 // Update existing server
@@ -65,6 +94,12 @@ function updateMinecraftServer(server) {
     // Update players
     generatePlayerList(server)
 }
+function updateArmaServer(server) {
+    // For now that's enough
+    updateGenericServer(server);
+
+    //TODO: Add connection with arma scripts to get info from the server
+}
 
 // Generate server element
 function getGenericElement(server) {
@@ -77,18 +112,18 @@ function getGenericElement(server) {
         `<div id="${server.htmlID}-server-status-box" class="server-status-box me-auto flex">` +
             `<span class="me-4" id="${server.htmlID}-status">${statusIndicators[server.status]}</span>` +
             `<span class="me-4" id="${server.htmlID}-status-text">${getStatusText(server)}</span>` +
-        `</div>`
+        `</div>`;
 
     // Display name
     serverElement.innerHTML +=
-        `<span class="me-name">${server.displayName}</span>`
+        `<span class="me-name">${server.displayName}</span>`;
 
-    return serverElement
+    return serverElement;
 }
 function getMinecraftElement(server) {
 
     // Get basic part of element from GenericServer
-    let serverElement = getGenericElement(server)
+    let serverElement = getGenericElement(server);
 
     // Remove margin to make place for buttons
     serverElement.querySelector(".me-name").className = '';
@@ -98,13 +133,24 @@ function getMinecraftElement(server) {
         `<span>` +
         `<button type="button" class="button btn btn-success btn-sm ms-5" id="${server.htmlID}-button-start">START</button>` +
         `<button type="button" class="button btn btn-danger btn-sm ms-5" id="${server.htmlID}-button-stop">STOP</button>` +
-        `</span>`
-
-
-    serverListElement.appendChild(serverElement);
-
-    generatePlayerList(server)
+        `</span>`;
 
     return serverElement;
 }
+function getArmaServer(server) {
 
+    // Get basic part of element from GenericServer
+    let serverElement = getGenericElement(server);
+
+    // Remove margin to make place for buttons
+    serverElement.querySelector(".me-name").className = '';
+
+    // Add buttons
+    serverElement.innerHTML +=
+        `<span>` +
+        `<button type="button" class="button btn btn-success btn-sm ms-5" id="${server.htmlID}-button-start">START</button>` +
+        `<button type="button" class="button btn btn-danger btn-sm ms-5" id="${server.htmlID}-button-stop">STOP</button>` +
+        `</span>`;
+
+    return serverElement;
+}
