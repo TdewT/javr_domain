@@ -1,3 +1,5 @@
+const child_process = require("child_process");
+const {set} = require("express/lib/application");
 const exec = require('child_process').exec;
 const statuses = {
     "ONLINE": "online", "STARTING": "starting", "BUSY": "busy", "OFFLINE": "offline",
@@ -22,14 +24,14 @@ class CustomServer {
     updateStatus() {
         exec(`netstat -an | find "${this.port}"`, (error, stdout, stderr) => {
             if (stderr) {
-                console.log(stderr)
+                console.log(`[${this.htmlID}] netstat failed: ${stderr}`)
             }
             if (stdout !== "") {
-                if (stdout.includes("LISTENING"))
+                if (!stdout.includes("AWAIT"))
                     this.status = statuses.ONLINE;
-                else
-                    if (this.status !== statuses.STARTING)
-                        this.status = statuses.OFFLINE;
+                else {
+                    this.status = statuses.OFFLINE;
+                }
             }
             else {
                 if (this.status !== statuses.STARTING)
@@ -42,15 +44,33 @@ class CustomServer {
     // TODO: Make it work with local variable instead
     lastStatus = statuses.OFFLINE
 
-    portChecker(emitFunc, socket, event, servers) {
+    statusMonitor(emitFunc, socket, event, servers) {
         setInterval(() => {
             if (this.lastStatus !== this.status) {
-                console.log("Updating status for:", this.htmlID);
+                console.log(`[${this.htmlID}]: Status changed to "${this.status}"`);
                 emitFunc(socket, event, servers);
             }
             this.lastStatus = this.status;
             this.updateStatus()
-        }, 1000);
+        }, 500);
+    }
+
+    // For servers with executable linked
+    exitCheck(server) {
+        server.currProcess.on('error', (error) => {
+            console.error(error)
+            server.status = statuses.OFFLINE;
+
+        });
+
+        server.currProcess.stderr.on('data', (data) => {
+            console.error(`[${this.htmlID}] [stderr]: ` + data)
+        });
+
+        server.currProcess.on('exit', () => {
+            console.log(`[${server.htmlID}]: Server process ended`);
+            server.status = statuses.OFFLINE;
+        })
     }
 }
 
@@ -74,7 +94,27 @@ class MinecraftServer extends CustomServer {
         this.startArgs = startArgs;
     }
 
+    // Check if port is busy, update server status
+    updateStatus() {
+        exec(`netstat -an | find "${this.port}"`, (error, stdout, stderr) => {
+            if (stderr) {
+                console.log(stderr)
+            }
+            if (stdout !== "") {
+                if (stdout.includes("LISTENING"))
+                    this.status = statuses.ONLINE;
+                else if (this.status !== statuses.STARTING)
+                    this.status = statuses.OFFLINE;
+            }
+            else {
+                if (this.status !== statuses.STARTING)
+                    this.status = statuses.OFFLINE;
+            }
+        })
+    }
+
     startServer(emitFunc, socket, servers) {
+        console.log(`[${this.htmlID}]: Starting server`)
         const child_process = require('child_process');
         this.status = statuses.STARTING;
 
@@ -84,13 +124,8 @@ class MinecraftServer extends CustomServer {
             {cwd: this.path}
         );
 
-        this.currProcess.on('error', function (error) {
-            console.error(error)
-        });
-
-        this.currProcess.stderr.on('data', (data)=> {
-            console.log(`[${this.htmlID}] [stderr]: `+data)
-        });
+        // Check for process exit
+        this.exitCheck(this);
 
         // Check player count after servers starts
         let firstCheck = true;
@@ -133,6 +168,8 @@ class MinecraftServer extends CustomServer {
                 emitFunc(socket, "status_response", servers);
             }
         })
+
+
     }
 
     sendCommand(command) {
@@ -145,6 +182,7 @@ class MinecraftServer extends CustomServer {
     }
 
     stopServer() {
+        console.log(`${this.htmlID}: Stopping server`);
         this.sendCommand('stop');
     }
 
@@ -166,7 +204,39 @@ class MinecraftServer extends CustomServer {
     }
 }
 
+class ArmaServer extends CustomServer {
+    constructor({
+                    port, htmlID, displayName, status = statuses.OFFLINE, path = '',
+                    startArgs, currProcess = null,
+                }) {
+        super({port, htmlID, displayName, status, path});
+
+        this.startArgs = startArgs;
+        this.currProcess = currProcess;
+    }
+
+    startServer(emitFunc, socket) {
+        console.log(`[${this.htmlID}]: Starting server`)
+        this.status = statuses.STARTING;
+
+        this.currProcess = child_process.execFile(
+            this.path,
+            [this.startArgs]
+        );
+
+        // Check for process exit
+        this.exitCheck(this);
+
+    }
+
+    stopServer() {
+        console.log(`${this.htmlID}: Stopping server`);
+        this.currProcess.kill();
+    }
+}
+
 module.exports = {
+    ArmaServer,
     CustomServer,
     MinecraftServer,
     statuses

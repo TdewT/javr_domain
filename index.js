@@ -1,13 +1,10 @@
 const express = require('express');
 const socketIO = require('socket.io');
 const CustomServers = require('./CustomServers')
-const {statuses} = require("./CustomServers");
-
-const CustomServer = CustomServers.CustomServer
-const MinecraftServer = CustomServers.MinecraftServer
+const {statuses, ArmaServer, MinecraftServer, CustomServer} = require("./CustomServers");
 
 // Import information required to start a server
-const serversInfo =  require('./servers_info.json')
+const serversInfo = require('./servers_info.json')
 
 // Setup express
 const app = express()
@@ -19,8 +16,8 @@ const server = app.listen(80, () => {
 
     // Start checking ports for every defined server
     for (const server of servers) {
-        console.log("Starting portChecker for:", server.htmlID)
-        server.portChecker(emitDataGlobal, io, "status_response", servers)
+        console.log("Starting statusMonitor for:", server.htmlID)
+        server.statusMonitor(emitDataGlobal, io, "status_response", servers)
     }
 })
 // Start socket
@@ -54,39 +51,45 @@ io.on('connection', client => {
 
     // Requested server start
     client.on('start_server_request', (serverID) => {
-        console.log("Client asked to start server", serverID)
+        console.log(`[${serverID}]: Client asked to start server`);
 
         // Get requested server's status
         const server = getServerByHtmlID(serverID);
 
-        if (server.status === statuses.OFFLINE){
-            if ((serverID) !== 'arma') {
-                console.log("Attempting to start", serverID)
-                // Start commandLine for the server
-                server.startServer(emitDataGlobal, io, servers)
+        if (server) {
+            if (server.status === statuses.OFFLINE) {
+                if ((serverID) !== 'arma') {
+                    // Start commandLine for the server
+                    server.startServer(emitDataGlobal, io, servers)
+                }
+                else {
+                    io.to(client.id).emit('request_failed', "Nie ma tego jeszcze")
+                }
             }
-            else{
-                io.to(client.id).emit('request_failed', "Nie ma tego jeszcze")
+            else {
+                console.log(`[${serverID}]: Request denied, port is taken`)
+                io.to(client.id).emit('request_failed', "Port jest zajęty")
             }
         }
-        else{
-            console.log('Request denied: server already started')
-            io.to(client.id).emit('request_failed', "Port jest zajęty")
+        else {
+            console.log(`[${serverID}]: Server not found`)
+            io.to(client.id).emit('request_failed', "Nie znaleziono serwera")
         }
     })
 
     // Requested server stop
     client.on('stop_server_request', (serverID) => {
-        console.log("Client asked to stop server", serverID);
+        console.log(`[${serverID}]: Client asked to stop server`);
 
         const server = getServerByHtmlID(serverID);
 
-        if (server.status === statuses.ONLINE){
-            console.log("Closing server", serverID);
+        if (server.status === statuses.ONLINE ||
+            (server.status === statuses.STARTING && server.constructor.name === "ArmaServer")
+        ) {
             server.stopServer();
         }
-        else{
-            console.log('Request denied: server not running')
+        else {
+            console.log(`[${serverID}]: Request denied, server is not running`)
             io.to(client.id).emit('request_failed', 'Serwer nie jest włączony')
         }
 
@@ -95,25 +98,15 @@ io.on('connection', client => {
 
 // Define all servers
 const servers = [
-    new MinecraftServer({
-        port: 25565,
-    htmlID: 'planetary',
-    displayName: 'Minecraft: Planetary',
-    path: serversInfo.planetary.path,
-    startArgs: serversInfo.planetary.args
-    }),
-    new MinecraftServer({
-        port: 25566,
-    htmlID: 'test',
-    displayName: 'Minecraft: Testing server',
-    path: serversInfo.test.path,
-    startArgs: serversInfo.test.args
-    }),
-    new CustomServer({
-        port: 2344,
-        htmlID: 'arma',
-        displayName: 'Arma 3: Antistasi'
-    })
+    new MinecraftServer(
+        serversInfo.minecraft.planetary
+    ),
+    new MinecraftServer(
+        serversInfo.minecraft.test
+    ),
+    new ArmaServer(
+        serversInfo.arma.test
+    )
 ]
 
 // Sending servers statuses
