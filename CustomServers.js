@@ -1,5 +1,4 @@
 const child_process = require("child_process");
-const {set} = require("express/lib/application");
 const exec = require('child_process').exec;
 const statuses = {
     "ONLINE": "online", "STARTING": "starting", "BUSY": "busy", "OFFLINE": "offline",
@@ -215,7 +214,7 @@ class ArmaServer extends CustomServer {
         this.currProcess = currProcess;
     }
 
-    startServer(emitFunc, socket) {
+    startServer() {
         console.log(`[${this.htmlID}]: Starting server`)
         this.status = statuses.STARTING;
 
