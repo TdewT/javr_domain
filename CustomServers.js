@@ -233,7 +233,7 @@ class ArmaServer extends GenericServer {
     }
 
     stopServer() {
-        console.log(`${this.htmlID}: Stopping server`);
+        console.log(`[${this.htmlID}]: Stopping server`);
         this.currProcess.kill();
     }
 }
