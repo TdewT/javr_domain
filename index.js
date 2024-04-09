@@ -45,8 +45,6 @@ const getServerByHtmlID = serverID => servers.filter((s) => {
     return s.htmlID === serverID
 })[0]
 
-//
-
 // When client connects to the server
 io.on('connection', client => {
     console.log("Client connected", client.id)
@@ -107,7 +105,6 @@ io.on('connection', client => {
     })
 
     
-
     //Handeling ZeroTier Request
     client.on('zt_request', () =>{
         console.log("ZeroTier Request Received")
