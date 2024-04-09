@@ -2,7 +2,6 @@ const express = require('express');
 const socketIO = require('socket.io');
 const axios = require('axios');
 const {statuses, types, ArmaServer, MinecraftServer, GenericServer} = require("./CustomServers");
-const ZtConfig = require('./config_zt.json');
 
 // Import information required to start a server
 const serversInfo = require('./servers_info.json')
@@ -114,7 +113,7 @@ io.on('connection', client => {
         console.log("ZeroTier Request Received")
         let wasRequested = false
         if(!wasRequested){
-            
+
             axios.request(config)
                 .then((response) => {
                     io.emit("zt_response",response.data)
