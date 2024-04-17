@@ -232,3 +232,7 @@ fabric.properties
 # End of https://www.toptal.com/developers/gitignore/api/node,webstorm+all
 /package-lock.json
 /servers_info.json
+/ts3server.sqlitedb
+/ts3server.sqlitedb-shm
+/ts3server.sqlitedb-wal
+/.ts3server_license_accepted
