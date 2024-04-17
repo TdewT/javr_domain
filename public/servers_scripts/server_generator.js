@@ -57,7 +57,7 @@ function createMinecraftElement(server) {
     $(`#${server.htmlID}-button-start`).addEventListener('click', () => {
         // If this command is supported for this server send request
         socket.emit(`start_server_request`, server.htmlID);
-    })
+    });
     // Send stop request to server on press
     $(`#${server.htmlID}-button-stop`).addEventListener('click', () => {
         socket.emit('stop_server_request', server.htmlID);
@@ -74,7 +74,7 @@ function createArmaElement(server) {
     $(`#${server.htmlID}-button-start`).addEventListener('click', () => {
         // If this command is supported for this server send request
         socket.emit(`start_server_request`, server.htmlID);
-    })
+    });
     // Send stop request to server on press
     $(`#${server.htmlID}-button-stop`).addEventListener('click', () => {
         socket.emit('stop_server_request', server.htmlID);
@@ -94,7 +94,7 @@ function createTeamspeakElement(server) {
     $(`#${server.htmlID}-button-start`).addEventListener('click', () => {
         // If this command is supported for this server send request
         socket.emit(`start_server_request`, server.htmlID);
-    })
+    });
     // Send stop request to server on press
     $(`#${server.htmlID}-button-stop`).addEventListener('click', () => {
         socket.emit('stop_server_request', server.htmlID);
@@ -116,7 +116,7 @@ function updateGenericServer(server) {
 }
 function updateMinecraftServer(server) {
     // This part is the same for both
-    updateGenericServer(server)
+    updateGenericServer(server);
 
     // Update players
     generatePlayerList(server)

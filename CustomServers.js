@@ -1,14 +1,14 @@
 const { exec, execFile, spawn } = require('child_process');
-const CustomUtils = require('./CustomUtils') 
+const CustomUtils = require('./CustomUtils');
 const statuses = {
     "ONLINE": "online", "STARTING": "starting", "BUSY": "busy", "OFFLINE": "offline",
-}
+};
 const types = {
     "GENERIC": "generic",
     "MINECRAFT": "minecraft",
     "ARMA": "arma",
     "TSSERVER": "tsserver"
-}
+};
 
 class GenericServer {
     constructor({
@@ -49,7 +49,7 @@ class GenericServer {
 
     // Run check periodically to see if the server is still up
     // TODO: Make it work with local variable instead
-    lastStatus = statuses.OFFLINE
+    lastStatus = statuses.OFFLINE;
 
     statusMonitor(emitFunc, socket, event, servers) {
         setInterval(() => {
@@ -65,7 +65,7 @@ class GenericServer {
     // For servers with executable linked
     exitCheck(server) {
         server.currProcess.on('error', (error) => {
-            console.error(error)
+            console.error(error);
             server.status = statuses.OFFLINE;
 
         });
@@ -118,8 +118,7 @@ class MinecraftServer extends GenericServer {
     }
 
     startServer(emitFunc, socket, servers) {
-        console.log(`[${this.htmlID}]: Starting server`)
-        const child_process = require('child_process');
+        console.log(`[${this.htmlID}]: Starting server`);
         this.status = statuses.STARTING;
 
         this.currProcess = spawn(
@@ -134,7 +133,7 @@ class MinecraftServer extends GenericServer {
         // Check player count after servers starts
         let firstCheck = true;
         // Send list command to get player count when first launched (required to get maxPlayers)
-        this.sendCommand('list')
+        this.sendCommand('list');
 
         // Server output stream
         this.currProcess.stdout.on('data', (data) => {
@@ -144,11 +143,11 @@ class MinecraftServer extends GenericServer {
             // Get maxPlayers when server starts
             if (firstCheck && output.includes("players online")) {
                 // Remove unnecessary information
-                const pureMsg = output.split(':')[3]
+                const pureMsg = output.split(':')[3];
                 // Split current and max player
-                const playerNumbers = pureMsg.split('/')
+                const playerNumbers = pureMsg.split('/');
                 // Filter out whatever is not a number
-                this.maxPlayers = this.extractNums(playerNumbers[1])
+                this.maxPlayers = this.extractNums(playerNumbers[1]);
                 // Set flag so this only runs once
                 firstCheck = false;
 
@@ -165,8 +164,8 @@ class MinecraftServer extends GenericServer {
             }
             // Remove player from current players
             if (output.includes("left the game")) {
-                const index = this.currPlayers.indexOf(this.getPlayerName(output))
-                this.currPlayers.splice(index, this.currPlayers.length)
+                const index = this.currPlayers.indexOf(this.getPlayerName(output));
+                this.currPlayers.splice(index, this.currPlayers.length);
 
                 // Send updated servers to client
                 emitFunc(socket, "status_response", servers);
@@ -202,7 +201,7 @@ class MinecraftServer extends GenericServer {
 
     getPlayerName(outputStr) {
         // Remove unnecessary information
-        const filtered = outputStr.split(':')[3]
+        const filtered = outputStr.split(':')[3];
         // Return player's name
         return filtered.split(' ')[1];
     }
@@ -221,7 +220,7 @@ class ArmaServer extends GenericServer {
     }
 
     startServer() {
-        console.log(`[${this.htmlID}]: Starting server`)
+        console.log(`[${this.htmlID}]: Starting server`);
         this.status = statuses.STARTING;
 
         this.currProcess = execFile(
@@ -309,4 +308,4 @@ module.exports = {
     TeamspeakServer,
     statuses,
     types
-}
+};
