@@ -1,4 +1,5 @@
-const {exec, execFile} = require('child_process');
+const { exec, execFile, spawn } = require('child_process');
+const CustomUtils = require('./CustomUtils') 
 const statuses = {
     "ONLINE": "online", "STARTING": "starting", "BUSY": "busy", "OFFLINE": "offline",
 }
@@ -6,6 +7,7 @@ const types = {
     "GENERIC": "generic",
     "MINECRAFT": "minecraft",
     "ARMA": "arma",
+    "TSSERVER": "tsserver"
 }
 
 class GenericServer {
@@ -120,7 +122,7 @@ class MinecraftServer extends GenericServer {
         const child_process = require('child_process');
         this.status = statuses.STARTING;
 
-        this.currProcess = child_process.spawn(
+        this.currProcess = spawn(
             "java",
             this.startArgs,
             {cwd: this.path}
@@ -238,10 +240,73 @@ class ArmaServer extends GenericServer {
     }
 }
 
+class TeamspeakServer extends GenericServer{
+    constructor({
+        port, htmlID, displayName, path = '', status = statuses.OFFLINE,
+        startArgs, currProcess = null,
+    }) {
+    super({port, htmlID, displayName, path, status});
+
+    this.type = types.TSSERVER;
+    this.startArgs = startArgs;
+    this.currProcess = currProcess;
+    }
+
+    startServer() {
+    console.log(`[${this.htmlID}]: Starting server`);
+    this.status = statuses.STARTING;
+
+    this.currProcess = exec(
+    this.path,
+    [this.startArgs]
+    );
+
+    // Check for process exit
+    this.exitCheck(this);
+
+    }
+
+    stopServer() {
+        console.log(`[${this.htmlID}]: Stopping server`);
+        if (this.currProcess){
+            // This does not kill the server process, just the one starting the server
+            this.currProcess.kill();
+        }
+        
+        this.killServer();
+    }
+
+    killServer(){
+        // Search for the process
+        exec('tasklist | find "ts3server.exe"', (error, stdout, stderr) => {
+            if (error){
+                console.error(`[${this.htmlID}]: ${error}`);
+            }
+            if (stderr) {
+                console.log(`[${this.htmlID}]: ${stderr}`);
+            }
+            if (stdout !== "") {
+                // Get cmd output
+                let tasklistRes = stdout + '';
+
+                // Replace multiple spaces with single spaces
+                tasklistRes = tasklistRes.replace( /\s\s+/g, ' ');
+                
+                // Split by space and call killTask function
+                CustomUtils.killTask(this.htmlID, tasklistRes.split(' ')[1]);
+            }
+            else {
+                console.log(`[${this.htmlID}]: No server process found`);
+            }
+        })
+    }
+}
+
 module.exports = {
     ArmaServer,
     GenericServer,
     MinecraftServer,
+    TeamspeakServer,
     statuses,
     types
 }

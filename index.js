@@ -1,6 +1,6 @@
 const express = require('express');
 const socketIO = require('socket.io');
-const {statuses, types, ArmaServer, MinecraftServer, GenericServer} = require("./CustomServers");
+const {statuses, types, ArmaServer, MinecraftServer, GenericServer, TeamspeakServer} = require("./CustomServers");
 
 // Import information required to start a server
 const serversInfo = require('./servers_info.json')
@@ -83,7 +83,8 @@ io.on('connection', client => {
         const server = getServerByHtmlID(serverID);
 
         if (server.status === statuses.ONLINE ||
-            (server.status === statuses.STARTING && server.type === types.ARMA)
+            (server.status === statuses.STARTING && 
+                (server.type === types.ARMA || server.type === types.TSSERVER))
         ) {
             server.stopServer();
         }
@@ -113,6 +114,9 @@ const servers = [
     // Arma Servers
     new ArmaServer(
         serversInfo.arma.test
+    ),
+    new TeamspeakServer(
+        serversInfo.tsserver.test
     )
 ]
 
