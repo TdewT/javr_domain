@@ -14,6 +14,11 @@ function killTask(name, PID) {
     }
 }
 
+function removeDuplicateSpace(string){
+    return string.replace( /\s\s+/g, ' ');
+}
+
 module.exports = {
-    killTask
+    killTask,
+    removeDuplicateSpace
 };

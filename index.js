@@ -109,15 +109,15 @@ const servers = [
         serversInfo.minecraft.planetary
     ),
     new MinecraftServer(
+        serversInfo.minecraft["forge-test"]
+    ),
+    new MinecraftServer(
         serversInfo.minecraft.test
     ),
     // Arma Servers
     new ArmaServer(
         serversInfo.arma.test
     ),
-    new TeamspeakServer(
-        serversInfo.tsserver.test
-    )
 ];
 
 // Sending servers statuses

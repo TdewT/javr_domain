@@ -1,5 +1,7 @@
 const { exec, execFile, spawn } = require('child_process');
 const CustomUtils = require('./CustomUtils');
+const minecraft_java_ver = require('./minecraft_java_ver');
+const e = require("express");
 const statuses = {
     "ONLINE": "online", "STARTING": "starting", "BUSY": "busy", "OFFLINE": "offline",
 };
@@ -87,7 +89,8 @@ class MinecraftServer extends GenericServer {
                     currProcess = null,
                     currPlayers = [],
                     maxPlayers = 0,
-                    startArgs = ["-jar", "minecraft_server.1.12.2.jar", "nogui"]
+                    startArgs = ["-jar", "minecraft_server.1.12.2.jar", "nogui"],
+                    minecraftVersion
                 }) {
         super({port, htmlID, displayName, path, status});
 
@@ -96,6 +99,7 @@ class MinecraftServer extends GenericServer {
         this.currPlayers = currPlayers;
         this.maxPlayers = maxPlayers;
         this.startArgs = startArgs;
+        this.minecraftVersion = minecraftVersion;
     }
 
     // Check if port is busy, update server status
@@ -121,11 +125,23 @@ class MinecraftServer extends GenericServer {
         console.log(`[${this.htmlID}]: Starting server`);
         this.status = statuses.STARTING;
 
-        this.currProcess = spawn(
-            "java",
-            this.startArgs,
-            {cwd: this.path}
-        );
+        // Check if minecraft version has java attached
+        if (!minecraft_java_ver[this.minecraftVersion]){
+            // If the version is not listed use default
+            this.currProcess = spawn(
+                "java",
+                this.startArgs,
+                {cwd: this.path}
+            );
+        }
+        else{
+            // If the version is listed use specified java version
+            this.currProcess = spawn(
+                minecraft_java_ver[this.minecraftVersion],
+                this.startArgs,
+                {cwd: this.path}
+            );
+        }
 
         // Check for process exit
         this.exitCheck(this);
@@ -142,12 +158,28 @@ class MinecraftServer extends GenericServer {
 
             // Get maxPlayers when server starts
             if (firstCheck && output.includes("players online")) {
+                let playerNumbers;
+
                 // Remove unnecessary information
                 const pureMsg = output.split(':')[3];
-                // Split current and max player
-                const playerNumbers = pureMsg.split('/');
-                // Filter out whatever is not a number
-                this.maxPlayers = this.extractNums(playerNumbers[1]);
+
+                // Check which version of message is given
+                if (!output.includes("max")) {
+                    // Split current and max player
+                    playerNumbers = pureMsg.split('/');
+                    // Filter out whatever is not a number
+                    playerNumbers = this.extractNums(playerNumbers[1]);
+                }
+                else{
+                    // Remove duplicate spaces and split by remaining spaces
+                    playerNumbers = CustomUtils.removeDuplicateSpace(pureMsg).split(' ');
+                    // Filter out anything that's not a number (leaves only current [0] and max [1] players)
+                    playerNumbers = playerNumbers.filter(el=> !isNaN(el))[2];
+                }
+
+                // Assign resulting int to object
+                this.maxPlayers = playerNumbers;
+
                 // Set flag so this only runs once
                 firstCheck = false;
 
@@ -177,7 +209,7 @@ class MinecraftServer extends GenericServer {
 
     sendCommand(command) {
         if (this.currProcess !== null) {
-            this.currProcess.stdin.write(command + " \n");
+            this.currProcess.stdin.write(command + "\n");
         }
         else {
             console.log("Command failed: server process is null");
@@ -289,7 +321,7 @@ class TeamspeakServer extends GenericServer{
                 let tasklistRes = stdout + '';
 
                 // Replace multiple spaces with single spaces
-                tasklistRes = tasklistRes.replace( /\s\s+/g, ' ');
+                tasklistRes = CustomUtils.removeDuplicateSpace(tasklistRes);
                 
                 // Split by space and call killTask function
                 CustomUtils.killTask(this.htmlID, tasklistRes.split(' ')[1]);

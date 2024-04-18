@@ -4,7 +4,7 @@ const statusIndicators = {
 
 
 function getStatusText(server) {
-    if (server.type === "minecraft" && server.currPlayers) {
+    if (server.type === "minecraft" && server.currPlayers && server.maxPlayers > 0) {
         if (server.status === 'online') return server.currPlayers.length + '/' + server.maxPlayers;
     }
     if (server.status === 'online') return 'Online';
