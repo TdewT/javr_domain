@@ -1,7 +1,6 @@
 const { exec, execFile, spawn } = require('child_process');
 const CustomUtils = require('./CustomUtils');
 const minecraft_java_ver = require('./minecraft_java_ver');
-const e = require("express");
 const statuses = {
     "ONLINE": "online", "STARTING": "starting", "BUSY": "busy", "OFFLINE": "offline",
 };
