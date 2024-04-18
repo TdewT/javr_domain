@@ -68,7 +68,7 @@
       "port": 2302,
       "htmlID": "ID name for front-end and logs",
       "displayName": "Name displayed to clients from browser",
-      "path": "windows path to folder",
+      "path": "windows path to server's executable",
       "startArgs": [
         "arguments (for now in one string)"
       ]
