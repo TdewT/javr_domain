@@ -7,11 +7,10 @@ socket.on('connect', () => {
 
 socket.on('zt_response', data => {
   const ZtList = $('#ZT-list');
-
-    data = data.sort(function(a,b){
-      return a.name - b.name;
-    });
     
+    data = data.sort(compareByName);
+    
+
     data.forEach(member => {
       let element = document.createElement('li')
       element.className = "list-group-item d-flex"
@@ -24,3 +23,13 @@ socket.on('zt_response', data => {
     })
 })
 
+//TODO: Sort By desc
+function compareByName( a, b ) {
+  if ( a.name < b.name ){
+    return -1;
+  }
+  if ( a.name > b.name ){
+    return 1;
+  }
+  return 0;
+}
