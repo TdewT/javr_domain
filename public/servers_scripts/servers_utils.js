@@ -84,6 +84,5 @@ function getDisplayedPlayers(server) {
             displayedPlayers.push(child.innerText);
         }
     }
-    console.log(displayedPlayers);
     return displayedPlayers;
 }
