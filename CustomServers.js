@@ -292,7 +292,7 @@ class TeamspeakServer extends GenericServer {
         // Search for the process
         exec('tasklist | find "ts3server.exe"', (error, stdout, stderr) => {
             if (error) {
-                console.error(`[${this.htmlID}]: ${error}`);
+                customLog(this.htmlID, `${error}`);
             }
             if (stderr) {
                 customLog(this.htmlID, `${stderr}`);

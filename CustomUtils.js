@@ -6,10 +6,10 @@ function killTask(name, PID) {
     if (PID) {
         exec(`taskkill /pid ${PID}`, (error, stdout, stderr) => {
             if (error) {
-                console.error(`[${name}]: ${error}`);
+                customLog(name, `${error}`);
             }
             if (stderr) {
-                console.log(`[${name}]: ${stderr}`);
+                customLog(name, `${stderr}`);
             }
         })
     }
