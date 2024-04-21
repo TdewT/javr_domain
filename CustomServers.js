@@ -100,6 +100,7 @@ class MinecraftServer extends GenericServer {
         this.maxPlayers = maxPlayers;
         this.startArgs = startArgs;
         this.minecraftVersion = minecraftVersion;
+        this.failedQuery = 0;
     }
 
     // Run check periodically to see if the server is still up
@@ -183,6 +184,7 @@ class MinecraftServer extends GenericServer {
         MinecraftStatus.MinecraftQuery.fullQuery("localhost", this.port, 500)
             // If query successful
             .then(response => {
+                this.failedQuery = 0;
                 if (this.status !== statuses.STOPPING) {
                     // Set server status to online
                     this.status = statuses.ONLINE;
@@ -193,9 +195,12 @@ class MinecraftServer extends GenericServer {
             })
             // If query failed
             .catch(() => {
-                // If server is not starting then it means it's offline
-                if (this.status !== statuses.STARTING)
-                    this.status = statuses.OFFLINE;
+                // If after going online server fails to answer query 10 times assume it's offline
+                if (this.status !== statuses.STARTING) {
+                    this.failedQuery += 1;
+                    if (this.failedQuery > 10)
+                        this.status = statuses.OFFLINE;
+                }
             })
     }
 
