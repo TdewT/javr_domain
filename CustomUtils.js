@@ -1,10 +1,10 @@
-const { exec } = require('child_process');
+const {exec} = require('child_process');
 
 function killTask(name, PID) {
     console.log(PID);
-    if (PID){
+    if (PID) {
         exec(`taskkill /pid ${PID}`, (error, stdout, stderr) => {
-            if (error){
+            if (error) {
                 console.error(`[${name}]: ${error}`);
             }
             if (stderr) {
@@ -14,11 +14,12 @@ function killTask(name, PID) {
     }
 }
 
-function removeDuplicateSpace(string){
-    return string.replace( /\s\s+/g, ' ');
+function removeDuplicateSpace(string) {
+    return string.replace(/\s\s+/g, ' ');
 }
 
 module.exports = {
     killTask,
-    removeDuplicateSpace
+    removeDuplicateSpace,
+    extractNums
 };

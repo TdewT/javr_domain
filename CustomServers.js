@@ -1,6 +1,7 @@
-const { exec, execFile, spawn } = require('child_process');
+const {exec, execFile, spawn} = require('child_process');
 const CustomUtils = require('./CustomUtils');
 const minecraft_java_ver = require('./minecraft_java_ver');
+const MinecraftStatus = require("minecraft-status");
 const statuses = {
     "ONLINE": "online", "STARTING": "starting", "BUSY": "busy", "OFFLINE": "offline",
 };
@@ -49,7 +50,6 @@ class GenericServer {
     }
 
     // Run check periodically to see if the server is still up
-    // TODO: Make it work with local variable instead
     lastStatus = statuses.OFFLINE;
 
     statusMonitor(emitFunc, socket, event, servers) {
@@ -101,23 +101,28 @@ class MinecraftServer extends GenericServer {
         this.minecraftVersion = minecraftVersion;
     }
 
+    // Run check periodically to see if the server is still up
+    lastStatus = statuses.OFFLINE;
+    lastPlayers = this.currPlayers;
+
+    statusMonitor(emitFunc, socket, event, servers) {
+        setInterval(() => {
+            if (this.lastStatus !== this.status) {
+                console.log(`[${this.htmlID}]: Status changed to "${this.status}"`);
+                emitFunc(socket, event, servers);
+            }
+            if (this.currPlayers !== this.lastPlayers){
+                emitFunc(socket, event, servers)
+            }
+            this.lastPlayers = this.currPlayers;
+            this.lastStatus = this.status;
+            this.updateStatus()
+        }, 500);
+    }
+
     // Check if port is busy, update server status
     updateStatus() {
-        exec(`netstat -an | find "${this.port}"`, (error, stdout, stderr) => {
-            if (stderr) {
-                console.log(stderr)
-            }
-            if (stdout !== "") {
-                if (stdout.includes("LISTENING"))
-                    this.status = statuses.ONLINE;
-                else if (this.status !== statuses.STARTING)
-                    this.status = statuses.OFFLINE;
-            }
-            else {
-                if (this.status !== statuses.STARTING)
-                    this.status = statuses.OFFLINE;
-            }
-        })
+        this.updateServerInfo()
     }
 
     startServer(emitFunc, socket, servers) {
@@ -125,7 +130,7 @@ class MinecraftServer extends GenericServer {
         this.status = statuses.STARTING;
 
         // Check if minecraft version has java attached
-        if (!minecraft_java_ver[this.minecraftVersion]){
+        if (!minecraft_java_ver[this.minecraftVersion]) {
             // If the version is not listed use default
             this.currProcess = spawn(
                 "java",
@@ -133,7 +138,7 @@ class MinecraftServer extends GenericServer {
                 {cwd: this.path}
             );
         }
-        else{
+        else {
             // If the version is listed use specified java version
             this.currProcess = spawn(
                 minecraft_java_ver[this.minecraftVersion],
@@ -145,65 +150,50 @@ class MinecraftServer extends GenericServer {
         // Check for process exit
         this.exitCheck(this);
 
-        // Check player count after servers starts
-        let firstCheck = true;
-        // Send list command to get player count when first launched (required to get maxPlayers)
-        this.sendCommand('list');
-
-        // Server output stream
         this.currProcess.stdout.on('data', (data) => {
             // Convert output to string
             let output = data + '';
 
-            // Get maxPlayers when server starts
-            if (firstCheck && output.includes("players online")) {
-                let playerNumbers;
-
-                // Remove unnecessary information
-                const pureMsg = output.split(':')[3];
-
-                // Check which version of message is given
-                if (!output.includes("max")) {
-                    // Split current and max player
-                    playerNumbers = pureMsg.split('/');
-                    // Filter out whatever is not a number
-                    playerNumbers = this.extractNums(playerNumbers[1]);
-                }
-                else{
-                    // Remove duplicate spaces and split by remaining spaces
-                    playerNumbers = CustomUtils.removeDuplicateSpace(pureMsg).split(' ');
-                    // Filter out anything that's not a number (leaves only current [0] and max [1] players)
-                    playerNumbers = playerNumbers.filter(el=> !isNaN(el))[2];
-                }
-
-                // Assign resulting int to object
-                this.maxPlayers = playerNumbers;
-
-                // Set flag so this only runs once
-                firstCheck = false;
+            // Get maxPlayers when server starts (regex to see when server is done launching)
+            if (/INFO]: Done \(.*\)! for help, type "help" or "\?"/.test(output)) {
+                this.updateServerInfo();
 
                 // Send updated servers to client
                 emitFunc(socket, "status_response", servers);
             }
 
-            // Add player to current players
+            // Player join event
             if (output.includes("joined the game")) {
-                this.currPlayers.push(this.getPlayerName(output));
-
-                // Send updated servers to client
-                emitFunc(socket, "status_response", servers);
+                // Update server with new info
+                this.updateServerInfo();
             }
-            // Remove player from current players
+            // Player left event
             if (output.includes("left the game")) {
-                const index = this.currPlayers.indexOf(this.getPlayerName(output));
-                this.currPlayers.splice(index, this.currPlayers.length);
-
-                // Send updated servers to client
-                emitFunc(socket, "status_response", servers);
+                // Update server with new info
+                this.updateServerInfo();
             }
         })
 
 
+    }
+
+    updateServerInfo() {
+        // Query server for info
+        MinecraftStatus.MinecraftQuery.fullQuery("localhost", this.port, 500)
+            // If query successful
+            .then(response => {
+                // Set server status to online
+                this.status = statuses.ONLINE;
+                // Update values
+                this.currPlayers = response.players.sample;
+                this.maxPlayers = response.players.max;
+            })
+            // If query failed
+            .catch(() => {
+                // If server is not starting then it means it's offline
+                if (this.status !== statuses.STARTING)
+                    this.status = statuses.OFFLINE;
+            })
     }
 
     sendCommand(command) {
@@ -220,21 +210,9 @@ class MinecraftServer extends GenericServer {
         this.sendCommand('stop');
     }
 
-    extractNums(str) {
-        let res = '';
-        for (const char of str) {
-            if (char >= '0' && char <= '9') {
-                res += char;
-            }
-        }
-        return Number(res)
-    }
-
-    getPlayerName(outputStr) {
-        // Remove unnecessary information
-        const filtered = outputStr.split(':')[3];
-        // Return player's name
-        return filtered.split(' ')[1];
+    versionToNumber(){
+        let versionInt = this.minecraftVersion.replace(/\./, '');
+        return Number(versionInt)
     }
 }
 
@@ -270,46 +248,46 @@ class ArmaServer extends GenericServer {
     }
 }
 
-class TeamspeakServer extends GenericServer{
+class TeamspeakServer extends GenericServer {
     constructor({
-        port, htmlID, displayName, path = '', status = statuses.OFFLINE,
-        startArgs, currProcess = null,
-    }) {
-    super({port, htmlID, displayName, path, status});
+                    port, htmlID, displayName, path = '', status = statuses.OFFLINE,
+                    startArgs, currProcess = null,
+                }) {
+        super({port, htmlID, displayName, path, status});
 
-    this.type = types.TSSERVER;
-    this.startArgs = startArgs;
-    this.currProcess = currProcess;
+        this.type = types.TSSERVER;
+        this.startArgs = startArgs;
+        this.currProcess = currProcess;
     }
 
     startServer() {
-    console.log(`[${this.htmlID}]: Starting server`);
-    this.status = statuses.STARTING;
+        console.log(`[${this.htmlID}]: Starting server`);
+        this.status = statuses.STARTING;
 
-    this.currProcess = exec(
-    this.path,
-    [this.startArgs]
-    );
+        this.currProcess = exec(
+            this.path,
+            [this.startArgs]
+        );
 
-    // Check for process exit
-    this.exitCheck(this);
+        // Check for process exit
+        this.exitCheck(this);
 
     }
 
     stopServer() {
         console.log(`[${this.htmlID}]: Stopping server`);
-        if (this.currProcess){
+        if (this.currProcess) {
             // This does not kill the server process, just the one starting the server
             this.currProcess.kill();
         }
-        
+
         this.killServer();
     }
 
-    killServer(){
+    killServer() {
         // Search for the process
         exec('tasklist | find "ts3server.exe"', (error, stdout, stderr) => {
-            if (error){
+            if (error) {
                 console.error(`[${this.htmlID}]: ${error}`);
             }
             if (stderr) {
@@ -321,7 +299,7 @@ class TeamspeakServer extends GenericServer{
 
                 // Replace multiple spaces with single spaces
                 tasklistRes = CustomUtils.removeDuplicateSpace(tasklistRes);
-                
+
                 // Split by space and call killTask function
                 CustomUtils.killTask(this.htmlID, tasklistRes.split(' ')[1]);
             }
