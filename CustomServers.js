@@ -34,7 +34,7 @@ class GenericServer {
     updateStatus() {
         exec(`netstat -an | find "${this.port}"`, (error, stdout, stderr) => {
             if (stderr) {
-                console.log(`[${this.htmlID}] netstat failed: ${stderr}`)
+                customLog(this.htmlID, `netstat failed: ${stderr}`)
             }
             if (stdout !== "") {
                 if (!stdout.includes("WAIT"))
@@ -67,13 +67,13 @@ class GenericServer {
     // For servers with executable linked
     exitCheck(server) {
         server.currProcess.on('error', (error) => {
-            console.error(error);
+            customLog(server.htmlID, error);
             server.status = statuses.OFFLINE;
 
         });
 
-        server.currProcess.stderr.on('data', (data) => {
-            console.error(`[${this.htmlID}] [stderr]: ` + data)
+        server.currProcess.stderr.on('data', (err) => {
+            customLog(server.htmlID, err)
         });
 
         server.currProcess.on('exit', () => {
@@ -202,7 +202,7 @@ class MinecraftServer extends GenericServer {
             this.currProcess.stdin.write(command + "\n");
         }
         else {
-            console.log("Command failed: server process is null");
+            customLog(this.htmlID, `"${command}" command failed, server process is null`);
         }
     }
 
