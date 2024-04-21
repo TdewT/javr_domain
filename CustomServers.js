@@ -61,7 +61,7 @@ class GenericServer {
             }
             this.lastStatus = this.status;
             this.updateStatus()
-        }, 500);
+        }, 1000);
     }
 
     // For servers with executable linked
@@ -119,7 +119,7 @@ class MinecraftServer extends GenericServer {
             this.lastPlayers = this.currPlayers;
             this.lastStatus = this.status;
             this.updateStatus()
-        }, 500);
+        }, 1000);
     }
 
     // Check if port is busy, update server status
