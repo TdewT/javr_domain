@@ -1,5 +1,5 @@
 const statusIndicators = {
-    "online": "🟢", "starting": "🟡", "busy": "🟡", "offline": "🔴",
+    "online": "🟢", "starting": "🟡", "busy": "🟡", "stopping": "🟡", "offline": "🔴",
 };
 
 
@@ -10,6 +10,7 @@ function getStatusText(server) {
     if (server.status === 'online') return 'Online';
     if (server.status === 'starting') return "Starting...";
     if (server.status === 'busy') return "Port is busy";
+    if (server.status === 'stopping') return 'Stopping...';
     if (server.status === 'offline') return 'Offline';
     return 'Starting...'
 }
@@ -83,6 +84,5 @@ function getDisplayedPlayers(server) {
             displayedPlayers.push(child.innerText);
         }
     }
-    console.log(displayedPlayers);
     return displayedPlayers;
 }

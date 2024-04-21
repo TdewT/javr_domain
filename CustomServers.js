@@ -4,7 +4,7 @@ const minecraft_java_ver = require('../JAVR_configs/minecraft_java_ver');
 const MinecraftStatus = require("minecraft-status");
 const {customLog} = require("./CustomUtils");
 const statuses = {
-    "ONLINE": "online", "STARTING": "starting", "BUSY": "busy", "OFFLINE": "offline",
+    "ONLINE": "online", "STARTING": "starting", "BUSY": "busy", "STOPPING": "stopping", "OFFLINE": "offline",
 };
 const types = {
     "GENERIC": "generic",
@@ -61,7 +61,7 @@ class GenericServer {
             }
             this.lastStatus = this.status;
             this.updateStatus()
-        }, 500);
+        }, 1000);
     }
 
     // For servers with executable linked
@@ -100,6 +100,7 @@ class MinecraftServer extends GenericServer {
         this.maxPlayers = maxPlayers;
         this.startArgs = startArgs;
         this.minecraftVersion = minecraftVersion;
+        this.failedQuery = 0;
     }
 
     // Run check periodically to see if the server is still up
@@ -112,13 +113,13 @@ class MinecraftServer extends GenericServer {
                 customLog(this.htmlID, `Status changed to "${this.status}"`);
                 emitFunc(socket, event, servers);
             }
-            if (this.currPlayers !== this.lastPlayers){
+            if (this.currPlayers !== this.lastPlayers) {
                 emitFunc(socket, event, servers)
             }
             this.lastPlayers = this.currPlayers;
             this.lastStatus = this.status;
             this.updateStatus()
-        }, 500);
+        }, 1000);
     }
 
     // Check if port is busy, update server status
@@ -183,17 +184,23 @@ class MinecraftServer extends GenericServer {
         MinecraftStatus.MinecraftQuery.fullQuery("localhost", this.port, 500)
             // If query successful
             .then(response => {
-                // Set server status to online
-                this.status = statuses.ONLINE;
-                // Update values
-                this.currPlayers = response.players.sample;
-                this.maxPlayers = response.players.max;
+                this.failedQuery = 0;
+                if (this.status !== statuses.STOPPING) {
+                    // Set server status to online
+                    this.status = statuses.ONLINE;
+                    // Update values
+                    this.currPlayers = response.players.sample;
+                    this.maxPlayers = response.players.max;
+                }
             })
             // If query failed
             .catch(() => {
-                // If server is not starting then it means it's offline
-                if (this.status !== statuses.STARTING)
-                    this.status = statuses.OFFLINE;
+                // If after going online server fails to answer query 10 times assume it's offline
+                if (this.status !== statuses.STARTING) {
+                    this.failedQuery += 1;
+                    if (this.failedQuery > 10)
+                        this.status = statuses.OFFLINE;
+                }
             })
     }
 
@@ -208,13 +215,14 @@ class MinecraftServer extends GenericServer {
 
     stopServer() {
         customLog(this.htmlID, `Stopping server`);
+        this.status = statuses.STOPPING;
         this.sendCommand('stop');
     }
 
     // If you need to compare versions e.g. currVersion > targetVersion
     // Useful for instance, for determining java version that server should run on
     // Currently not in use
-    versionToNumber(){
+    versionToNumber() {
         let versionInt = this.minecraftVersion.replace(/\./, '');
         return Number(versionInt)
     }
@@ -248,6 +256,7 @@ class ArmaServer extends GenericServer {
 
     stopServer() {
         customLog(this.htmlID, `Stopping server`);
+        this.status = statuses.STOPPING;
         this.currProcess.kill();
     }
 }
@@ -278,6 +287,7 @@ class TeamspeakServer extends GenericServer {
 
     stopServer() {
         customLog(this.htmlID, `Stopping server`);
+        this.status = statuses.STOPPING;
         if (this.currProcess) {
             // This does not kill the server process, just the one starting the server
             this.currProcess.kill();
