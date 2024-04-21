@@ -83,7 +83,7 @@
       ]
     }
   },
-  "teamspeak": {
+  "tsserver": {
     "serverName (purely for reference in object initialisation)": {
       "port": 9987,
       "htmlID": "ID name for front-end and logs",
@@ -93,14 +93,12 @@
         "should be empty unless you really know what you're doing"
       ]
     },
-    "teamspeak": {
-      "main": {
-        "port": 9987,
-        "htmlID": "teamspeak-main",
-        "displayName": "Teamspeak 3 Server",
-        "path": "D:\\serwery\\teamspeak3-server_win64\\ts3server.lnk",
-        "startArgs": []
-      }
+    "main": {
+      "port": 9987,
+      "htmlID": "teamspeak-main",
+      "displayName": "Teamspeak 3 Server",
+      "path": "D:\\serwery\\teamspeak3-server_win64\\ts3server.lnk",
+      "startArgs": []
     }
   }
 }
