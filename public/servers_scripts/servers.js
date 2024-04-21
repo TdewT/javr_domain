@@ -18,7 +18,6 @@ socket.on('status_response', servers => {
             printServer(server);
         }
         else {
-            console.log("updating");
             updateServer(server);
         }
     }
