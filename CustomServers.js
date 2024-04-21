@@ -32,7 +32,7 @@ class GenericServer {
 
     // Check if port is being used
     updateStatus() {
-        exec(`netstat -an | find "${this.port}"`, (error, stdout, stderr) => {
+        exec(`netstat -an | find ":${this.port} "`, (error, stdout, stderr) => {
             if (stderr) {
                 customLog(this.htmlID, `netstat failed: ${stderr}`)
             }
@@ -255,12 +255,11 @@ class ArmaServer extends GenericServer {
 class TeamspeakServer extends GenericServer {
     constructor({
                     port, htmlID, displayName, path = '', status = statuses.OFFLINE,
-                    startArgs, currProcess = null,
+                    currProcess = null,
                 }) {
         super({port, htmlID, displayName, path, status});
 
         this.type = types.TSSERVER;
-        this.startArgs = startArgs;
         this.currProcess = currProcess;
     }
 
@@ -268,9 +267,8 @@ class TeamspeakServer extends GenericServer {
         customLog(this.htmlID, `Starting server`);
         this.status = statuses.STARTING;
 
-        this.currProcess = execFile(
+        this.currProcess = exec(
             this.path,
-            [this.startArgs]
         );
 
         // Check for process exit

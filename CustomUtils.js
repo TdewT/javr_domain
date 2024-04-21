@@ -3,7 +3,7 @@ const fs = require("node:fs");
 let logStream;
 
 function killTask(name, PID) {
-    if (PID){
+    if (PID) {
         exec(`taskkill /pid ${PID}`, (error, stdout, stderr) => {
             if (error) {
                 customLog(name, `${error}`);
@@ -44,12 +44,12 @@ function extractNums(data) {
         }
         return res
     }
-    else{
+    else {
         throw new Error('Function "extractNums()" only takes string or object type arguments');
     }
 }
 
-function customLog(name, str){
+function customLog(name, str) {
 
     // Get and format date and time now
     let time = new Date().toLocaleString();
@@ -58,13 +58,30 @@ function customLog(name, str){
     time = time.replaceAll(",", " |");
 
 
-
     // Final log text
     const logTxt = `[${time}] [${name}]: ${str}`;
 
+    // Create directory if it doesn't exist
+    createLogsDir();
+
     // Write to log file and console
-    logStream.write(logTxt+'\n');
+    logStream.write(logTxt + '\n');
     console.log(logTxt);
+}
+
+function createLogsDir() {
+    const folderPath = "./logs";
+
+
+    // Check if the directory exists, if not, create it
+    if (!fs.existsSync(folderPath)) {
+        try {
+            fs.mkdirSync(folderPath, {recursive: true});
+        }
+        catch (err) {
+            console.error('Error in creating logs directory!', err);
+        }
+    }
 }
 
 function createLogStream() {
@@ -72,13 +89,13 @@ function createLogStream() {
 
     // Assign filename based on time
     time = time.replaceAll("/", "-");
-    time = time.replaceAll(",", " -");
+    time = time.replaceAll(",", " _");
     time = time.replaceAll(" ", "");
     let logFileName = time.replaceAll(":", "-");
 
     // Assign file path
     const filePath = `./logs/${logFileName}.txt`;
-    logStream = fs.createWriteStream(filePath, { flags: 'a' });
+    logStream = fs.createWriteStream(filePath, {flags: 'a'});
 }
 
 module.exports = {

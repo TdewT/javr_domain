@@ -88,17 +88,13 @@
       "port": 9987,
       "htmlID": "ID name for front-end and logs",
       "displayName": "Name displayed to clients from browser",
-      "path": "windows path to shortcut to server's executable server.lnk (it can't be direct path to .exe)",
-      "startArgs": [
-        "should be empty unless you really know what you're doing"
-      ]
+      "path": "windows path to shortcut to server's executable server.lnk (it can't be direct path to .exe)"
     },
     "main": {
       "port": 9987,
       "htmlID": "teamspeak-main",
       "displayName": "Teamspeak 3 Server",
-      "path": "D:\\serwery\\teamspeak3-server_win64\\ts3server.lnk",
-      "startArgs": []
+      "path": "D:\\serwery\\teamspeak3-server_win64\\ts3server.lnk"
     }
   }
 }
