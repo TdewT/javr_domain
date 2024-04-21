@@ -1,7 +1,8 @@
 const {exec} = require('child_process');
+const fs = require("node:fs");
+let logStream;
 
 function killTask(name, PID) {
-    console.log(PID);
     if (PID) {
         exec(`taskkill /pid ${PID}`, (error, stdout, stderr) => {
             if (error) {
@@ -48,8 +49,42 @@ function extractNums(data) {
     }
 }
 
+function customLog(name, str){
+
+    // Get and format date and time now
+    let time = new Date().toLocaleString();
+    // Reformat date
+    time = time.replaceAll("/", "-");
+    time = time.replaceAll(",", " |");
+
+
+
+    // Final log text
+    const logTxt = `[${time}] [${name}]: ${str}`;
+
+    // Write to log file and console
+    logStream.write(logTxt+'\n');
+    console.log(logTxt);
+}
+
+function createLogStream() {
+    let time = new Date().toLocaleString();
+
+    // Assign filename based on time
+    time = time.replaceAll("/", "-");
+    time = time.replaceAll(",", " -");
+    time = time.replaceAll(" ", "");
+    let logFileName = time.replaceAll(":", "-");
+
+    // Assign file path
+    const filePath = `./logs/${logFileName}.txt`;
+    logStream = fs.createWriteStream(filePath, { flags: 'a' });
+}
+
 module.exports = {
     killTask,
     removeDuplicateSpace,
-    extractNums
+    extractNums,
+    customLog,
+    createLogStream
 };

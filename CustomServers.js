@@ -1,7 +1,8 @@
 const {exec, execFile, spawn} = require('child_process');
 const CustomUtils = require('./CustomUtils');
-const minecraft_java_ver = require('./minecraft_java_ver');
+const minecraft_java_ver = require('../JAVR_configs/minecraft_java_ver');
 const MinecraftStatus = require("minecraft-status");
+const {customLog} = require("./CustomUtils");
 const statuses = {
     "ONLINE": "online", "STARTING": "starting", "BUSY": "busy", "OFFLINE": "offline",
 };
@@ -55,7 +56,7 @@ class GenericServer {
     statusMonitor(emitFunc, socket, event, servers) {
         setInterval(() => {
             if (this.lastStatus !== this.status) {
-                console.log(`[${this.htmlID}]: Status changed to "${this.status}"`);
+                customLog(this.htmlID, `Status changed to "${this.status}"`);
                 emitFunc(socket, event, servers);
             }
             this.lastStatus = this.status;
@@ -76,7 +77,7 @@ class GenericServer {
         });
 
         server.currProcess.on('exit', () => {
-            console.log(`[${server.htmlID}]: Server process ended`);
+            customLog(server.htmlID, `Server process ended`);
             server.status = statuses.OFFLINE;
         })
     }
@@ -108,7 +109,7 @@ class MinecraftServer extends GenericServer {
     statusMonitor(emitFunc, socket, event, servers) {
         setInterval(() => {
             if (this.lastStatus !== this.status) {
-                console.log(`[${this.htmlID}]: Status changed to "${this.status}"`);
+                customLog(this.htmlID, `Status changed to "${this.status}"`);
                 emitFunc(socket, event, servers);
             }
             if (this.currPlayers !== this.lastPlayers){
@@ -126,7 +127,7 @@ class MinecraftServer extends GenericServer {
     }
 
     startServer(emitFunc, socket, servers) {
-        console.log(`[${this.htmlID}]: Starting server`);
+        customLog(this.htmlID, `Starting server`);
         this.status = statuses.STARTING;
 
         // Check if minecraft version has java attached
@@ -206,10 +207,13 @@ class MinecraftServer extends GenericServer {
     }
 
     stopServer() {
-        console.log(`[${this.htmlID}]: Stopping server`);
+        customLog(this.htmlID, `Stopping server`);
         this.sendCommand('stop');
     }
 
+    // If you need to compare versions e.g. currVersion > targetVersion
+    // Useful for instance, for determining java version that server should run on
+    // Currently not in use
     versionToNumber(){
         let versionInt = this.minecraftVersion.replace(/\./, '');
         return Number(versionInt)
@@ -229,7 +233,7 @@ class ArmaServer extends GenericServer {
     }
 
     startServer() {
-        console.log(`[${this.htmlID}]: Starting server`);
+        customLog(this.htmlID, `Starting server`);
         this.status = statuses.STARTING;
 
         this.currProcess = execFile(
@@ -243,7 +247,7 @@ class ArmaServer extends GenericServer {
     }
 
     stopServer() {
-        console.log(`[${this.htmlID}]: Stopping server`);
+        customLog(this.htmlID, `Stopping server`);
         this.currProcess.kill();
     }
 }
@@ -261,10 +265,10 @@ class TeamspeakServer extends GenericServer {
     }
 
     startServer() {
-        console.log(`[${this.htmlID}]: Starting server`);
+        customLog(this.htmlID, `Starting server`);
         this.status = statuses.STARTING;
 
-        this.currProcess = exec(
+        this.currProcess = execFile(
             this.path,
             [this.startArgs]
         );
@@ -275,7 +279,7 @@ class TeamspeakServer extends GenericServer {
     }
 
     stopServer() {
-        console.log(`[${this.htmlID}]: Stopping server`);
+        customLog(this.htmlID, `Stopping server`);
         if (this.currProcess) {
             // This does not kill the server process, just the one starting the server
             this.currProcess.kill();
@@ -291,7 +295,7 @@ class TeamspeakServer extends GenericServer {
                 console.error(`[${this.htmlID}]: ${error}`);
             }
             if (stderr) {
-                console.log(`[${this.htmlID}]: ${stderr}`);
+                customLog(this.htmlID, `${stderr}`);
             }
             if (stdout !== "") {
                 // Get cmd output
@@ -304,7 +308,7 @@ class TeamspeakServer extends GenericServer {
                 CustomUtils.killTask(this.htmlID, tasklistRes.split(' ')[1]);
             }
             else {
-                console.log(`[${this.htmlID}]: No server process found`);
+                customLog(this.htmlID, `No server process found`);
             }
         })
     }
