@@ -1,4 +1,4 @@
-const socket = io('ws:///')
+const socket = io('ws:///');
 
 const $ = (e) => document.querySelector(e);
 
@@ -6,7 +6,7 @@ let serverListElement;
 
 socket.on('connect', () => {
     socket.emit('status_request');
-})
+});
 
 socket.on('status_response', servers => {
     // Get list element
@@ -18,14 +18,13 @@ socket.on('status_response', servers => {
             printServer(server);
         }
         else {
-            console.log("updating")
             updateServer(server);
         }
     }
 
-})
+});
 
 socket.on('request_failed', err => {
     alert('Nie da się tego uczynić, albowiem: ' + err)
-})
+});
 

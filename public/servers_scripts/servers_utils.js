@@ -1,15 +1,16 @@
 const statusIndicators = {
-    "online": "🟢", "starting": "🟡", "busy": "🟡", "offline": "🔴",
-}
+    "online": "🟢", "starting": "🟡", "busy": "🟡", "stopping": "🟡", "offline": "🔴",
+};
 
 
 function getStatusText(server) {
-    if (server.type === "minecraft" && server.currPlayers) {
+    if (server.type === "minecraft" && server.currPlayers && server.maxPlayers > 0) {
         if (server.status === 'online') return server.currPlayers.length + '/' + server.maxPlayers;
     }
     if (server.status === 'online') return 'Online';
     if (server.status === 'starting') return "Starting...";
     if (server.status === 'busy') return "Port is busy";
+    if (server.status === 'stopping') return 'Stopping...';
     if (server.status === 'offline') return 'Offline';
     return 'Starting...'
 }
@@ -40,13 +41,13 @@ function generatePlayerList(server) {
 
     // Create entry for each player on the server
     setTimeout(() => {
-        const playerList = $(`#${server.htmlID}-player-list`)
+        const playerList = $(`#${server.htmlID}-player-list`);
         if (server.status !== "offline" && server.currPlayers.length > 0) {
             // Get all players displayed on site and on the server
             let allPlayers = server.currPlayers;
             const displayedPlayers = getDisplayedPlayers(server);
             allPlayers = allPlayers.concat(displayedPlayers);
-            allPlayers = [...new Set(allPlayers)]
+            allPlayers = [...new Set(allPlayers)];
 
             for (const player of allPlayers) {
                 if (!isPlayerDisplayed(server, playerList, player)) {
@@ -83,6 +84,5 @@ function getDisplayedPlayers(server) {
             displayedPlayers.push(child.innerText);
         }
     }
-    console.log(displayedPlayers)
     return displayedPlayers;
 }
