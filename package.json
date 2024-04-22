@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "axios": "^1.6.8",
     "express": "^4.19.2",
     "minecraft-status": "^1.1.0",
     "process-exists": "^5.0.0",

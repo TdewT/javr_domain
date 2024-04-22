@@ -9,11 +9,13 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
             integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"
             defer></script>
+    <script src="socket.io.min.js"></script>
+    <script src="zt.js"></script>
 </head>
 <body class="bg-dark bg-gradient min-vh-100">
     <nav class="navbar navbar-expand-sm bg-dark bg-opacity-50">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#"><img src="logo.png" width="80" alt="javr logo"></a>
+            <a class="navbar-brand" href="index.html"><img src="logo.png" width="80" alt="javr logo"></a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                     aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -21,7 +23,7 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="#">Home</a>
+                        <a class="nav-link active" aria-current="page" href="index.html">Home</a>
                 </ul>
                 <ul class="navbar-nav">
                     <li class="nav-item">
@@ -29,20 +31,25 @@
                 </ul>
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="zt.html">ZeroTier</a>
+                        <a class="nav-link active" aria-current="page" href="#">ZeroTier</a>
                 </ul>
             </div>
         </div>
     </nav>
 
     <div class="container-sm status-content mt-5 p-5 rounded-4">
-        <h1>Witam!</h1>
-        <div class="text-center mt-5">
-            <img class="img-fluid" src="https://media1.tenor.com/m/KM3VNP5d1FIAAAAC/miku-hello.gif" alt="waving miku">
-        </div>
-        <div class="text-center mt-5">
-            <h5>Może kiedyś tu coś będzie</h5>
-        </div>
+        <ul id="ZT-list" class="list-group container-sm striped-list border-dark">
+            <li class="list-group-item d-flex border-primary-subtle fw-bold">
+                <span class="ZT-name w-25">Nazwa</span>
+                <span class="ZT-IP me-auto">Komentarz</span>
+                <span class="ZT-IP ms-auto me-2">Adres IP</span>
+            </li>
+            <!-- <li class="list-group-item d-flex">
+                <span class="ZT-name">Nazwa</span>
+                <span class="ZT-IP">Adres IP</span>
+            </li> -->
+
+        </ul>
     </div>
 </body>
 </html>
