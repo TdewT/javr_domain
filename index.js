@@ -4,7 +4,7 @@ const {statuses, types, ArmaServer, MinecraftServer, GenericServer, TeamspeakSer
 const {customLog, createLogStream} = require('./CustomUtils');
 
 // Import information required to start a server
-const serversInfo = require('../JAVR_configs/servers_info.json');
+const serversInfo = require('./configs/servers_info.json');
 
 // Setup express
 const app = express();

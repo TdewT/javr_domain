@@ -237,3 +237,4 @@ fabric.properties
 /ts3server.sqlitedb-shm
 /ts3server.sqlitedb-wal
 /.ts3server_license_accepted
+/configs/*
