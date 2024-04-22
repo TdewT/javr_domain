@@ -13,15 +13,15 @@ const app = express();
 app.use(express.static('public'));
 
 // Assign id-name to server (for logs)
-const serverIDName = 'JAVR_Strona';
+const siteIDName = 'JAVR_Strona';
 
 //Setup Config for ZeroTier
 let config = {
     method: 'GET',
     maxBodyLength: Infinity,
     url: 'https://api.zerotier.com/api/v1/network/0cccb752f7ccba90/member',
-    headers: { 
-      'Authorization': 'Bearer dRBMhds9vGR9Dtqcn21gmm7zFYr24iFR'
+    headers: {
+        'Authorization': 'Bearer dRBMhds9vGR9Dtqcn21gmm7zFYr24iFR'
     }
 };
 
@@ -31,7 +31,7 @@ const server = app.listen(80, () => {
     // Create stream to log file
     createLogStream();
 
-    customLog(serverIDName, `Server started on port ${server.address().port}`);
+    customLog(siteIDName, `Server started on port ${server.address().port}`);
 
     // Start checking ports for every defined server
     for (const server of servers) {
@@ -50,18 +50,20 @@ const getServerByHtmlID = serverID => servers.filter((s) => {
 // When client connects to the server
 io.on('connection', socket => {
 
+    let targetSite = socket.request.headers.referer.split('/');
+    targetSite = targetSite[targetSite.length - 1];
     let ip = socket.handshake.address.split(':');
     ip = ip[ip.length - 1];
 
-    customLog(serverIDName, `Client ${ip} connected`);
+    customLog(siteIDName, `Client ${ip} connected to site: ${targetSite}`);
 
     // Respond to clients data request
     socket.on('status_request', () => {
         // Send back servers statuses
         if (socket) {
-            customLog(serverIDName, `Status request received from ${ip}`);
+            customLog(siteIDName, `Status request received from ${ip}`);
             emitDataGlobal(io, "status_response", servers);
-            customLog(serverIDName, `Status update sent ${ip}`);
+            customLog(siteIDName, `Status update sent ${ip}`);
         }
     });
 
@@ -104,32 +106,21 @@ io.on('connection', socket => {
             io.to(socket.id).emit('request_failed', 'Serwer nie jest włączony')
         }
 
-    })
-    
-    //Handeling ZeroTier Request
-    client.on('zt_request', () =>{
-        console.log("ZeroTier Request Received")
-        let wasRequested = false
-        if(!wasRequested){
+    });
 
-            axios.request(config)
-                .then((response) => {
-                    io.emit("zt_response",response.data)
-                })
-                .catch((error) => {
-                    console.log(error);
-                });
+    //Handling ZeroTier Request
+    socket.on('zt_request', () => {
+        customLog(siteIDName, `${ip} requested ZeroTier information`);
 
-            wasRequested = true;
-        }
-        
+        axios.request(config)
+            .then((response) => {
+                io.emit("zt_response", response.data)
+            })
+            .catch((error) => {
+                customLog(siteIDName, `Error fetching data from ZeroTier: ${error}`);
+            });
+    });
 
-        
-
-        console.log("ZeroTier Response sent")
-    })
-
-    
 });
 
 // Define all servers
