@@ -95,10 +95,7 @@ io.on('connection', socket => {
 
         const server = getServerByHtmlID(serverID);
 
-        if (server.status === statuses.ONLINE ||
-            (server.status === statuses.STARTING &&
-                (server.type === types.ARMA || server.type === types.TSSERVER))
-        ) {
+        if (server.status !== statuses.OFFLINE) {
             server.stopServer();
         }
         else {

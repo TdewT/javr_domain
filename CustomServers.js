@@ -199,8 +199,10 @@ class MinecraftServer extends GenericServer {
                 // If after going online server fails to answer query 10 times assume it's offline
                 if (this.status !== statuses.STARTING) {
                     this.failedQuery += 1;
-                    if (this.failedQuery > 10)
+                    if (this.failedQuery > 10){
                         this.status = statuses.OFFLINE;
+                        this.currPlayers = [];
+                    }
                 }
             })
     }
@@ -216,8 +218,18 @@ class MinecraftServer extends GenericServer {
 
     stopServer() {
         customLog(this.htmlID, `Stopping server`);
-        this.status = statuses.STOPPING;
-        this.sendCommand('stop');
+        if (this.status === statuses.ONLINE) {
+            this.status = statuses.STOPPING;
+            this.sendCommand('stop');
+        }
+        else{
+            customLog(this.htmlID, `Server not online, forcing exit`);
+            if (this.currProcess !== null)
+                this.currProcess.kill();
+            else{
+                customLog(this.htmlID, `Cannot stop, server not attached to this process`);
+            }
+        }
     }
 
     // If you need to compare versions e.g. currVersion > targetVersion
