@@ -37,10 +37,11 @@ class GenericServer {
                 customLog(this.htmlID, `netstat failed: ${stderr}`)
             }
             if (stdout !== "") {
-                if (!stdout.includes("WAIT"))
+                if (stdout.includes("LISTENING") || stdout.includes("*:*"))
                     this.status = statuses.ONLINE;
                 else {
-                    this.status = statuses.OFFLINE;
+                    if (this.status !== statuses.STARTING)
+                        this.status = statuses.OFFLINE;
                 }
             }
             else {
@@ -291,6 +292,10 @@ class TeamspeakServer extends GenericServer {
         if (this.currProcess) {
             // This does not kill the server process, just the one starting the server
             this.currProcess.kill();
+            customLog(this.htmlID, "Attached process killed (Not the same as server process!)")
+        }
+        else{
+            customLog(this.htmlID, "No attached process found (Not the same as server process!), ignoring")
         }
 
         this.killServer();
