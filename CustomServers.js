@@ -221,11 +221,14 @@ class MinecraftServer extends GenericServer {
         if (this.status === statuses.ONLINE) {
             this.status = statuses.STOPPING;
             this.sendCommand('stop');
+            this.currPlayers = [];
         }
         else{
             customLog(this.htmlID, `Server not online, forcing exit`);
-            if (this.currProcess !== null)
+            if (this.currProcess !== null) {
                 this.currProcess.kill();
+                this.currPlayers = [];
+            }
             else{
                 customLog(this.htmlID, `Cannot stop, server not attached to this process`);
             }
