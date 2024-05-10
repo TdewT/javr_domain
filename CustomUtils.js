@@ -98,10 +98,18 @@ function createLogStream() {
     logStream = fs.createWriteStream(filePath, {flags: 'a'});
 }
 
+function sleep(ms) {
+    return new Promise((resolve) => {
+      setTimeout(resolve, ms);
+    });
+  }
+  
+
 module.exports = {
     killTask,
     removeDuplicateSpace,
     extractNums,
     customLog,
-    createLogStream
+    createLogStream,
+    sleep
 };
