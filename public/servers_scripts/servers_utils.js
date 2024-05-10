@@ -1,10 +1,11 @@
 const statusIndicators = {
-    "online": "🟢", "starting": "🟡", "busy": "🟡", "stopping": "🟡", "offline": "🔴",
+    "online": "🟢", "starting": "🟡", "busy": "🟡", "stopping": "🟡", "offline": "🔴", "I have crashed...": "🔴"
 };
 
 
 function getStatusText(server) {
     if (server.type === "minecraft" && server.currPlayers && server.maxPlayers > 0) {
+        if (server.status === 'Stopping...' || server.status === 'Starting...') return startCountTimeout(server)
         if (server.status === 'online') return server.currPlayers.length + '/' + server.maxPlayers;
     }
     if (server.status === 'online') return 'Online';
@@ -12,7 +13,7 @@ function getStatusText(server) {
     if (server.status === 'busy') return "Port is busy";
     if (server.status === 'stopping') return 'Stopping...';
     if (server.status === 'offline') return 'Offline';
-    return 'Starting...'
+    return 'Starting...';
 }
 
 function isPlayerDisplayed(server, playerList, player) {
@@ -85,4 +86,18 @@ function getDisplayedPlayers(server) {
         }
     }
     return displayedPlayers;
+}
+
+function startCountTimeout(server){
+    
+    let timeout = 120;
+
+    for(let t = 0; t>timeout;t++){
+        t++;
+        if(server.status !== 'Stopping...' || server.status !== 'Starting...'){
+            return server.status;
+        }
+    }
+
+    return 'I have crashed...';
 }
