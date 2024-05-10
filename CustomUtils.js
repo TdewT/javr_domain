@@ -98,6 +98,8 @@ function createLogStream() {
     logStream = fs.createWriteStream(filePath, {flags: 'a'});
 }
 
+  
+
 module.exports = {
     killTask,
     removeDuplicateSpace,

@@ -12,7 +12,7 @@ function getStatusText(server) {
     if (server.status === 'busy') return "Port is busy";
     if (server.status === 'stopping') return 'Stopping...';
     if (server.status === 'offline') return 'Offline';
-    return 'Starting...'
+    return 'Starting...';
 }
 
 function isPlayerDisplayed(server, playerList, player) {
