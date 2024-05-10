@@ -98,11 +98,6 @@ function createLogStream() {
     logStream = fs.createWriteStream(filePath, {flags: 'a'});
 }
 
-function sleep(ms) {
-    return new Promise((resolve) => {
-      setTimeout(resolve, ms);
-    });
-  }
   
 
 module.exports = {
@@ -110,6 +105,5 @@ module.exports = {
     removeDuplicateSpace,
     extractNums,
     customLog,
-    createLogStream,
-    sleep
+    createLogStream
 };
