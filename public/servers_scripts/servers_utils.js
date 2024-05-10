@@ -92,7 +92,7 @@ function startCountTimeout(server){
     
     let timeout = 120;
 
-    for(let t = 0; t>timeout;t++){
+    for(let t = 0; t<timeout;t++){
         t++;
         if(server.status !== 'Stopping...' || server.status !== 'Starting...'){
             return server.status;
