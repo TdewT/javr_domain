@@ -16,7 +16,7 @@ socket.on('zt_response', data => {
 
 function generateDataElements(data, listElement) {
   data = data.sort(compareByName);
-
+  let nonAuthorized;
   
 
   data.forEach(member => {
@@ -31,8 +31,36 @@ function generateDataElements(data, listElement) {
 
       listElement.append(element)
     }
+    else{
+      nonAuthorized.append(member)
+    }
+
+
+
+
     
   })
+}
+
+function generateForm(nonAuthorized){
+  const ZtForm = $('#ZT-form');
+  let element = document.createElement('form')
+  element.method = "post"
+  element.action = "https://api.zerotier.com/api/v1/network/0cccb752f7ccba90/member/" + nonAuthorized.config.id;
+
+  element.innerHTML += `<ul>
+                          <li>
+                            <label for="name">Name:</label> <input id="name" type="text" value="name">
+                          </li>
+                          <li>
+                            <label for="description">description:</label> <input id="description" type="text" value="description">
+                          </li>
+                          <li>
+                            <label for="authorize">Authorize</label> <input id="authorize" type="checkbox" value="authorized"> 
+                          </li>
+                          <li>
+                          <input type="submit">
+                          </li>`;
 }
 
 function compareByName( a, b ) {
