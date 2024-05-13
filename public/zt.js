@@ -17,16 +17,21 @@ socket.on('zt_response', data => {
 function generateDataElements(data, listElement) {
   data = data.sort(compareByName);
 
+  
 
   data.forEach(member => {
-    let element = document.createElement('li');
-    element.className = "list-group-item d-flex";
 
-    element.innerHTML += `<span class="w-25" id="${member.config.id}-name">${member.name}</span>`;
-    element.innerHTML += `<span class="me-auto" id="${member.config.id}-desc">${member.description}</span>`;
-    element.innerHTML += `<span class="ms-auto" id="${member.config.id}-ipAssigment">${member.config.ipAssignments[0]}</span>`;
+    if(member.config.authorized == true){
+      let element = document.createElement('li');
+      element.className = "list-group-item d-flex";
 
-    listElement.append(element)
+      element.innerHTML += `<span class="w-25" id="${member.config.id}-name">${member.name}</span>`;
+      element.innerHTML += `<span class="me-auto" id="${member.config.id}-desc">${member.description}</span>`;
+      element.innerHTML += `<span class="ms-auto" id="${member.config.id}-ipAssigment">${member.config.ipAssignments[0]}</span>`;
+
+      listElement.append(element)
+    }
+    
   })
 }
 
