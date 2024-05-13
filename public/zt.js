@@ -7,21 +7,21 @@ socket.on('connect', () => {
 
 socket.on('zt_response', data => {
   const ZtList = $('#ZT-list');
+  const ZtForm = $('#ZT-form');
   // Check if list is already generated
   if (ZtList.children.length === 1){
-    generateDataElements(data, ZtList);
+    generateDataElements(data, ZtList, ZtForm);
   }
 });
 
 
-function generateDataElements(data, listElement) {
+function generateDataElements(data, listElement,formElement) {
   data = data.sort(compareByName);
-  let nonAuthorized;
   
 
   data.forEach(member => {
 
-    if(member.config.authorized == true){
+    if(member.config.authorized === true){
       let element = document.createElement('li');
       element.className = "list-group-item d-flex";
 
@@ -32,21 +32,18 @@ function generateDataElements(data, listElement) {
       listElement.append(element)
     }
     else{
-      nonAuthorized.append(member)
+
+      
     }
-
-
-
-
     
   })
 }
 
-function generateForm(nonAuthorized){
-  const ZtForm = $('#ZT-form');
+function generateForm(unAuthorized, formElement){
+  
   let element = document.createElement('form')
   element.method = "post"
-  element.action = "https://api.zerotier.com/api/v1/network/0cccb752f7ccba90/member/" + nonAuthorized.config.id;
+  element.action = "https://api.zerotier.com/api/v1/network/0cccb752f7ccba90/member/" + unAuthorized.config.id;
 
   element.innerHTML += `<ul>
                           <li>
@@ -61,6 +58,8 @@ function generateForm(nonAuthorized){
                           <li>
                           <input type="submit">
                           </li>`;
+
+  formElement.append(element)
 }
 
 function compareByName( a, b ) {
