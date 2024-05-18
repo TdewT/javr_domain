@@ -18,18 +18,7 @@ app.use(express.static('public'));
 const siteIDName = 'JAVR_Strona';
 
 //Setup Config for ZeroTier
-<<<<<<< HEAD
-let config = {
-    method: 'GET',
-    maxBodyLength: Infinity,
-    url: 'https://api.zerotier.com/api/v1/network/0cccb752f7ccba90/member',
-    headers: { //TODO HIDE TOKEN in file
-        'Authorization': 'Bearer DyCCwaIRMRZ8ehjZBLwxLkTCnmDugc38'
-    }
-};
-=======
 let config = zeroTierToken;
->>>>>>> 1439e4e6c5dfac461c5b239f1c7454be17987802
 
 
 // Start server

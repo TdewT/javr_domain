@@ -13,13 +13,8 @@ socket.on('zt_response', data => {
   const ZtList = $('#ZT-list');
   const ZtForm = $('#ZT-form');
   // Check if list is already generated
-<<<<<<< Updated upstream
-  if (ZtList.children.length === 1){
-    generateDataElements(data, ZtList, ZtForm);
-=======
   if (ZtList.children.length === 1) {
     generateDataElements(data, ZtList);
->>>>>>> Stashed changes
   }
 });
 
@@ -38,48 +33,15 @@ function generateDataElements(data, listElement,formElement) {
 
       listElement.append(element)
     }
-<<<<<<< Updated upstream
-    else{
-
-      
-=======
     else {
       let selectElement = $('#Select-form');
 
       selectElement.innerHTML += `<option value="${[member.config.id, member.name, member.description]}">${member.config.id}</option>`
->>>>>>> Stashed changes
     }
 
   })
 }
 
-<<<<<<< Updated upstream
-function generateForm(unAuthorized, formElement){
-  
-  let element = document.createElement('form')
-  element.method = "post"
-  element.action = "https://api.zerotier.com/api/v1/network/0cccb752f7ccba90/member/" + unAuthorized.config.id;
-
-  element.innerHTML += `<ul>
-                          <li>
-                            <label for="name">Name:</label> <input id="name" type="text" value="name">
-                          </li>
-                          <li>
-                            <label for="description">description:</label> <input id="description" type="text" value="description">
-                          </li>
-                          <li>
-                            <label for="authorize">Authorize</label> <input id="authorize" type="checkbox" value="authorized"> 
-                          </li>
-                          <li>
-                          <input type="submit">
-                          </li>`;
-
-  formElement.append(element)
-}
-
-function compareByName( a, b ) {
-  if ( a.name < b.name ){
-=======
 function generateForm() {
 
   console.log('Started Creating form')
@@ -143,7 +105,6 @@ function sendData()
 
 function compareByName(a, b) {
   if (a.name < b.name) {
->>>>>>> Stashed changes
     return -1;
   }
   if (a.name > b.name) {
