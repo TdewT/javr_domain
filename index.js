@@ -7,6 +7,8 @@ const {customLog, createLogStream} = require('./CustomUtils');
 
 // Import information required to start a server
 const serversInfo = require('./configs/servers_info.json');
+// Import zt token
+const zeroTierToken = require('./configs/zerotier_token.json');
 
 // Setup express
 const app = express();
@@ -16,14 +18,7 @@ app.use(express.static('public'));
 const siteIDName = 'JAVR_Strona';
 
 //Setup Config for ZeroTier
-let config = {
-    method: 'GET',
-    maxBodyLength: Infinity,
-    url: 'https://api.zerotier.com/api/v1/network/0cccb752f7ccba90/member',
-    headers: { //TODO HIDE TOKEN in file
-        'Authorization': 'Bearer dRBMhds9vGR9Dtqcn21gmm7zFYr24iFR'
-    }
-};
+let config = zeroTierToken;
 
 
 // Start server
