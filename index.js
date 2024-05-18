@@ -7,6 +7,8 @@ const {customLog, createLogStream} = require('./CustomUtils');
 
 // Import information required to start a server
 const serversInfo = require('./configs/servers_info.json');
+// Import zt token
+const zeroTierToken = require('./configs/zerotier_token.json');
 
 // Setup express
 const app = express();
@@ -16,6 +18,7 @@ app.use(express.static('public'));
 const siteIDName = 'JAVR_Strona';
 
 //Setup Config for ZeroTier
+<<<<<<< HEAD
 let config = {
     method: 'GET',
     maxBodyLength: Infinity,
@@ -24,6 +27,9 @@ let config = {
         'Authorization': 'Bearer DyCCwaIRMRZ8ehjZBLwxLkTCnmDugc38'
     }
 };
+=======
+let config = zeroTierToken;
+>>>>>>> 1439e4e6c5dfac461c5b239f1c7454be17987802
 
 
 // Start server
