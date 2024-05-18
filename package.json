@@ -13,6 +13,7 @@
     "express": "^4.19.2",
     "minecraft-status": "^1.1.0",
     "process-exists": "^5.0.0",
+    "request": "^2.88.2",
     "socket.io": "^4.7.5",
     "tcp-port-used": "^1.0.2"
   }
