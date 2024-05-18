@@ -21,7 +21,7 @@ let config = {
     maxBodyLength: Infinity,
     url: 'https://api.zerotier.com/api/v1/network/0cccb752f7ccba90/member',
     headers: { //TODO HIDE TOKEN in file
-        'Authorization': 'Bearer dRBMhds9vGR9Dtqcn21gmm7zFYr24iFR'
+        'Authorization': 'Bearer DyCCwaIRMRZ8ehjZBLwxLkTCnmDugc38'
     }
 };
 
