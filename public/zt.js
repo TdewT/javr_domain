@@ -10,7 +10,7 @@ socket.on('connect', () => {
 
 socket.on('zt_response', data => {
   const ZtList = $('#ZT-list');
-  
+
   // Check if list is already generated
   if (ZtList.children.length === 1) {
     generateDataElements(data, ZtList);
@@ -61,22 +61,22 @@ function generateDataElements(data, listElement) {
 //Generate form with network members
 function generateForm() {
 
-  const ZtForm = $('#ZT-form');
+  const ZtForm = $('#ZT-user-editor');
 
-  let memberToEdit =  $('#Select-form').value.split(',');
+  let memberToEdit = $('#Select-form').value.split(',');
 
   if (!$('#Post-Form')) {
     let element = document.createElement('form');
     element.id = "Post-Form";
     element.innerHTML += `<ul>
                             <li>
-                              <label for="name">Name:</label> <input id="name" type="text" value="${memberToEdit[1]}" >
+                              <label for="name">Nazwa:</label> <input id="name" type="text" value="${memberToEdit[1]}" >
                             </li>
                             <li>
-                              <label for="description">description:</label> <input id="description" type="text" value="${memberToEdit[2]}">
+                              <label for="description">Opis:</label> <input id="description" type="text" value="${memberToEdit[2]}">
                             </li>
                             <li>
-                              <label for="authorize">Authorize</label> <input id="authorize" type="checkbox" value="authorized" checked disabled> 
+                              <label for="authorize">Autoryzuj:</label> <input id="authorize" type="checkbox" value="authorized" checked disabled> 
                             </li>
                             <li>
                             <input type="button" value="Prześlij" onclick="sendData()">
