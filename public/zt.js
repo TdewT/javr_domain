@@ -10,14 +10,16 @@ socket.on('connect', () => {
 
 socket.on('zt_response', data => {
   const ZtList = $('#ZT-list');
-
+  
   // Check if list is already generated
   if (ZtList.children.length === 1) {
+
     generateDataElements(data, ZtList);
   }
 });
 
 //Generate site content
+
 function generateDataElements(data, listElement) {
   data = data.sort(compareByName);
 
@@ -53,7 +55,6 @@ function generateDataElements(data, listElement) {
       else {
         selectElement.innerHTML += `<option class="unauthorised" value="${[member.config.id, member.name, member.description, member.config.authorized]}">${displayName}</option>`
       }
-
     }
   })
 }
