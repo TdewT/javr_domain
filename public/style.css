@@ -24,10 +24,10 @@ ul.striped-list > li:nth-of-type(odd) {
     background-color: aqua;
 }
 
-#Select-form .authorised{
+#ZT-user-editor .authorised{
     color: green;
 }
-#Select-form .unauthorised{
+#ZT-user-editor .unauthorised{
     color: red;
 }
 
