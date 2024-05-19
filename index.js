@@ -132,7 +132,7 @@ io.on('connection', socket => {
             "url": apiUrl,
             "data": JSON.stringify(userJSON),
             "headers": {
-                "Authorization": `${zeroTierToken.TOKEN}`
+                "Authorization": `${zeroTierToken.token}`
             }
         }
         
