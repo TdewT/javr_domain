@@ -48,10 +48,10 @@ function generateDataElements(data, listElement, formElement) {
 
       //Coloring diffrent options for easier seeing (green - authorised, red - unauthorised)
       if (member.config.authorized) {
-        selectElement.innerHTML += `<option style="color:Green" value="${[member.config.id, member.name, member.description]}">${displayName}</option>`
+        selectElement.innerHTML += `<option class="authorised" value="${[member.config.id, member.name, member.description]}">${displayName}</option>`
       }
       else {
-        selectElement.innerHTML += `<option style="color:Red" value="${[member.config.id, member.name, member.description]}">${displayName}</option>`
+        selectElement.innerHTML += `<option class="unauthorised" value="${[member.config.id, member.name, member.description]}">${displayName}</option>`
       }
 
     }

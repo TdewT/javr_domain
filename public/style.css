@@ -24,6 +24,13 @@ ul.striped-list > li:nth-of-type(odd) {
     background-color: aqua;
 }
 
+#Select-form .authorised{
+    color: green;
+}
+#Select-form .unauthorised{
+    color: red;
+}
+
 @media (max-width: 992px) {
     .no-padding-md {
         padding: 0;
