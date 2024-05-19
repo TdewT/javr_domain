@@ -48,10 +48,10 @@ function generateDataElements(data, listElement) {
 
       //Coloring diffrent options for easier seeing (green - authorised, red - unauthorised)
       if (member.config.authorized) {
-        selectElement.innerHTML += `<option class="authorised" value="${[member.config.id, member.name, member.description]}">${displayName}</option>`
+        selectElement.innerHTML += `<option class="authorised" value="${[member.config.id, member.name, member.description, member.config.authorized]}">${displayName}</option>`
       }
       else {
-        selectElement.innerHTML += `<option class="unauthorised" value="${[member.config.id, member.name, member.description]}">${displayName}</option>`
+        selectElement.innerHTML += `<option class="unauthorised" value="${[member.config.id, member.name, member.description, member.config.authorized]}">${displayName}</option>`
       }
 
     }
@@ -68,19 +68,20 @@ function generateForm() {
   if (!$('#Post-Form')) {
     let element = document.createElement('form');
     element.id = "Post-Form";
-    element.innerHTML += `<ul>
-                            <li>
-                              <label for="name">Nazwa:</label> <input id="name" type="text" value="${memberToEdit[1]}" >
-                            </li>
-                            <li>
-                              <label for="description">Opis:</label> <input id="description" type="text" value="${memberToEdit[2]}">
-                            </li>
-                            <li>
-                              <label for="authorize">Autoryzuj:</label> <input id="authorize" type="checkbox" value="authorized" checked disabled> 
-                            </li>
-                            <li>
-                            <input type="button" value="Prześlij" onclick="sendData()">
-                            </li>`;
+    element.innerHTML += ` <div class="mb-3">
+                              <label class="form-label" for="name">Nazwa:</label>
+                              <input class="form-control" id="name" type="text" value="${memberToEdit[1]}">
+                            </div>
+                            <div class="mb-3">
+                              <label class="form-label" for="description">Opis:</label>
+                              <input class="form-control" aria-describedby="descriptionHelp" id="description" type="text" value="${memberToEdit[2]}">
+                              <div id="descriptionHelp" class="form-text">Podaj typ urządzenia np. PC lub laptop.</div>
+                            </div>
+                            <div class="mb-3 form-check">
+                              <input class="form-check-input" id="authorize" type="checkbox" value="${memberToEdit[3]}" checked>
+                              <label class="form-check-label" for="authorize">Autoryzuj</label>
+                            </div>                            
+                            <button type="button" class="btn btn-primary" onclick="sendData()">Prześlij</button>`;
     ZtForm.append(element);
   }
 
@@ -98,7 +99,7 @@ function sendData() {
     "description": $('#description').value,
     "config":
     {
-      "authorized": true
+      "authorized": $('#authorize').checked
     }
   };
   socket.emit('zt_send_form', postData, postUserID, apiUrl)
