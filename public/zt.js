@@ -1,6 +1,5 @@
-// const request = require('request');
-
-let formAction;
+let apiUrl;
+let postUserID;
 
 const $ = (e) => document.querySelector(e);
 const socket = io('ws:///');
@@ -19,11 +18,11 @@ socket.on('zt_response', data => {
 });
 
 
-function generateDataElements(data, listElement,formElement) {
+function generateDataElements(data, listElement, formElement) {
   data = data.sort(compareByName);
 
   data.forEach(member => {
-    if (member.config.authorized === true) {
+    if(member.config.authorized && !member.hidden) {
       let element = document.createElement('li');
       element.className = "list-group-item d-flex";
 
@@ -32,19 +31,34 @@ function generateDataElements(data, listElement,formElement) {
       element.innerHTML += `<span class="ms-auto" id="${member.config.id}-ipAssigment">${member.config.ipAssignments[0]}</span>`;
 
       listElement.append(element)
+
     }
-    else {
+    
+    if (!member.hidden){
       let selectElement = $('#Select-form');
+  
+      let displayName = member.name + " " + member.description;
+  
+      if (displayName === " ") {
+        displayName = member.config.id;
+      }
 
-      selectElement.innerHTML += `<option value="${[member.config.id, member.name, member.description]}">${member.config.id}</option>`
+      
+      if(member.config.authorized){
+        selectElement.innerHTML += `<option style="color:Green" value="${[member.config.id, member.name, member.description]}">${displayName}</option>`
+      }
+      else{
+        selectElement.innerHTML += `<option style="color:Red" value="${[member.config.id, member.name, member.description]}">${displayName}</option>`
+      }
+
+        
     }
 
-  })
+    })
 }
 
 function generateForm() {
 
-  console.log('Started Creating form')
   const ZtForm = $('#ZT-form');
 
   const ZTSelect = $('#Select-form');
@@ -72,14 +86,15 @@ function generateForm() {
   }
 
   element = $('#Post-Form');
-  formAction = "https://api.zerotier.com/api/v1/network/0cccb752f7ccba90/member/" + unAuthorized[0];
+  apiUrl = "https://api.zerotier.com/api/v1/network/0cccb752f7ccba90/member/" + unAuthorized[0];
+  postUserID = unAuthorized[0];
   $('#name').value = unAuthorized[1];
   $('#description').value = unAuthorized[2];
 }
 
-function sendData() 
-{
-  let postData = {
+function sendData() {
+  let postData =
+  {
     "name": $('#name').value,
     "description": $('#description').value,
     "config":
@@ -87,19 +102,8 @@ function sendData()
       "authorized": true
     }
   };
-  
-  var clientServerOptions = {
-    uri: formAction,
-    body: JSON.stringify(postData),
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  }
-  request(clientServerOptions, function (error, response) {
-    console.log(error, response.body);
-    return;
-  });
+  console.log(postData + " " + postUserID + " " + apiUrl)
+  socket.emit('zt_send_form', postData, postUserID, apiUrl)
 }
 
 
