@@ -121,6 +121,7 @@ io.on('connection', socket => {
             });
     });
 
+    //Sending user edit form to ZeroTier api
     socket.on('zt_send_form',(userJSON, idUserJSON, apiUrl)=>{
         
         customLog(siteIDName,`${ip} requested change of ZeroTier user - (${idUserJSON}) ${userJSON.name} ${userJSON.description}`);

@@ -10,19 +10,20 @@ socket.on('connect', () => {
 
 socket.on('zt_response', data => {
   const ZtList = $('#ZT-list');
-  const ZtForm = $('#ZT-form');
+  
   // Check if list is already generated
   if (ZtList.children.length === 1) {
     generateDataElements(data, ZtList);
   }
 });
 
-
+//Generate site content
 function generateDataElements(data, listElement, formElement) {
   data = data.sort(compareByName);
 
+  //Generate table showing all authorised members
   data.forEach(member => {
-    if(member.config.authorized && !member.hidden) {
+    if (member.config.authorized && !member.hidden) {
       let element = document.createElement('li');
       element.className = "list-group-item d-flex";
 
@@ -33,38 +34,37 @@ function generateDataElements(data, listElement, formElement) {
       listElement.append(element)
 
     }
-    
-    if (!member.hidden){
+
+    //Generate options for form
+    if (!member.hidden) {
       let selectElement = $('#Select-form');
-  
+
+
+      //Checking if member has name if not assigning member id as his shown name
       let displayName = member.name + " " + member.description;
-  
       if (displayName === " ") {
         displayName = member.config.id;
       }
 
-      
-      if(member.config.authorized){
+      //Coloring diffrent options for easier seeing (green - authorised, red - unauthorised)
+      if (member.config.authorized) {
         selectElement.innerHTML += `<option style="color:Green" value="${[member.config.id, member.name, member.description]}">${displayName}</option>`
       }
-      else{
+      else {
         selectElement.innerHTML += `<option style="color:Red" value="${[member.config.id, member.name, member.description]}">${displayName}</option>`
       }
 
-        
     }
-
-    })
+  })
 }
 
+//Generate form with network members
 function generateForm() {
 
   const ZtForm = $('#ZT-form');
 
   const ZTSelect = $('#Select-form');
   unAuthorized = ZTSelect.value.split(',');
-  console.log(unAuthorized);
-
 
   if (!$('#Post-Form')) {
     let element = document.createElement('form');
@@ -92,6 +92,7 @@ function generateForm() {
   $('#description').value = unAuthorized[2];
 }
 
+//Send data to index.js where axios will send that data to Zerotier Api
 function sendData() {
   let postData =
   {
@@ -102,7 +103,6 @@ function sendData() {
       "authorized": true
     }
   };
-  console.log(postData + " " + postUserID + " " + apiUrl)
   socket.emit('zt_send_form', postData, postUserID, apiUrl)
 }
 
