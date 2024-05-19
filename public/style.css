@@ -24,6 +24,18 @@ ul.striped-list > li:nth-of-type(odd) {
     background-color: aqua;
 }
 
+#ZT-user-editor .authorised{
+    color: green;
+}
+#ZT-user-editor .unauthorised{
+    color: red;
+}
+
+#ZT-user-editor form{
+    margin-top: 30px;
+}
+
+
 @media (max-width: 992px) {
     .no-padding-md {
         padding: 0;

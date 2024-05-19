@@ -7,6 +7,8 @@ const {customLog, createLogStream} = require('./CustomUtils');
 
 // Import information required to start a server
 const serversInfo = require('./configs/servers_info.json');
+// Import zt token
+const zeroTierToken = require('./configs/zerotier_token.json');
 
 // Setup express
 const app = express();
@@ -15,15 +17,7 @@ app.use(express.static('public'));
 // Assign id-name to server (for logs)
 const siteIDName = 'JAVR_Strona';
 
-//Setup Config for ZeroTier
-let config = {
-    method: 'GET',
-    maxBodyLength: Infinity,
-    url: 'https://api.zerotier.com/api/v1/network/0cccb752f7ccba90/member',
-    headers: { //TODO HIDE TOKEN in file
-        'Authorization': 'Bearer dRBMhds9vGR9Dtqcn21gmm7zFYr24iFR'
-    }
-};
+
 
 
 // Start server
@@ -108,6 +102,15 @@ io.on('connection', socket => {
     //Handling ZeroTier Request
     socket.on('zt_request', () => {
         customLog(siteIDName, `${ip} requested ZeroTier information`);
+        
+        let config = {
+            "method": "GET",
+            "maxBodyLength": "Infinity",
+            "url": "https://api.zerotier.com/api/v1/network/0cccb752f7ccba90/member",
+            "headers": {
+                "Authorization": `${zeroTierToken.token}`
+            }
+        }
 
         axios.request(config)
             .then((response) => {
@@ -117,6 +120,31 @@ io.on('connection', socket => {
                 customLog(siteIDName, `Error fetching data from ZeroTier: ${error}`);
             });
     });
+
+    //Sending user edit form to ZeroTier api
+    socket.on('zt_send_form',(userJSON, idUserJSON, apiUrl)=>{
+        
+        customLog(siteIDName,`${ip} requested change of ZeroTier user - (${idUserJSON}) ${userJSON.name} ${userJSON.description}`);
+
+        let postConfig = {
+            "method": "POST",
+            "maxBodyLength": "Infinity",
+            "url": apiUrl,
+            "data": JSON.stringify(userJSON),
+            "headers": {
+                "Authorization": `${zeroTierToken.token}`
+            }
+        }
+        
+        axios.request(postConfig)
+        .then(()=>{
+            customLog(siteIDName,`${ip} changed ZeroTier user - (${idUserJSON}) ${userJSON.name} ${userJSON.description}`);
+        })
+        .catch((error) => {
+            customLog(siteIDName, `Error fetching data from ZeroTier: ${error.response.data}`);
+        });
+        
+    })
 
 });
 
