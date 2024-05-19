@@ -18,7 +18,7 @@ socket.on('zt_response', data => {
 });
 
 //Generate site content
-function generateDataElements(data, listElement, formElement) {
+function generateDataElements(data, listElement) {
   data = data.sort(compareByName);
 
   //Generate table showing all authorised members
@@ -63,18 +63,17 @@ function generateForm() {
 
   const ZtForm = $('#ZT-form');
 
-  const ZTSelect = $('#Select-form');
-  unAuthorized = ZTSelect.value.split(',');
+  let memberToEdit =  $('#Select-form').value.split(',');
 
   if (!$('#Post-Form')) {
     let element = document.createElement('form');
     element.id = "Post-Form";
     element.innerHTML += `<ul>
                             <li>
-                              <label for="name">Name:</label> <input id="name" type="text" value="${unAuthorized[1]}" >
+                              <label for="name">Name:</label> <input id="name" type="text" value="${memberToEdit[1]}" >
                             </li>
                             <li>
-                              <label for="description">description:</label> <input id="description" type="text" value="${unAuthorized[2]}">
+                              <label for="description">description:</label> <input id="description" type="text" value="${memberToEdit[2]}">
                             </li>
                             <li>
                               <label for="authorize">Authorize</label> <input id="authorize" type="checkbox" value="authorized" checked disabled> 
@@ -85,14 +84,13 @@ function generateForm() {
     ZtForm.append(element);
   }
 
-  element = $('#Post-Form');
-  apiUrl = "https://api.zerotier.com/api/v1/network/0cccb752f7ccba90/member/" + unAuthorized[0];
-  postUserID = unAuthorized[0];
-  $('#name').value = unAuthorized[1];
-  $('#description').value = unAuthorized[2];
+  apiUrl = "https://api.zerotier.com/api/v1/network/0cccb752f7ccba90/member/" + memberToEdit[0];
+  postUserID = memberToEdit[0];
+  $('#name').value = memberToEdit[1];
+  $('#description').value = memberToEdit[2];
 }
 
-//Send data to index.js where axios will send that data to Zerotier Api
+//Send data to index.js where axios will send that data to ZeroTier api
 function sendData() {
   let postData =
   {
