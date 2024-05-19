@@ -108,7 +108,7 @@ io.on('connection', socket => {
             "maxBodyLength": "Infinity",
             "url": "https://api.zerotier.com/api/v1/network/0cccb752f7ccba90/member",
             "headers": {
-                "Authorization": `${zeroTierToken.TOKEN}`
+                "Authorization": `${zeroTierToken.token}`
             }
         }
 
