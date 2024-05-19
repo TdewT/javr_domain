@@ -17,8 +17,7 @@ app.use(express.static('public'));
 // Assign id-name to server (for logs)
 const siteIDName = 'JAVR_Strona';
 
-//Setup Config for ZeroTier
-let config = zeroTierToken;
+
 
 
 // Start server
@@ -103,6 +102,15 @@ io.on('connection', socket => {
     //Handling ZeroTier Request
     socket.on('zt_request', () => {
         customLog(siteIDName, `${ip} requested ZeroTier information`);
+        
+        let config = {
+            "method": "GET",
+            "maxBodyLength": "Infinity",
+            "url": "https://api.zerotier.com/api/v1/network/0cccb752f7ccba90/member",
+            "headers": {
+                "Authorization": `${zeroTierToken.TOKEN}`
+            }
+        }
 
         axios.request(config)
             .then((response) => {
@@ -112,6 +120,30 @@ io.on('connection', socket => {
                 customLog(siteIDName, `Error fetching data from ZeroTier: ${error}`);
             });
     });
+
+    socket.on('zt_send_form',(userJSON, idUserJSON, apiUrl)=>{
+        
+        customLog(siteIDName,`${ip} requested change of ZeroTier user - (${idUserJSON}) ${userJSON.name} ${userJSON.description}`);
+
+        let postConfig = {
+            "method": "POST",
+            "maxBodyLength": "Infinity",
+            "url": apiUrl,
+            "data": JSON.stringify(userJSON),
+            "headers": {
+                "Authorization": `${zeroTierToken.TOKEN}`
+            }
+        }
+        
+        axios.request(postConfig)
+        .then(()=>{
+            customLog(siteIDName,`${ip} changed ZeroTier user - (${idUserJSON}) ${userJSON.name} ${userJSON.description}`);
+        })
+        .catch((error) => {
+            customLog(siteIDName, `Error fetching data from ZeroTier: ${error.response.data}`);
+        });
+        
+    })
 
 });
 
