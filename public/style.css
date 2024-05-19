@@ -31,6 +31,11 @@ ul.striped-list > li:nth-of-type(odd) {
     color: red;
 }
 
+#ZT-user-editor form{
+    margin-top: 30px;
+}
+
+
 @media (max-width: 992px) {
     .no-padding-md {
         padding: 0;
