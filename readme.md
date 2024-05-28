@@ -16,7 +16,7 @@ Although it may have more features in the future
 - Information about ZeroTier network
 - Form for modifying ZeroTier network users
 
-### Fully supported types of servers:
+### Supported types of servers:
 - Minecraft vanilla (full support of all features)
 - Minecraft forge (same as vanilla, needs different initialization, 
 <a href="https://github.com/TdewT/javr_strona/blob/api/json_templates/servers_info.json#L53"> see json_templates/servers_info.json</a>)
@@ -33,10 +33,14 @@ For now, you need to make due with comments in code.
 # API
 
 ## 1. Token
+
 To use site's api you need to get yourself a token, which will be generated after sending GET request on `http://website.address/api/token`
 
 > [!NOTE]
 > If you send token request while already having one assigned, you will get a new one.
+
+>[!IMPORTANT]
+> Current token system will most likely be replaced in the future.
 
 ### Python example
 
