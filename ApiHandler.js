@@ -66,7 +66,7 @@ class ApiHandler {
 
             // Generate and send back new token
             const newToken = tokenManager.generateToken(clientIP, this);
-            resp.send(newToken)
+            resp.json({token: newToken})
         });
     }
 
