@@ -64,6 +64,10 @@ function customLog(name, str) {
     // Create directory if it doesn't exist
     createLogsDir();
 
+    // Create stream to log file
+    if (!logStream)
+        createLogStream();
+
     // Write to log file and console
     logStream.write(logTxt + '\n');
     console.log(logTxt);

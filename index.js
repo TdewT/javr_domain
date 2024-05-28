@@ -1,9 +1,11 @@
+// External imports
 const express = require('express');
 const socketIO = require('socket.io');
 const axios = require('axios');
+
+// Local imports
 const {statuses, types, ArmaServer, MinecraftServer, GenericServer, TeamspeakServer} = require("./CustomServers");
 const {customLog, createLogStream} = require('./CustomUtils');
-
 
 // Import information required to start a server
 const serversInfo = require('./configs/servers_info.json');
@@ -18,13 +20,8 @@ app.use(express.static('public'));
 const siteIDName = 'JAVR_Strona';
 
 
-
-
 // Start server
 const server = app.listen(80, () => {
-    // Create stream to log file
-    createLogStream();
-
     customLog(siteIDName, `Server started on port ${server.address().port}`);
 
     // Start checking ports for every defined server
@@ -102,7 +99,7 @@ io.on('connection', socket => {
     //Handling ZeroTier Request
     socket.on('zt_request', () => {
         customLog(siteIDName, `${ip} requested ZeroTier information`);
-        
+
         let config = {
             "method": "GET",
             "maxBodyLength": "Infinity",
@@ -110,7 +107,7 @@ io.on('connection', socket => {
             "headers": {
                 "Authorization": `${zeroTierToken.token}`
             }
-        }
+        };
 
         axios.request(config)
             .then((response) => {
@@ -122,9 +119,9 @@ io.on('connection', socket => {
     });
 
     //Sending user edit form to ZeroTier api
-    socket.on('zt_send_form',(userJSON, idUserJSON, apiUrl)=>{
-        
-        customLog(siteIDName,`${ip} requested change of ZeroTier user - (${idUserJSON}) ${userJSON.name} ${userJSON.description}`);
+    socket.on('zt_send_form', (userJSON, idUserJSON, apiUrl) => {
+
+        customLog(siteIDName, `${ip} requested change of ZeroTier user - (${idUserJSON}) ${userJSON.name} ${userJSON.description}`);
 
         let postConfig = {
             "method": "POST",
@@ -134,16 +131,16 @@ io.on('connection', socket => {
             "headers": {
                 "Authorization": `${zeroTierToken.token}`
             }
-        }
-        
+        };
+
         axios.request(postConfig)
-        .then(()=>{
-            customLog(siteIDName,`${ip} changed ZeroTier user - (${idUserJSON}) ${userJSON.name} ${userJSON.description}`);
-        })
-        .catch((error) => {
-            customLog(siteIDName, `Error fetching data from ZeroTier: ${error.response.data}`);
-        });
-        
+            .then(() => {
+                customLog(siteIDName, `${ip} changed ZeroTier user - (${idUserJSON}) ${userJSON.name} ${userJSON.description}`);
+            })
+            .catch((error) => {
+                customLog(siteIDName, `Error fetching data from ZeroTier: ${error.response.data}`);
+            });
+
     })
 
 });
@@ -167,8 +164,28 @@ for (const serverName in serversInfo[types.TSSERVER]) {
     servers.push(new TeamspeakServer(server))
 }
 
+// Export servers so that other modules can use them
+module.exports = {
+    servers
+};
+
 // Sending servers statuses
 function emitDataGlobal(socket, event, data) {
     socket.emit(event, data);
 }
 
+
+//
+// API
+//
+
+// Local imports
+const {ApiHandler} = require("./ApiHandler");
+// Initialise api-handler
+const apiHandler = new ApiHandler(app);
+
+
+// Create api-endpoint for generation of new tokens
+apiHandler.newTokenEndpoint();
+// Create endpoints for all existing tokens
+apiHandler.createEndpoints(servers);
