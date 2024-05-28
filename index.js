@@ -5,7 +5,7 @@ const axios = require('axios');
 
 // Local imports
 const {statuses, types, ArmaServer, MinecraftServer, GenericServer, TeamspeakServer} = require("./CustomServers");
-const {customLog, createLogStream} = require('./CustomUtils');
+const {customLog} = require('./CustomUtils');
 
 // Import information required to start a server
 const serversInfo = require('./configs/servers_info.json');
