@@ -74,10 +74,11 @@ class ApiHandler {
         // Create api endpoints for all authorised users
 
         // Create endpoints for server information
-        for (const token of tokenManager.tokenValues) {
+        for (const token of tokenManager.tokenValues()) {
             const path = `/api/${token}/servers`;
             // Check if endpoint was already established
             if (!this.usedEndpoints.includes(path)){
+                customLog(logName, `Adding new endpoint at ${path}`);
 
                 // Convert servers to a format that's more comprehensible in JSON
                 let serversJSON = {};

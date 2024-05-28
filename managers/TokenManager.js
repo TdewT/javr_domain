@@ -1,9 +1,7 @@
 // Load saved api-tokens
 const {writeFile} = require("node:fs");
 const {customLog} = require("../CustomUtils");
-const apiTokens = require('../configs/api_tokens.json');
-const tokenValues = Object.values(apiTokens["tokens"]);
-const tokenKeys = Object.keys(apiTokens["tokens"]);
+let apiTokens = require('../configs/api_tokens.json');
 const {servers} = require("../index");
 
 // Name to be displayed in logs
@@ -50,12 +48,19 @@ function saveToken(token, identifier) {
 
 // Check if given identifier has registered api token
 function hasToken(identifier) {
-    return tokenKeys.includes(identifier);
+    return tokenKeys().includes(identifier);
 }
 
 // Check if api token is present in server's files
 function getToken(identifier) {
-    return apiTokens.get(identifier);
+    return apiTokens["tokens"][identifier];
+}
+
+function tokenValues() {
+    return Object.values(apiTokens["tokens"]);
+}
+function tokenKeys() {
+    return Object.keys(apiTokens["tokens"]);
 }
 
 module.exports = {
