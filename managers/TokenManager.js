@@ -1,8 +1,11 @@
-// Load saved api-tokens
+// External imports
 const {writeFile} = require("node:fs");
+// Local imports
 const {customLog} = require("../CustomUtils");
-let apiTokens = require('../configs/api_tokens.json');
 const {servers} = require("../index");
+
+// Load saved api-tokens
+let apiTokens = require('../configs/api_tokens.json');
 
 // Name to be displayed in logs
 const logName = "token-manager";
@@ -10,7 +13,7 @@ const logName = "token-manager";
 // Generate token
 function generateToken(identifier, apiHandler) {
 
-    customLog(logName, `Generating new api token for ${identifier}`);
+    customLog(logName, `Generating api token for ${identifier}`);
 
     // Initialise token for future additions
     let token = "";
@@ -28,7 +31,7 @@ function generateToken(identifier, apiHandler) {
     // Save for future use
     saveToken(token, identifier);
 
-    // Create endpoint for the new token
+    // Create endpoints for the new token
     apiHandler.createEndpoints(servers);
 
     return token;
@@ -39,7 +42,7 @@ function saveToken(token, identifier) {
     // Add token to list
     apiTokens["tokens"][identifier] = token;
 
-    // Write the updated tokens object back to api_tokens.json
+    // Write the updated token object back to file storing tokens
     writeFile('./configs/api_tokens.json', JSON.stringify(apiTokens), (err) => {
         if (err) customLog(logName, err);
         else customLog(logName, "Token saved successfully.");
@@ -51,14 +54,16 @@ function hasToken(identifier) {
     return tokenKeys().includes(identifier);
 }
 
-// Check if api token is present in server's files
+// Get api token by identifier
 function getToken(identifier) {
     return apiTokens["tokens"][identifier];
 }
 
+// Get an array of all saved tokens
 function tokenValues() {
     return Object.values(apiTokens["tokens"]);
 }
+// Get an array of all saved users
 function tokenKeys() {
     return Object.keys(apiTokens["tokens"]);
 }

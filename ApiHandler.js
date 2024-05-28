@@ -6,7 +6,7 @@ const {servers} = require("./index");
 const logName = "api-handler";
 
 
-
+// Currently supported requestMethods
 const requestMethods = {
     GET: "GET",
     POST: "POST",
@@ -16,6 +16,8 @@ class ApiHandler {
 
     constructor(app) {
         this.app = app;
+
+        // Stores endpoint paths that are initialised
         this.usedEndpoints = [];
     }
 
@@ -35,6 +37,7 @@ class ApiHandler {
             // Create endpoint for the request
             const path = `/api/${token}/servers`;
             methodHandler(path, (req, resp) => {
+                // Send back the response
                 resp.json(body);
             });
 
@@ -55,15 +58,15 @@ class ApiHandler {
             const clientIP = req.ip;
 
             // Check if this ip already has token
-            if (!tokenManager.hasToken(clientIP)) {
-                // Generate and send back new token
-                const newToken = tokenManager.generateToken(clientIP, this);
-                resp.send(newToken)
+            if (tokenManager.hasToken(clientIP)) {
+                customLog(logName, `Refreshing token for ${clientIP}`);
+                const indexToRemove = this.usedEndpoints.indexOf(clientIP);
+                this.usedEndpoints.slice(indexToRemove, 1)
             }
-            else {
-                // Send back existing token
-                resp.send(tokenManager.getToken(clientIP))
-            }
+
+            // Generate and send back new token
+            const newToken = tokenManager.generateToken(clientIP, this);
+            resp.send(newToken)
         });
     }
 
@@ -71,11 +74,11 @@ class ApiHandler {
     // Create all endpoints for all authorised users
     createEndpoints(){
         customLog(logName, "Creating api endpoints");
-        // Create api endpoints for all authorised users
 
         // Create endpoints for server information
         for (const token of tokenManager.tokenValues()) {
             const path = `/api/${token}/servers`;
+
             // Check if endpoint was already established
             if (!this.usedEndpoints.includes(path)){
                 customLog(logName, `Adding new endpoint at ${path}`);
