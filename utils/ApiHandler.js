@@ -1,4 +1,4 @@
-const tokenManager = require("./TokenManager");
+const tokenManager = require("./JavrTokenManager");
 const {customLog} = require("./CustomUtils");
 const {servers} = require("../index");
 

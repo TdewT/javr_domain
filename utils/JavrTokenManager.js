@@ -63,6 +63,7 @@ function getToken(identifier) {
 function tokenValues() {
     return Object.values(apiTokens["tokens"]);
 }
+
 // Get an array of all saved users
 function tokenKeys() {
     return Object.keys(apiTokens["tokens"]);
