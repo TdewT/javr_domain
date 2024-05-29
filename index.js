@@ -23,7 +23,10 @@ ConfigManager.loadConfigs();
 
 // Get loaded configs
 const serversInfo = ConfigManager.getConfig(configTypes.serversInfo);
-const zeroTierToken = ConfigManager.getConfig(configTypes.zeroTierToken);
+const apiTokens = ConfigManager.getConfig(configTypes.apiTokens);
+
+// Extract token for ZeroTier
+const zeroTierToken = apiTokens["tokens"]["zerotier"];
 
 // Define all servers
 const servers = [];
@@ -139,7 +142,7 @@ io.on('connection', socket => {
             "maxBodyLength": "Infinity",
             "url": "https://api.zerotier.com/api/v1/network/0cccb752f7ccba90/member",
             "headers": {
-                "Authorization": `${zeroTierToken.token}`
+                "Authorization": `${zeroTierToken}`
             }
         };
 
@@ -163,7 +166,7 @@ io.on('connection', socket => {
             "url": apiUrl,
             "data": JSON.stringify(userJSON),
             "headers": {
-                "Authorization": `${zeroTierToken.token}`
+                "Authorization": `${zeroTierToken}`
             }
         };
 

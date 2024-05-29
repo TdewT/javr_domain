@@ -8,7 +8,6 @@ const configTypes = {
     apiTokens: "api_tokens.json",
     minecraftJavaVer: "minecraft_java_ver.json",
     serversInfo: "servers_info.json",
-    zeroTierToken: "zerotier_token.json"
 };
 
 class ConfigManager {
@@ -16,7 +15,7 @@ class ConfigManager {
     static loadedConfigs = {};
 
     // Load all configs from ./configs
-    static loadConfigs(){
+    static loadConfigs() {
         ConfigManager.allconfigs = readdirSync('./configs');
 
         // Iterate through all files in ./configs
@@ -28,20 +27,20 @@ class ConfigManager {
 
                 customLog(logName, `Config loaded ${config}`);
             }
-            else{
+            else {
                 customLog(logName, `Unsupported config not loaded ${config}`);
             }
         }
     }
 
-    static saveConfig(configType, data){
-        writeFile(`./configs/${configTypes[configType]}`, JSON.stringify(data), (err) => {
+    static saveConfig(configType, data) {
+        writeFile(`./configs/${configType}`, JSON.stringify(data), (err) => {
             if (err) customLog(logName, err);
             else customLog(logName, `Config ${configType} saved successfully.`);
         });
     }
 
-    static getConfig(configType){
+    static getConfig(configType) {
         return ConfigManager.loadedConfigs[configType];
     }
 }

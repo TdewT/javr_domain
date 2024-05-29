@@ -41,10 +41,10 @@ function generateToken(identifier, apiHandler) {
 
 function saveToken(token, identifier) {
     // Add token to list
-    apiTokens["tokens"][identifier] = token;
+    apiTokens["tokens"]["javr-api"][identifier] = token;
 
     // Write the updated token object back to file storing tokens
-    ConfigManager.saveConfig(configTypes.apiTokens, token);
+    ConfigManager.saveConfig(configTypes.apiTokens, apiTokens);
 }
 
 // Check if given identifier has registered api token
@@ -54,17 +54,17 @@ function hasToken(identifier) {
 
 // Get api token by identifier
 function getToken(identifier) {
-    return apiTokens["tokens"][identifier];
+    return apiTokens["tokens"]["javr-api"][identifier];
 }
 
 // Get an array of all saved tokens
 function tokenValues() {
-    return Object.values(apiTokens["tokens"]);
+    return Object.values(apiTokens["tokens"]["javr-api"]);
 }
 
 // Get an array of all saved users
 function tokenKeys() {
-    return Object.keys(apiTokens["tokens"]);
+    return Object.keys(apiTokens["tokens"]["javr-api"]);
 }
 
 module.exports = {
