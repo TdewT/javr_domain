@@ -226,7 +226,7 @@ class MinecraftServer extends GenericServer {
             setTimeout(() => {
                 
                 if(this.status === statuses.STOPPING){
-                    customLog(this.htmlID, `Server not online, forcing automated exit`)
+                    customLog(this.htmlID, `Server not online, forcing automated exit`);
                     if (this.currProcess !== null) {
                         this.currProcess.kill();
                         this.currPlayers = [];
