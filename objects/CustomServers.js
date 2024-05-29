@@ -1,8 +1,8 @@
 const {exec, execFile, spawn} = require('child_process');
-const CustomUtils = require('./CustomUtils');
-const minecraft_java_ver = require('./configs/minecraft_java_ver');
+const CustomUtils = require('../utils/CustomUtils');
+const minecraft_java_ver = require('../configs/minecraft_java_ver.json');
 const MinecraftStatus = require("minecraft-status");
-const {customLog} = require("./CustomUtils");
+const {customLog} = require("../utils/CustomUtils");
 const statuses = {
     "ONLINE": "online", "STARTING": "starting", "BUSY": "busy", "STOPPING": "stopping", "OFFLINE": "offline",
 };

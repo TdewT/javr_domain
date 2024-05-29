@@ -4,8 +4,8 @@ const socketIO = require('socket.io');
 const axios = require('axios');
 
 // Local imports
-const {statuses, types, ArmaServer, MinecraftServer, GenericServer, TeamspeakServer} = require("./CustomServers");
-const {customLog} = require('./CustomUtils');
+const {statuses, types, ArmaServer, MinecraftServer, GenericServer, TeamspeakServer} = require("./objects/CustomServers");
+const {customLog} = require('./utils/CustomUtils');
 
 // Import information required to start a server
 const serversInfo = require('./configs/servers_info.json');
@@ -180,7 +180,7 @@ function emitDataGlobal(socket, event, data) {
 //
 
 // Local imports
-const {ApiHandler} = require("./ApiHandler");
+const {ApiHandler} = require("./utils/ApiHandler");
 // Initialise api-handler
 const apiHandler = new ApiHandler(app);
 

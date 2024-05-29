@@ -1,6 +1,6 @@
-const tokenManager = require("./managers/TokenManager");
+const tokenManager = require("./TokenManager");
 const {customLog} = require("./CustomUtils");
-const {servers} = require("./index");
+const {servers} = require("../index");
 
 // Name that will be displayed in logs
 const logName = "api-handler";

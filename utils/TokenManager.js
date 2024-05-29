@@ -1,7 +1,7 @@
 // External imports
 const {writeFile} = require("node:fs");
 // Local imports
-const {customLog} = require("../CustomUtils");
+const {customLog} = require("./CustomUtils");
 const {servers} = require("../index");
 
 // Load saved api-tokens
