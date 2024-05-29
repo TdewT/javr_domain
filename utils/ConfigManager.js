@@ -80,7 +80,7 @@ class ConfigManager {
     }
 
     static saveConfig(configType, data) {
-        writeFile(`./configs/${configType}`, JSON.stringify(data), (err) => {
+        writeFileSync(`./configs/${configType}`, JSON.stringify(data), (err) => {
             if (err) customLog(logName, err);
             else customLog(logName, `Config ${configType} saved successfully.`);
         });
