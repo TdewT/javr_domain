@@ -10,6 +10,7 @@ const configTypes = {
     serversInfo: "servers_info.json",
 };
 
+// Templates used for config generation
 const fileTemplates = {
     "api_tokens.json": {
         tokens: {
@@ -25,16 +26,20 @@ class ConfigManager {
     // Dictionary of loaded configs
     static loadedConfigs = {};
 
-    // Load all configs from ./configs
+    // Load all configs from configsPath
     static loadConfigs() {
         const configsPath = "./configs";
 
+        // All configs at path
         let allConfigs;
+        // Check if folder is present
         if (!existsSync(configsPath)){
+            // Create folder and set allConfigs as empty
             mkdirSync(configsPath, { recursive: true });
             allConfigs = {}
         }
         else{
+            // Get configs' names
             allConfigs = readdirSync('./configs');
         }
 
@@ -42,8 +47,10 @@ class ConfigManager {
         for (const config of Object.values(configTypes)) {
             if (!Object.values(allConfigs).includes(config)) {
                 try {
+                    // Load template for this config
                     const data = fileTemplates[config];
 
+                    // Write template
                     writeFileSync(`./configs/${config}`, JSON.stringify(data));
                     customLog(logName, `Generated empty config ${config}.`);
                 }
