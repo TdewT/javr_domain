@@ -82,8 +82,8 @@ serversEndpoint = "http://localhost/api/drbu8e1ph1jdknh8o414tnsdspv0phl56eltn/se
 # send POST request
 resp = requests.post(url=serversEndpoint)
 # get object
-token = resp.json()
-print(token)
+servers_info = resp.json()
+print(servers_info)
 ```
 ### Example output
 ```yaml
