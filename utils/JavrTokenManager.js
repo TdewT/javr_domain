@@ -1,11 +1,12 @@
-// External imports
-const {writeFile} = require("node:fs");
 // Local imports
+// Static imports
 const {customLog} = require("./CustomUtils");
+const {configTypes, ConfigManager} = require("./ConfigManager");
+// Dynamic imports
 const {servers} = require("../index");
 
-// Load saved api-tokens
-let apiTokens = require('../configs/api_tokens.json');
+// Get apiTokens from json file
+const apiTokens = ConfigManager.getConfig(configTypes.apiTokens);
 
 // Name to be displayed in logs
 const logName = "token-manager";
@@ -43,10 +44,7 @@ function saveToken(token, identifier) {
     apiTokens["tokens"][identifier] = token;
 
     // Write the updated token object back to file storing tokens
-    writeFile('./configs/api_tokens.json', JSON.stringify(apiTokens), (err) => {
-        if (err) customLog(logName, err);
-        else customLog(logName, "Token saved successfully.");
-    });
+    ConfigManager.saveConfig(configTypes.apiTokens, token);
 }
 
 // Check if given identifier has registered api token

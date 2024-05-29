@@ -1,8 +1,10 @@
 const {exec, execFile, spawn} = require('child_process');
 const CustomUtils = require('../utils/CustomUtils');
-const minecraft_java_ver = require('../configs/minecraft_java_ver.json');
 const MinecraftStatus = require("minecraft-status");
 const {customLog} = require("../utils/CustomUtils");
+const {ConfigManager, configTypes} = require("../utils/ConfigManager");
+
+
 const statuses = {
     "ONLINE": "online", "STARTING": "starting", "BUSY": "busy", "STOPPING": "stopping", "OFFLINE": "offline",
 };
@@ -85,6 +87,8 @@ class GenericServer {
 }
 
 class MinecraftServer extends GenericServer {
+    static minecraftJavaVer;
+
     constructor({
                     port, htmlID, displayName, path = '', status = statuses.OFFLINE,
                     currProcess = null,
@@ -102,6 +106,7 @@ class MinecraftServer extends GenericServer {
         this.startArgs = startArgs;
         this.minecraftVersion = minecraftVersion;
         this.failedQuery = 0;
+        MinecraftServer.minecraftJavaVer = ConfigManager.getConfig(configTypes.minecraftJavaVer);
     }
 
     // Run check periodically to see if the server is still up
@@ -133,7 +138,7 @@ class MinecraftServer extends GenericServer {
         this.status = statuses.STARTING;
 
         // Check if minecraft version has java attached
-        if (!minecraft_java_ver[this.minecraftVersion]) {
+        if (!MinecraftServer.minecraftJavaVer[this.minecraftVersion]) {
             // If the version is not listed use default
             this.currProcess = spawn(
                 "java",
@@ -144,7 +149,7 @@ class MinecraftServer extends GenericServer {
         else {
             // If the version is listed use specified java version
             this.currProcess = spawn(
-                minecraft_java_ver[this.minecraftVersion],
+                MinecraftServer.minecraftJavaVer[this.minecraftVersion],
                 this.startArgs,
                 {cwd: this.path}
             );
@@ -254,7 +259,7 @@ class MinecraftServer extends GenericServer {
     }
 
     // If you need to compare versions e.g. currVersion > targetVersion
-    // Useful for instance, for determining java version that server should run on
+    // Useful when determining java version that server should run on
     // Currently not in use
     versionToNumber() {
         let versionInt = this.minecraftVersion.replace(/\./, '');

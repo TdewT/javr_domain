@@ -4,21 +4,55 @@ const socketIO = require('socket.io');
 const axios = require('axios');
 
 // Local imports
-const {statuses, types, ArmaServer, MinecraftServer, GenericServer, TeamspeakServer} = require("./objects/CustomServers");
+const {
+    statuses,
+    types,
+    ArmaServer,
+    MinecraftServer,
+    GenericServer,
+    TeamspeakServer
+} = require("./object classes/CustomServers");
 const {customLog} = require('./utils/CustomUtils');
 
-// Import information required to start a server
-const serversInfo = require('./configs/servers_info.json');
-// Import zt token
-const zeroTierToken = require('./configs/zerotier_token.json');
+
+// Create ConfigManager instance
+const {ConfigManager, configTypes} = require("./utils/ConfigManager");
+
+// Load configs
+ConfigManager.loadConfigs();
+
+// Get loaded configs
+const serversInfo = ConfigManager.getConfig(configTypes.serversInfo);
+const zeroTierToken = ConfigManager.getConfig(configTypes.zeroTierToken);
+
+// Define all servers
+const servers = [];
+for (const serverName in serversInfo[types.GENERIC]) {
+    const server = (serversInfo[types.GENERIC][serverName]);
+    servers.push(new GenericServer(server))
+}
+for (const serverName in serversInfo[types.MINECRAFT]) {
+    const server = (serversInfo[types.MINECRAFT][serverName]);
+    servers.push(new MinecraftServer(server))
+}
+for (const serverName in serversInfo[types.ARMA]) {
+    const server = (serversInfo[types.ARMA][serverName]);
+    servers.push(new ArmaServer(server))
+}
+for (const serverName in serversInfo[types.TSSERVER]) {
+    const server = (serversInfo[types.TSSERVER][serverName]);
+    servers.push(new TeamspeakServer(server))
+}
+
+module.exports = {servers};
 
 // Setup express
 const app = express();
+
 app.use(express.static('public'));
-
 // Assign id-name to server (for logs)
-const siteIDName = 'JAVR_Strona';
 
+const siteIDName = 'JAVR_Strona';
 
 // Start server
 const server = app.listen(80, () => {
@@ -145,29 +179,6 @@ io.on('connection', socket => {
 
 });
 
-// Define all servers
-const servers = [];
-for (const serverName in serversInfo[types.GENERIC]) {
-    const server = (serversInfo[types.GENERIC][serverName]);
-    servers.push(new GenericServer(server))
-}
-for (const serverName in serversInfo[types.MINECRAFT]) {
-    const server = (serversInfo[types.MINECRAFT][serverName]);
-    servers.push(new MinecraftServer(server))
-}
-for (const serverName in serversInfo[types.ARMA]) {
-    const server = (serversInfo[types.ARMA][serverName]);
-    servers.push(new ArmaServer(server))
-}
-for (const serverName in serversInfo[types.TSSERVER]) {
-    const server = (serversInfo[types.TSSERVER][serverName]);
-    servers.push(new TeamspeakServer(server))
-}
-
-// Export servers so that other modules can use them
-module.exports = {
-    servers
-};
 
 // Sending servers statuses
 function emitDataGlobal(socket, event, data) {
