@@ -33,19 +33,19 @@ class ConfigManager {
         // All configs at path
         let allConfigs;
         // Check if folder is present
-        if (!existsSync(configsPath)){
+        if (!existsSync(configsPath)) {
             // Create folder and set allConfigs as empty
-            mkdirSync(configsPath, { recursive: true });
+            mkdirSync(configsPath, {recursive: true});
             allConfigs = {}
         }
-        else{
+        else {
             // Get configs' names
             allConfigs = readdirSync('./configs');
         }
 
         // Generate empty config files
         for (const config of Object.values(configTypes)) {
-            if (!Object.values(allConfigs).includes(config)) {
+            if (!Object.values(allConfigs).includes(config) || ConfigManager.isEmpty(`./configs/${config}`)) {
                 try {
                     // Load template for this config
                     const data = fileTemplates[config];
@@ -76,6 +76,22 @@ class ConfigManager {
             else {
                 customLog(logName, `Unsupported config not loaded ${config}`);
             }
+        }
+    }
+
+    static isEmpty(filePath) {
+        // Read the file
+        const data = readFileSync(filePath, 'utf8');
+
+        // Try to parse the JSON file
+        try {
+            // Check if the object has no keys
+            return data.length === 0;
+        }
+        catch (e) {
+            // If an error occurs during parsing, the file is not valid JSON
+            customLog(logName, `Invalid json file ${filePath}`);
+            return false;
         }
     }
 
