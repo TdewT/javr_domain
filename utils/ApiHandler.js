@@ -38,7 +38,14 @@ class ApiHandler {
             const path = `/api/${token}/servers`;
             methodHandler(path, (req, resp) => {
                 // Send back the response
-                resp.json(body);
+                if (tokenManager.tokenValues().includes(token)){
+                    resp.json(body);
+                }
+                else{
+                    resp.status(403).send({
+                        message: "Token expired",
+                    })
+                }
             });
 
             // Register endpoint to avoid duplication
