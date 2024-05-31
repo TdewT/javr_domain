@@ -1,6 +1,5 @@
-const {execFile, spawn} = require('child_process');
+const {spawn} = require('child_process');
 const {customLog} = require("../utils/CustomUtils");
-const {disable} = require("express/lib/application");
 
 class DiscordBot {
     constructor({dirPath, lavaArgs, name}) {
@@ -31,16 +30,6 @@ class DiscordBot {
         customLog(this.htmldID, "Launching bot...")
         this.botProcess = spawn(pythonPath, ['main.py'], {cwd: this.dirPath});
 
-        //TODO: remove debug
-        this.botProcess.on('error', (err) => {
-            console.log(err + '');
-        })
-        this.botProcess.stderr.on('data', (err) => {
-            console.log(err + '');
-        });
-        this.botProcess.stdout.on('data', (data) => {
-            console.log(data + '')
-        })
     }
 }
 
