@@ -1,6 +1,6 @@
-const tokenManager = require("./managers/TokenManager");
+const tokenManager = require("./JavrTokenManager");
 const {customLog} = require("./CustomUtils");
-const {servers} = require("./index");
+const {servers} = require("../index");
 
 // Name that will be displayed in logs
 const logName = "api-handler";
@@ -37,8 +37,17 @@ class ApiHandler {
             // Create endpoint for the request
             const path = `/api/${token}/servers`;
             methodHandler(path, (req, resp) => {
-                // Send back the response
-                resp.json(body);
+                // Check if token for that endpoint is still valid
+                if (tokenManager.tokenValues().includes(token)){
+                    // Send back the response
+                    resp.json(body);
+                }
+                else{
+                    // If not send back 403 fobidden
+                    resp.status(403).send({
+                        message: "Token expired",
+                    })
+                }
             });
 
             // Register endpoint to avoid duplication

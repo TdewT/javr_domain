@@ -1,11 +1,12 @@
-// External imports
-const {writeFile} = require("node:fs");
 // Local imports
-const {customLog} = require("../CustomUtils");
+// Static imports
+const {customLog} = require("./CustomUtils");
+const {configTypes, ConfigManager} = require("./ConfigManager");
+// Dynamic imports
 const {servers} = require("../index");
 
-// Load saved api-tokens
-let apiTokens = require('../configs/api_tokens.json');
+// Get apiTokens from json file
+const apiTokens = ConfigManager.getConfig(configTypes.apiTokens);
 
 // Name to be displayed in logs
 const logName = "token-manager";
@@ -40,13 +41,10 @@ function generateToken(identifier, apiHandler) {
 
 function saveToken(token, identifier) {
     // Add token to list
-    apiTokens["tokens"][identifier] = token;
+    apiTokens["tokens"]["javr-api"][identifier] = token;
 
     // Write the updated token object back to file storing tokens
-    writeFile('./configs/api_tokens.json', JSON.stringify(apiTokens), (err) => {
-        if (err) customLog(logName, err);
-        else customLog(logName, "Token saved successfully.");
-    });
+    ConfigManager.saveConfig(configTypes.apiTokens, apiTokens);
 }
 
 // Check if given identifier has registered api token
@@ -56,16 +54,17 @@ function hasToken(identifier) {
 
 // Get api token by identifier
 function getToken(identifier) {
-    return apiTokens["tokens"][identifier];
+    return apiTokens["tokens"]["javr-api"][identifier];
 }
 
 // Get an array of all saved tokens
 function tokenValues() {
-    return Object.values(apiTokens["tokens"]);
+    return Object.values(apiTokens["tokens"]["javr-api"]);
 }
+
 // Get an array of all saved users
 function tokenKeys() {
-    return Object.keys(apiTokens["tokens"]);
+    return Object.keys(apiTokens["tokens"]["javr-api"]);
 }
 
 module.exports = {
