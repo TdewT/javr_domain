@@ -4,7 +4,7 @@ const {statuses} = require("./CustomServers");
 
 class DiscordBot {
     constructor({dirPath, lavaArgs, name}) {
-        this.status = statuses.OFFLINE
+        this.status = statuses.OFFLINE;
         this.dirPath = dirPath;
         this.lavaArgs = lavaArgs;
         this.displayName = name;
@@ -15,7 +15,7 @@ class DiscordBot {
     }
 
     start() {
-        customLog(this.htmldID, "Bot starting...")
+        customLog(this.htmldID, "Bot starting...");
 
         // Start lavalink before bot
         customLog(this.htmldID, "Launching Lavalink...");
@@ -52,7 +52,7 @@ class DiscordBot {
         discordProcess.stdout.on('data', (data) => {
             data = String(data);
             if (data.includes("online")){
-                customLog(this.htmldID, "Bot is now online")
+                customLog(this.htmldID, "Bot is now online");
                 this.status = statuses.ONLINE;
             }
         });
@@ -66,7 +66,7 @@ class DiscordBot {
         lavaProcess.stdout.on('data', (data) => {
             data = String(data);
             if (data.includes("Lavalink is ready to accept connections.")) {
-                customLog(this.htmldID, "Successfully started lavalink")
+                customLog(this.htmldID, "Successfully started lavalink");
                 this.lavaConnected = true;
             }
         });
@@ -89,4 +89,4 @@ class DiscordBot {
     }
 }
 
-module.exports = {DiscordBot}
+module.exports = {DiscordBot};
