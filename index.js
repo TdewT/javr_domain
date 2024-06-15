@@ -59,10 +59,9 @@ module.exports = {servers};
 
 // Setup express
 const app = express();
-
 app.use(express.static('public'));
-// Assign id-name to server (for logs)
 
+// Assign id-name to server (for logs)
 const siteIDName = 'JAVR_Strona';
 
 // Start server
@@ -75,6 +74,7 @@ const server = app.listen(80, () => {
         server.statusMonitor(emitDataGlobal, io, "status_response", servers)
     }
 });
+
 // Start socket
 const io = socketIO(server);
 
