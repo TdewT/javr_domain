@@ -51,8 +51,6 @@ function createMinecraftElement(server) {
     // Add playerList to the server
     generatePlayerList(server);
 
-    //TODO: Add connection with arma scripts to get info from the server
-
     // Send start request to server on press
     $(`#${server.htmlID}-button-start`).addEventListener('click', () => {
         // If this command is supported for this server send request
@@ -99,9 +97,6 @@ function createTeamspeakElement(server) {
     $(`#${server.htmlID}-button-stop`).addEventListener('click', () => {
         socket.emit('stop_server_request', server.htmlID);
     })
-
-
-    //TODO: Add connection with arma scripts to get info from the server
 }
 
 // Update existing server
@@ -130,8 +125,6 @@ function updateArmaServer(server) {
 function updateTeamspeakServer(server) {
     // For now that's enough
     updateGenericServer(server);
-
-    //TODO: Add connection with arma scripts to get info from the server
 }
 
 // Generate server element
