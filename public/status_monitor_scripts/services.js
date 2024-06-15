@@ -8,19 +8,18 @@ socket.on('connect', () => {
     socket.emit('status_request');
 });
 
-socket.on('status_response', servers => {
+socket.on('status_response', (services) => {
     // Get list element
     serverListElement = $("#server-list");
+    const servers = services["servers"];
+    const discordBots = services["discordBots"];
+    console.log(servers);
 
-    // Add to server list or update value
-    for (let server of servers) {
-        if (!$(`#${server.htmlID}-server-status-box`)){
-            printServer(server);
-        }
-        else {
-            updateServer(server);
-        }
-    }
+    // Generate or update elements for servers
+    generateServers(servers);
+
+    // Generate or update elements for Discord bots
+    generateDiscordBots(discordBots);
 
 });
 

@@ -1,3 +1,15 @@
+// Generate all servers from list
+function generateServers(servers) {
+    for (let server of servers) {
+        if (!$(`#${server.htmlID}-server-status-box`)){
+            printServer(server);
+        }
+        else {
+            updateServer(server);
+        }
+    }
+}
+
 // Create server element
 function printServer(server) {
     if (server.type === "minecraft") {
