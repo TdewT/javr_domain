@@ -7,7 +7,6 @@ function printServer(server) {
         createArmaElement(server)
     }
     else if (server.type === "tsserver"){
-        // Temporary fix
         createTeamspeakElement(server)
     }
     else {
