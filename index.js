@@ -13,6 +13,7 @@ const {
     TeamspeakServer
 } = require("./object classes/CustomServers");
 const {customLog} = require('./utils/CustomUtils');
+const {DiscordBot} = require('./object classes/DiscordBot');
 
 
 // Create ConfigManager instance
@@ -24,11 +25,18 @@ ConfigManager.loadConfigs();
 // Get loaded configs
 const serversInfo = ConfigManager.getConfig(configTypes.serversInfo);
 const apiTokens = ConfigManager.getConfig(configTypes.apiTokens);
+const discordBotsConfig = ConfigManager.getConfig(configTypes.discordBots);
 
 // Extract token for ZeroTier
 const zeroTierToken = apiTokens["tokens"]["zerotier"];
 
-// Define all servers
+// Load Discord bots
+const discordBots= [];
+for (const botName in discordBotsConfig) {
+    discordBots.push(new DiscordBot(discordBotsConfig[botName]));
+}
+
+// Load servers
 const servers = [];
 for (const serverName in serversInfo[types.GENERIC]) {
     const server = (serversInfo[types.GENERIC][serverName]);
