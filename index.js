@@ -84,7 +84,7 @@ io.on('connection', socket => {
         // Send back servers statuses
         if (socket) {
             customLog(siteIDName, `Status request received from ${ip}`);
-            emitDataGlobal(io, "status_response", servers);
+            io.to(socket.id).emit("status_response", {servers: servers, discordBots: discordBots});
             customLog(siteIDName, `Status update sent ${ip}`);
         }
     });
