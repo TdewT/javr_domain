@@ -65,8 +65,8 @@ const server = app.listen(80, () => {
 const io = socketIO(server);
 
 //Find server in servers[] by server.htmlID
-const getServerByHtmlID = serverID => servers.filter((s) => {
-    return s.htmlID === serverID
+const getObjectByHtmlID = serverID => servers.filter((o) => {
+    return o.htmlID === serverID
 })[0];
 
 // When client connects to the server
@@ -94,7 +94,7 @@ io.on('connection', socket => {
         customLog(serverID, `${ip} requested server start`);
 
         // Get requested server's status
-        const server = getServerByHtmlID(serverID);
+        const server = getObjectByHtmlID(serverID);
 
         if (server) {
             if (server.status === statuses.OFFLINE) {
@@ -115,7 +115,7 @@ io.on('connection', socket => {
     socket.on('stop_server_request', (serverID) => {
         customLog(serverID, `${ip} requested server stop`);
 
-        const server = getServerByHtmlID(serverID);
+        const server = getObjectByHtmlID(serverID);
 
         if (server.status !== statuses.OFFLINE) {
             server.stopServer();
