@@ -127,6 +127,27 @@ io.on('connection', socket => {
 
     });
 
+
+    // Request bot start
+    socket.on('start_bot_request', (botID) => {
+
+        const bot = getObjectByHtmlID(botID)
+
+        if (bot) {
+            if (bot.status === statuses.OFFLINE) {
+                bot.start(emitDataGlobal, io, servers)
+            }
+            else {
+                customLog(botID, `${ip} request denied, bot already on`);
+                io.to(socket.id).emit('request_failed', "Bot jest już włączony")
+            }
+        }
+        else {
+            customLog(botID, `${ip} request denied, Server not found`);
+            io.to(socket.id).emit('request_failed', "Nie znaleziono serwera")
+        }
+    })
+
     //Handling ZeroTier Request
     socket.on('zt_request', () => {
         customLog(siteIDName, `${ip} requested ZeroTier information`);
