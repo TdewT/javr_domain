@@ -76,7 +76,8 @@ class DiscordBot {
     errorHandler(process) {
         process.stderr.on('data', (err) => {
             err = String(err);
-            customLog(this.htmldID, err);
+            if (!err.includes("on Lavalink with the provided password."))
+                customLog(this.htmldID, err);
         });
         process.on('error', (err) => {
             err = String(err);
