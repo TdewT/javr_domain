@@ -6,11 +6,8 @@ const axios = require('axios');
 // Local imports
 const {
     statuses,
-    types,
-    ArmaServer,
-    MinecraftServer,
-    GenericServer,
-    TeamspeakServer
+    serverTypes,
+    serverClasses,
 } = require("./object classes/CustomServers");
 const {customLog} = require('./utils/CustomUtils');
 const {DiscordBot} = require('./object classes/DiscordBot');
@@ -38,23 +35,12 @@ for (const botName in discordBotsConfig) {
 
 // Load servers
 const servers = [];
-for (const serverName in serversInfo[types.GENERIC]) {
-    const server = (serversInfo[types.GENERIC][serverName]);
-    servers.push(new GenericServer(server))
+for (const type of Object.values(serverTypes)) {
+    for (const serverName in serversInfo[type]) {
+        const server = (serversInfo[type][serverName]);
+        servers.push(new serverClasses[type](server))
+    }
 }
-for (const serverName in serversInfo[types.MINECRAFT]) {
-    const server = (serversInfo[types.MINECRAFT][serverName]);
-    servers.push(new MinecraftServer(server))
-}
-for (const serverName in serversInfo[types.ARMA]) {
-    const server = (serversInfo[types.ARMA][serverName]);
-    servers.push(new ArmaServer(server))
-}
-for (const serverName in serversInfo[types.TSSERVER]) {
-    const server = (serversInfo[types.TSSERVER][serverName]);
-    servers.push(new TeamspeakServer(server))
-}
-
 module.exports = {servers};
 
 // Setup express
