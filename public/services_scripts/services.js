@@ -11,15 +11,21 @@ socket.on('connect', () => {
 socket.on('status_response', (services) => {
     // Get list element
     serverListElement = $("#server-list");
-    const servers = services["servers"];
-    const discordBots = services["discordBots"];
+    const servers = services.servers;
+    const discordBots = services.discordBots;
+
     console.log(servers);
+    console.log(discordBots);
 
     // Generate or update elements for servers
-    generateServers(servers);
+    if (servers) {
+        generateServers(servers);
+    }
 
     // Generate or update elements for Discord bots
-    generateDiscordBots(discordBots);
+    if (discordBots) {
+        generateDiscordBots(discordBots);
+    }
 
 });
 
