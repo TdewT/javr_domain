@@ -129,7 +129,7 @@ io.on('connection', socket => {
 
         if (bot) {
             if (bot.status === statuses.OFFLINE) {
-                bot.start(emitDataGlobal, io, {discordBots: discordBots})
+                bot.start()
             }
             else {
                 customLog(botID, `${ip} request denied, bot already on`);
