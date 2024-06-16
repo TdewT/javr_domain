@@ -31,5 +31,11 @@ function printBot(bot){
 }
 
 function updateBot(bot){
+    // Get relevant elements
+    const indicatorElement = $(`#${bot.htmlID}-status`);
+    const statusTxtElement = $(`#${bot.htmlID}-status-text`);
 
+    // Change values
+    indicatorElement.innerText = statusIndicators[bot.status];
+    statusTxtElement.innerText = getStatusText(bot);
 }
