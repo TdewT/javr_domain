@@ -100,7 +100,7 @@ io.on('connection', socket => {
 
         if (server) {
             if (server.status === statuses.OFFLINE) {
-                server.startServer(emitDataGlobal, io, servers)
+                server.startServer(emitDataGlobal, io, {servers: servers})
             }
             else {
                 customLog(serverID, `${ip} request denied, port is taken`);
@@ -137,7 +137,7 @@ io.on('connection', socket => {
 
         if (bot) {
             if (bot.status === statuses.OFFLINE) {
-                bot.start(emitDataGlobal, io, servers)
+                bot.start(emitDataGlobal, io, {discordBots: discordBots})
             }
             else {
                 customLog(botID, `${ip} request denied, bot already on`);
