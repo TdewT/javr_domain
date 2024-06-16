@@ -27,7 +27,27 @@ function printBot(bot){
     botElement.innerHTML +=
         `<span class="me-name">${bot.displayName}</span>`;
 
-    return botElement;
+    // Add buttons
+    botElement.innerHTML +=
+        `<span>` +
+        `<button type="button" class="button btn btn-success btn-sm ms-5" id="${bot.htmlID}-button-start">START</button>` +
+        `<button type="button" class="button btn btn-danger btn-sm ms-5" id="${bot.htmlID}-button-stop">STOP</button>` +
+        `</span>`;
+
+    // Add element to DOM
+    serviceListElement.appendChild(botElement);
+
+    // Remove margin to make place for buttons
+    botElement.querySelector(".me-name").className = '';
+
+    // Send start request to bot on press
+    $(`#${bot.htmlID}-button-start`).addEventListener('click', () => {
+        socket.emit(`start_dbot_request`, bot.htmlID);
+    });
+    // Send stop request to bot on press
+    $(`#${bot.htmlID}-button-stop`).addEventListener('click', () => {
+        socket.emit('stop_dbot_request', bot.htmlID);
+    });
 }
 
 function updateBot(bot){
