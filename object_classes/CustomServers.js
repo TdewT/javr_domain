@@ -70,9 +70,9 @@ class GenericServer {
     // For servers with executable linked
     exitCheck(server) {
         server.currProcess.on('error', (error) => {
+            String(error);
             customLog(server.htmlID, error);
             server.status = statuses.OFFLINE;
-
         });
 
         server.currProcess.stderr.on('data', (err) => {
