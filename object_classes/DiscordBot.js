@@ -3,35 +3,55 @@ const {customLog} = require("../utils/CustomUtils");
 const {statuses} = require("./CustomServers");
 
 class DiscordBot {
-    constructor({dirPath, name,
+    constructor({
+                    dirPath, name, emitFunc, io, discordBots,
                     lavaArgs = ["-jar", "Lavalink.jar"],
-                    pythonPath = "python"}) {
+                    pythonPath = "python"
+                }) {
+        // Current state of the bot
         this.status = statuses.OFFLINE;
+        // Path to the bots folder
         this.dirPath = dirPath;
-        this.lavaArgs = lavaArgs;
+        // Path to python installation that is supposed to run bot
         this.pythonPath = pythonPath;
+        // Name displayed in clients browser
         this.displayName = name;
-        this.htmldID = name.replace(' ', '_');
+        // Name use for identification on both front and backend
+        this.htmlID = name.replace(' ', '_');
+        
+        // Arguments for lavalink spawn (generally best to leave default)
+        this.lavaArgs = lavaArgs;
+        // Lavalink status
+        this.lavaStatus = statuses.OFFLINE;
+        // Whether it is connected to Discord bot
         this.lavaConnected = false;
+        
+        // Stores processes of lavalink and bot itself
         this.lavaProcess = null;
         this.botProcess = null;
+        
+        // Pass variables and functions needed for updating client's info
+        this.emitFunc = emitFunc;
+        // FIXME: This is temporary work-around, will fix with general refactor
+        this.io = io;
+        this.discordBots = discordBots;
     }
 
-    start(emitFunc, socket, discordBots) {
-        customLog(this.htmldID, "Bot starting...");
+    start() {
+        customLog(this.htmlID, "Bot starting...");
+        this.updateBotStatus(statuses.STARTING);
 
-        // Start lavalink before bot
-        customLog(this.htmldID, "Launching Lavalink...");
-        this.startLava(emitFunc, socket, discordBots);
+        // Start lavalink before bot (lavalink takes longer to boot up)
+        customLog(this.htmlID, "Launching Lavalink...");
+        this.startLava();
 
 
         // Start the bot process
-        customLog(this.htmldID, "Launching bot...");
-        this.startBot(emitFunc, socket, discordBots);
-        emitFunc(socket, "status-response", discordBots);
+        customLog(this.htmlID, "Launching bot...");
+        this.startBot();
     }
 
-    startLava(emitFunc, socket, discordBots) {
+    startLava() {
         // Start lavalink process
         this.lavaProcess = spawn(
             "java",
@@ -39,62 +59,113 @@ class DiscordBot {
             {cwd: this.dirPath, shell: true}
         );
         // Start lavalink output handler
-        this.lavalinkHandler(this.lavaProcess, emitFunc, socket, discordBots);
+        this.lavalinkHandler();
     }
 
-    startBot(emitFunc, socket, discordBots) {
+    startBot() {
         // Start bot process
         this.botProcess = spawn(`"${this.pythonPath}"`, ['main.py'], {cwd: this.dirPath, shell: true});
         // Start process output handler
-        this.discordProcessHandler(this.botProcess, emitFunc, socket, discordBots);
+        this.discordProcessHandler();
     }
 
-    discordProcessHandler(discordProcess, emitFunc, socket, discordBots) {
-        // On process output
-        discordProcess.stdout.on('data', (data) => {
+    // Handle bots console output
+    discordProcessHandler() {
+        // On processes output
+        this.botProcess.stdout.on('data', (data) => {
             data = String(data);
-            if (data.includes("online")){
-                customLog(this.htmldID, "Bot is now online");
-                this.status = statuses.ONLINE;
-                emitFunc(socket, "status-response", discordBots);
+            // Trigger when the bot reports it's online
+            if (data.includes("online")) {
+                customLog(this.htmlID, "Bot is now online");
+                this.updateBotStatus(statuses.ONLINE);
             }
         });
 
-        this.errorHandler(discordProcess, emitFunc, socket, discordBots);
-
+        // Start handling errors
+        this.errorHandler();
     }
 
-    lavalinkHandler(lavaProcess, emitFunc, socket, discordBots) {
-        // On process output
-        lavaProcess.stdout.on('data', (data) => {
+    // Handle Lavalinks console output
+    lavalinkHandler() {
+        // On processes output
+        this.lavaProcess.stdout.on('data', (data) => {
             data = String(data);
+            // Trigger when Lavalink reports it's online
             if (data.includes("Lavalink is ready to accept connections.")) {
-                customLog(this.htmldID, "Successfully started lavalink");
+                customLog(this.htmlID, "Successfully started lavalink");
+                this.updateLavaStatus(statuses.ONLINE);
+            }
+            // Trigger when bot connects to lavalink
+            else if (data.includes("GET /v4/websocket, client=127.0.0.1")){
+                customLog(this.htmlID, "Lavalink Connected");
                 this.lavaConnected = true;
-                emitFunc(socket, "status-response", discordBots);
             }
         });
-        this.errorHandler(lavaProcess, emitFunc, socket, discordBots)
+
+        // Start handling errors
+        this.errorHandler()
     }
 
-    errorHandler(process, emitFunc, socket, discordBots) {
+    // Generalised error handler for both Discord bot and Lavalink
+    errorHandler(process) {
         process.stderr.on('data', (err) => {
             err = String(err);
-            if (!err.includes("on Lavalink with the provided password.")){
-                customLog(this.htmldID, err);
+            // Filter out log spam when bot can't connect to lavalink
+            if (err.includes("Failed to authenticate Node") && err.includes(`identifier=${this.htmlID}`)) {
+                // Update connection state with lavalink
                 this.lavaConnected = false;
-                emitFunc(socket, "status-response", discordBots);
+                this.sendResponse();
             }
+            // Log if it's a different error
+            customLog(this.htmlID, err);
         });
+        // Print out any errors
         process.on('error', (err) => {
             err = String(err);
-            customLog(this.htmldID, err);
+            customLog(this.htmlID, err);
         });
+        // Triggers when application is closed in any way
         process.on('exit', () => {
-            this.lavaConnected = false;
-            this.lavaProcess = null;
-            emitFunc(socket, "status-response", discordBots);
+            // Check which app closed
+            if (process === this.lavaProcess){
+                this.lavaStatus = false;
+                this.lavaProcess = null;
+                customLog(this.htmlID, "Lavalink closed");
+            }
+            else{
+                this.botProcess = null;
+                this.updateBotStatus(statuses.OFFLINE);
+                customLog(this.htmlID, "Bot closed");
+            }
         });
+    }
+
+    stop() {
+        customLog(this.htmlID, `Stopping Discord bot`);
+        if (this.status === statuses.ONLINE) {
+            // Set status to stopping before they stop
+            this.updateBotStatus(statuses.STOPPING);
+            this.updateLavaStatus(statuses.STOPPING);
+            if (this.botProcess) {
+                // Kill the processes
+                // Updates are done by their exit handlers
+                this.botProcess.kill();
+                this.lavaProcess.kill();
+            }
+        }
+    }
+
+    // Small helper methods
+    updateBotStatus(status){
+        this.status = status;
+        this.sendResponse();
+    }
+    updateLavaStatus(status){
+        this.lavaStatus = status;
+        this.sendResponse();
+    }
+    sendResponse(){
+        this.emitFunc(this.io(), "status_response", {discordBots: this.discordBots()});
     }
 }
 

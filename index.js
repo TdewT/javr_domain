@@ -27,23 +27,6 @@ const discordBotsConfig = ConfigManager.getConfig(configTypes.discordBots);
 // Extract token for ZeroTier
 const zeroTierToken = apiTokens["tokens"]["zerotier"];
 
-// Load Discord bots
-const discordBots= [];
-for (const botName in discordBotsConfig) {
-    discordBots.push(new DiscordBot(discordBotsConfig[botName]));
-}
-
-
-// Load servers
-const servers = [];
-for (const type of Object.values(serverTypes)) {
-    for (const serverName in serversInfo[type]) {
-        const server = (serversInfo[type][serverName]);
-        servers.push(new serverClasses[type](server))
-    }
-}
-module.exports = {servers};
-
 // Setup express
 const app = express();
 app.use(express.static('public'));
@@ -204,9 +187,37 @@ function emitDataGlobal(socket, event, data) {
     socket.emit(event, data);
 }
 
+//
+// Services
+//
 
-//FIXME: debug only
-discordBots[0].start(emitDataGlobal, io, discordBots);
+// Load Discord bots
+const discordBots = [];
+for (const botName in discordBotsConfig) {
+    // Load initial parameters from config
+    let constructorParams = discordBotsConfig[botName];
+
+    // Add missing parameters
+    Object.assign(constructorParams, {
+        emitFunc: emitDataGlobal,
+        // FIXME: This is temporary work-around, will fix with general refactor
+        io: ()=> io,
+        discordBots:()=> discordBots,
+    });
+    // Create bot instance and add it to the list
+    discordBots.push(new DiscordBot(constructorParams));
+}
+
+// Load servers
+const servers = [];
+for (const type of Object.values(serverTypes)) {
+    for (const serverName in serversInfo[type]) {
+        const server = (serversInfo[type][serverName]);
+        servers.push(new serverClasses[type](server))
+    }
+}
+module.exports = {servers};
+
 
 //
 // API
