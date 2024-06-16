@@ -105,12 +105,18 @@ io.on('connection', socket => {
 
         const server = getServerByHtmlID(serverID);
 
-        if (server.status !== statuses.OFFLINE) {
-            server.stopServer();
+        if (server) {
+            if (server.status !== statuses.OFFLINE) {
+                server.stopServer();
+            }
+            else {
+                customLog(serverID, `${ip} request denied, server is not running`);
+                io.to(socket.id).emit('request_failed', 'Serwer nie jest włączony')
+            }
         }
         else {
-            customLog(serverID, `${ip} request denied, server is not running`);
-            io.to(socket.id).emit('request_failed', 'Serwer nie jest włączony')
+            customLog(serverID, `${ip} request denied, Server not found`);
+            io.to(socket.id).emit('request_failed', "Nie znaleziono serwera")
         }
 
     });
