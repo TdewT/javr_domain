@@ -49,8 +49,12 @@ const server = app.listen(80, () => {
 const io = socketIO(server);
 
 //Find server in servers[] by server.htmlID
-const getObjectByHtmlID = serverID => servers.filter((o) => {
-    return o.htmlID === serverID
+const getServerByHtmlID = serverID => servers.filter((s) => {
+    return s.htmlID === serverID
+})[0];
+//Find Discord bot in discordBots[] by server.htmlID
+const getDbotByHtmlID = botID => discordBots.filter((b) => {
+    return b.htmlID === botID
 })[0];
 
 // When client connects to the server
@@ -78,7 +82,7 @@ io.on('connection', socket => {
         customLog(serverID, `${ip} requested server start`);
 
         // Get requested server's status
-        const server = getObjectByHtmlID(serverID);
+        const server = getServerByHtmlID(serverID);
 
         if (server) {
             if (server.status === statuses.OFFLINE) {
@@ -99,7 +103,7 @@ io.on('connection', socket => {
     socket.on('stop_server_request', (serverID) => {
         customLog(serverID, `${ip} requested server stop`);
 
-        const server = getObjectByHtmlID(serverID);
+        const server = getServerByHtmlID(serverID);
 
         if (server.status !== statuses.OFFLINE) {
             server.stopServer();
@@ -115,7 +119,7 @@ io.on('connection', socket => {
     // Request bot start
     socket.on('start_bot_request', (botID) => {
 
-        const bot = getObjectByHtmlID(botID);
+        const bot = getDbotByHtmlID(botID);
 
         if (bot) {
             if (bot.status === statuses.OFFLINE) {
