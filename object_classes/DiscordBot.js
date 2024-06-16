@@ -144,7 +144,6 @@ class DiscordBot {
     }
 
     stop() {
-        customLog(this.htmlID, `Stopping Discord bot`);
         if (this.status === statuses.ONLINE) {
             // Set status to stopping before they stop
             this.updateBotStatus(statuses.STOPPING);
@@ -153,9 +152,11 @@ class DiscordBot {
             // Kill the processes
             // Updates are done by their exit handlers
             if (this.lavaProcess) {
+                customLog(this.htmlID, `Stopping Lavalink`);
                 this.lavaProcess.kill();
             }
             if (this.botProcess) {
+                customLog(this.htmlID, `Stopping Discord bot`);
                 this.botProcess.kill();
             }
         }
