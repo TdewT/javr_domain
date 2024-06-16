@@ -131,8 +131,8 @@ io.on('connection', socket => {
             }
         }
         else {
-            customLog(botID, `${ip} request denied, Server not found`);
-            io.to(socket.id).emit('request_failed', "Nie znaleziono serwera")
+            customLog(botID, `${ip} request denied, Bot not found`);
+            io.to(socket.id).emit('request_failed', "Nie znaleziono bota")
         }
     });
 
