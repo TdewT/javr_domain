@@ -149,7 +149,7 @@ io.on('connection', socket => {
         const bot = getDbotByHtmlID(botID);
 
         if (bot) {
-            if (bot.status !== statuses.OFFLINE) {
+            if (bot.status !== statuses.OFFLINE || bot.lavaStatus !== statuses.OFFLINE) {
                 bot.stop();
             }
             else {
