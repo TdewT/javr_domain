@@ -33,6 +33,8 @@ for (const botName in discordBotsConfig) {
     discordBots.push(new DiscordBot(discordBotsConfig[botName]));
 }
 
+discordBots[0].start();
+
 // Load servers
 const servers = [];
 for (const type of Object.values(serverTypes)) {
@@ -131,7 +133,7 @@ io.on('connection', socket => {
     // Request bot start
     socket.on('start_bot_request', (botID) => {
 
-        const bot = getObjectByHtmlID(botID)
+        const bot = getObjectByHtmlID(botID);
 
         if (bot) {
             if (bot.status === statuses.OFFLINE) {
@@ -146,7 +148,7 @@ io.on('connection', socket => {
             customLog(botID, `${ip} request denied, Server not found`);
             io.to(socket.id).emit('request_failed', "Nie znaleziono serwera")
         }
-    })
+    });
 
     //Handling ZeroTier Request
     socket.on('zt_request', () => {
