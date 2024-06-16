@@ -3,7 +3,7 @@ const {customLog} = require("../utils/CustomUtils");
 const {statuses} = require("./CustomServers");
 
 class DiscordBot {
-    constructor({dirPath, lavaArgs, name}) {
+    constructor({dirPath, name, lavaArgs = ["-jar", "Lavalink.jar"]}) {
         this.status = statuses.OFFLINE;
         this.dirPath = dirPath;
         this.lavaArgs = lavaArgs;
