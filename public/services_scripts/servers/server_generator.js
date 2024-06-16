@@ -1,5 +1,5 @@
 // Generate all servers from list
-function generateServers(servers) {
+function syncServers(servers) {
     for (let server of servers) {
         if (!$(`#${server.htmlID}-server-status-box`)){
             printServer(server);
@@ -50,14 +50,14 @@ function createGenericElement(server) {
     const serverElement = getGenericElement(server);
 
     // Add element to DOM
-    serverListElement.appendChild(serverElement);
+    serviceListElement.appendChild(serverElement);
 }
 function createMinecraftElement(server) {
     // Generate element with the function
     const serverElement = getMinecraftElement(server);
 
     // Add element to DOM
-    serverListElement.appendChild(serverElement);
+    serviceListElement.appendChild(serverElement);
 
     // Add playerList to the server
     generatePlayerList(server);
@@ -77,7 +77,7 @@ function createArmaElement(server) {
     const serverElement = getArmaServer(server);
 
     // Add element to DOM
-    serverListElement.appendChild(serverElement);
+    serviceListElement.appendChild(serverElement);
 
     // Send start request to server on press
     $(`#${server.htmlID}-button-start`).addEventListener('click', () => {
@@ -97,7 +97,7 @@ function createTeamspeakElement(server) {
     const serverElement = getTeamspeakServer(server);
 
     // Add element to DOM
-    serverListElement.appendChild(serverElement);
+    serviceListElement.appendChild(serverElement);
 
     // Send start request to server on press
     $(`#${server.htmlID}-button-start`).addEventListener('click', () => {

@@ -2,7 +2,7 @@ const socket = io('ws:///');
 
 const $ = (e) => document.querySelector(e);
 
-let serverListElement;
+let serviceListElement;
 
 socket.on('connect', () => {
     socket.emit('status_request');
@@ -10,18 +10,18 @@ socket.on('connect', () => {
 
 socket.on('status_response', (services) => {
     // Get list element
-    serverListElement = $("#server-list");
+    serviceListElement = $("#service-list");
     const servers = services.servers;
     const discordBots = services.discordBots;
 
     // Generate or update elements for servers
     if (servers) {
-        generateServers(servers);
+        syncServers(servers);
     }
 
     // Generate or update elements for Discord bots
     if (discordBots) {
-        generateDiscordBots(discordBots);
+        syncDiscordBots(discordBots);
     }
 
 });

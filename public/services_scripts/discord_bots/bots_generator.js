@@ -1,4 +1,4 @@
-function generateDiscordBots(bots){
+function syncDiscordBots(bots){
     // Go through all passed bots
     for (const bot of bots) {
         // Check if bot was already loaded
@@ -28,4 +28,8 @@ function printBot(bot){
         `<span class="me-name">${bot.displayName}</span>`;
 
     return botElement;
+}
+
+function updateBot(bot){
+
 }
