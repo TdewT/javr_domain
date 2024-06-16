@@ -166,7 +166,7 @@ io.on('connection', socket => {
             }
             else {
                 customLog(botID, `${ip} request denied, bot is not online`);
-                io.to(socket.id).emit('request_failed', 'bot nie jest włączony')
+                io.to(socket.id).emit('request_failed', 'bot nie jest w pełni włączony')
             }
         }
         else {
