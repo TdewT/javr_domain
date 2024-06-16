@@ -154,11 +154,18 @@ io.on('connection', socket => {
 
         // Check if bot was found
         if (bot) {
-            if (bot.status !== statuses.OFFLINE || bot.lavaStatus !== statuses.OFFLINE) {
+            // Conditions broken down for clarity
+            const botOnline = bot.status === statuses.ONLINE;
+            const lavaOnline = bot.lavaStatus === statuses.ONLINE;
+            const botStarting = bot.status === statuses.STARTING;
+            const botStopping = bot.status === statuses.STOPPING;
+
+            // Check if conditions to stop the bot are met
+            if ((botOnline || lavaOnline) && !(botStarting || botStopping)) {
                 bot.stop();
             }
             else {
-                customLog(botID, `${ip} request denied, bot is not running`);
+                customLog(botID, `${ip} request denied, bot is not online`);
                 io.to(socket.id).emit('request_failed', 'bot nie jest włączony')
             }
         }
