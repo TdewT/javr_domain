@@ -33,8 +33,6 @@ for (const botName in discordBotsConfig) {
     discordBots.push(new DiscordBot(discordBotsConfig[botName]));
 }
 
-//FIXME: debug only
-discordBots[0].start();
 
 // Load servers
 const servers = [];
@@ -206,6 +204,9 @@ function emitDataGlobal(socket, event, data) {
     socket.emit(event, data);
 }
 
+
+//FIXME: debug only
+discordBots[0].start(emitDataGlobal, io, discordBots);
 
 //
 // API
