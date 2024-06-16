@@ -136,6 +136,29 @@ io.on('connection', socket => {
         }
     });
 
+    // Requested server stop
+    socket.on('stop_dbot_request', (botID) => {
+        customLog(botID, `${ip} requested bot stop`);
+
+        const bot = getDbotByHtmlID(botID);
+
+        if (bot) {
+            if (bot.status !== statuses.OFFLINE) {
+                bot.stop();
+            }
+            else {
+                customLog(botID, `${ip} request denied, bot is not running`);
+                io.to(socket.id).emit('request_failed', 'bot nie jest włączony')
+            }
+        }
+        else {
+            customLog(botID, `${ip} request denied, Bot not found`);
+            io.to(socket.id).emit('request_failed', "Nie znaleziono bota")
+        }
+
+    });
+
+
     //Handling ZeroTier Request
     socket.on('zt_request', () => {
         customLog(siteIDName, `${ip} requested ZeroTier information`);
