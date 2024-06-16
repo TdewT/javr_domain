@@ -117,7 +117,7 @@ io.on('connection', socket => {
 
 
     // Request bot start
-    socket.on('start_bot_request', (botID) => {
+    socket.on('start_dbot_request', (botID) => {
 
         const bot = getDbotByHtmlID(botID);
 
