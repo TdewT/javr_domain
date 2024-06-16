@@ -18,18 +18,18 @@ class DiscordBot {
         this.displayName = name;
         // Name use for identification on both front and backend
         this.htmlID = name.replace(' ', '_');
-        
+
         // Arguments for lavalink spawn (generally best to leave default)
         this.lavaArgs = lavaArgs;
         // Lavalink status
         this.lavaStatus = statuses.OFFLINE;
         // Whether it is connected to Discord bot
         this.lavaConnected = false;
-        
+
         // Stores processes of lavalink and bot itself
         this.lavaProcess = null;
         this.botProcess = null;
-        
+
         // Pass variables and functions needed for updating client's info
         this.emitFunc = emitFunc;
         // FIXME: This is temporary work-around, will fix with general refactor
@@ -96,7 +96,7 @@ class DiscordBot {
                 this.updateLavaStatus(statuses.ONLINE);
             }
             // Trigger when bot connects to lavalink
-            else if (data.includes("GET /v4/websocket, client=127.0.0.1")){
+            else if (data.includes("GET /v4/websocket, client=127.0.0.1")) {
                 customLog(this.htmlID, "Lavalink Connected");
                 this.lavaConnected = true;
             }
@@ -127,12 +127,12 @@ class DiscordBot {
         // Triggers when application is closed in any way
         process.on('exit', () => {
             // Check which app closed
-            if (process === this.lavaProcess){
+            if (process === this.lavaProcess) {
                 this.lavaStatus = false;
                 this.lavaProcess = null;
                 customLog(this.htmlID, "Lavalink closed");
             }
-            else{
+            else {
                 this.botProcess = null;
                 this.updateBotStatus(statuses.OFFLINE);
                 customLog(this.htmlID, "Bot closed");
@@ -156,15 +156,17 @@ class DiscordBot {
     }
 
     // Small helper methods
-    updateBotStatus(status){
+    updateBotStatus(status) {
         this.status = status;
         this.sendResponse();
     }
-    updateLavaStatus(status){
+
+    updateLavaStatus(status) {
         this.lavaStatus = status;
         this.sendResponse();
     }
-    sendResponse(){
+
+    sendResponse() {
         this.emitFunc(this.io(), "status_response", {discordBots: this.discordBots()});
     }
 }
