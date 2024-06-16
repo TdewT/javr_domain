@@ -58,7 +58,9 @@ function customLog(name, str) {
     time = time.replaceAll(",", " |");
 
     // Trim the string and remove unwanted special chars
-    str = str.trim().replace(/[\r\n]+/gm, '');
+    if (typeof str === "string"){
+        str = str.trim().replace(/[\r\n]+/gm, '');
+    }
     // Final log text
     const logTxt = `[${time}] [${name}]: ${str}`;
 
