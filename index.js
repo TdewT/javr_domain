@@ -60,7 +60,7 @@ const server = app.listen(80, () => {
     // Start checking ports for every defined server
     for (const server of servers) {
         customLog(server.htmlID, "Starting statusMonitor");
-        server.statusMonitor(emitDataGlobal, io, "status_response", servers)
+        server.statusMonitor(emitDataGlobal, io, "status_response", {servers: servers})
     }
 });
 

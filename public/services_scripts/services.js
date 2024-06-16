@@ -14,9 +14,6 @@ socket.on('status_response', (services) => {
     const servers = services.servers;
     const discordBots = services.discordBots;
 
-    console.log(servers);
-    console.log(discordBots);
-
     // Generate or update elements for servers
     if (servers) {
         generateServers(servers);
