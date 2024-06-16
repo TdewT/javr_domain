@@ -8,9 +8,9 @@ const {
     statuses,
     serverTypes,
     serverClasses,
-} = require("./object classes/CustomServers");
+} = require("./object_classes/CustomServers");
 const {customLog} = require('./utils/CustomUtils');
-const {DiscordBot} = require('./object classes/DiscordBot');
+const {DiscordBot} = require('./object_classes/DiscordBot');
 
 
 // Create ConfigManager instance
@@ -33,6 +33,7 @@ for (const botName in discordBotsConfig) {
     discordBots.push(new DiscordBot(discordBotsConfig[botName]));
 }
 
+//FIXME: debug only
 discordBots[0].start();
 
 // Load servers
