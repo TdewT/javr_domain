@@ -3,7 +3,9 @@ const {customLog} = require("../utils/CustomUtils");
 const {statuses} = require("./CustomServers");
 
 class DiscordBot {
-    constructor({dirPath, name, lavaArgs = ["-jar", "Lavalink.jar"], pythonPath = "python"}) {
+    constructor({dirPath, name,
+                    lavaArgs = ["-jar", "Lavalink.jar"],
+                    pythonPath = "python"}) {
         this.status = statuses.OFFLINE;
         this.dirPath = dirPath;
         this.lavaArgs = lavaArgs;
@@ -41,7 +43,7 @@ class DiscordBot {
 
     startBot() {
         // Start bot process
-        this.botProcess = spawn(this.pythonPath, ['main.py'], {cwd: this.dirPath, shell: true});
+        this.botProcess = spawn(`"${this.pythonPath}"`, ['main.py'], {cwd: this.dirPath, shell: true});
         // Start process output handler
         this.discordProcessHandler(this.botProcess);
     }
