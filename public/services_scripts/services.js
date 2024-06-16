@@ -14,14 +14,14 @@ socket.on('status_response', (services) => {
     const servers = services.servers;
     const discordBots = services.discordBots;
 
-    // Generate or update elements for servers
-    if (servers) {
-        syncServers(servers);
-    }
-
     // Generate or update elements for Discord bots
     if (discordBots) {
         syncDiscordBots(discordBots);
+    }
+
+    // Generate or update elements for servers
+    if (servers) {
+        syncServers(servers);
     }
 
 });
