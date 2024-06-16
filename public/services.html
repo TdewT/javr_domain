@@ -8,10 +8,10 @@
     <link href="style.css" rel="stylesheet">
     <script src="socket.io.min.js"></script>
     <script src="services_scripts/services.js"></script>
-    <script src="services_scripts/servers/server_generator.js"></script>
+    <script src="services_scripts/servers/server_handler.js"></script>
     <script src="services_scripts/servers/servers_utils.js"></script>
-    <script src="services_scripts/servers/server_generator.js"></script>
-    <script src="services_scripts/discord_bots/bots_generator.js"></script>
+    <script src="services_scripts/servers/server_handler.js"></script>
+    <script src="services_scripts/discord_bots/discord_bot_handler.js"></script>
     <script src="services_scripts/discord_bots/bots_utils.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
             integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"
@@ -45,14 +45,7 @@
     <div class="container status-content fluid-custom no-padding-md mx-lg-auto mt-md-5 p-lg-5 rounded-4 d-flex flex flex-column align-items-center max-width-4">
         <h2 class="d-none d-md-block mb-5">Aktualny stan serwerów/botów</h2>
         <div class="container-fluid fluid-custom p-md-0 no-padding-md">
-            <ul id="server-list" class="list-group striped-list border-dark">
-                <li class="list-group-item d-flex">
-                    <div id="argentino-server-status-box" class="server-status-box me-auto flex">
-                        <span class="me-4" id="argentino-status">🔴</span>
-                        <span class="me-4" id="argentino-status-text">Offline</span>
-                    </div>
-                    <span class="me-name">JAVR Argentino</span>
-                </li>
+            <ul id="service-list" class="list-group striped-list border-dark">
             </ul>
         </div>
     </div>
