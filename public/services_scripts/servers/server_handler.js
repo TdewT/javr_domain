@@ -130,8 +130,6 @@ function updateMinecraftServer(server) {
 function updateArmaServer(server) {
     // For now that's enough
     updateGenericServer(server);
-
-    //TODO: Add connection with arma scripts to get info from the server
 }
 function updateTeamspeakServer(server) {
     // For now that's enough
