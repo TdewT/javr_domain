@@ -146,11 +146,14 @@ class DiscordBot {
             // Set status to stopping before they stop
             this.updateBotStatus(statuses.STOPPING);
             this.updateLavaStatus(statuses.STOPPING);
-            if (this.botProcess) {
-                // Kill the processes
-                // Updates are done by their exit handlers
-                this.botProcess.kill();
+
+            // Kill the processes
+            // Updates are done by their exit handlers
+            if (this.lavaProcess) {
                 this.lavaProcess.kill();
+            }
+            if (this.botProcess) {
+                this.botProcess.kill();
             }
         }
     }
