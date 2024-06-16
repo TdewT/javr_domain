@@ -82,7 +82,7 @@ class DiscordBot {
         });
 
         // Start handling errors
-        this.errorHandler();
+        this.errorHandler(this.botProcess);
     }
 
     // Handle Lavalinks console output
@@ -103,7 +103,7 @@ class DiscordBot {
         });
 
         // Start handling errors
-        this.errorHandler()
+        this.errorHandler(this.lavaProcess)
     }
 
     // Generalised error handler for both Discord bot and Lavalink
