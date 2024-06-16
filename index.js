@@ -125,9 +125,12 @@ io.on('connection', socket => {
     // Request bot start
     socket.on('start_dbot_request', (botID) => {
 
+        // Search for bot in the list
         const bot = getDbotByHtmlID(botID);
 
+        // Check if bot was found
         if (bot) {
+            // Check if bot isn't already on
             if (bot.status === statuses.OFFLINE) {
                 bot.start()
             }
@@ -146,8 +149,10 @@ io.on('connection', socket => {
     socket.on('stop_dbot_request', (botID) => {
         customLog(botID, `${ip} requested bot stop`);
 
+        // Search for bot in the list
         const bot = getDbotByHtmlID(botID);
 
+        // Check if bot was found
         if (bot) {
             if (bot.status !== statuses.OFFLINE || bot.lavaStatus !== statuses.OFFLINE) {
                 bot.stop();
