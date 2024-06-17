@@ -8,7 +8,7 @@ const {ConfigManager, configTypes} = require("../utils/ConfigManager");
 const statuses = {
     "ONLINE": "online", "STARTING": "starting", "BUSY": "busy", "STOPPING": "stopping", "OFFLINE": "offline",
 };
-const types = {
+const serverTypes = {
     "GENERIC": "generic",
     "MINECRAFT": "minecraft",
     "ARMA": "arma",
@@ -22,7 +22,7 @@ class GenericServer {
                     displayName,
                     path = '',
                     status = statuses.OFFLINE,
-                    type = types.GENERIC,
+                    type = serverTypes.GENERIC,
                 }) {
         this.port = port;
         this.htmlID = htmlID;
@@ -70,9 +70,9 @@ class GenericServer {
     // For servers with executable linked
     exitCheck(server) {
         server.currProcess.on('error', (error) => {
+            String(error);
             customLog(server.htmlID, error);
             server.status = statuses.OFFLINE;
-
         });
 
         server.currProcess.stderr.on('data', (err) => {
@@ -99,7 +99,7 @@ class MinecraftServer extends GenericServer {
                 }) {
         super({port, htmlID, displayName, path, status});
 
-        this.type = types.MINECRAFT;
+        this.type = serverTypes.MINECRAFT;
         this.currProcess = currProcess;
         this.currPlayers = currPlayers;
         this.maxPlayers = maxPlayers;
@@ -274,7 +274,7 @@ class ArmaServer extends GenericServer {
                 }) {
         super({port, htmlID, displayName, path, status});
 
-        this.type = types.ARMA;
+        this.type = serverTypes.ARMA;
         this.startArgs = startArgs;
         this.currProcess = currProcess;
     }
@@ -307,7 +307,7 @@ class TeamspeakServer extends GenericServer {
                 }) {
         super({port, htmlID, displayName, path, status});
 
-        this.type = types.TSSERVER;
+        this.type = serverTypes.TSSERVER;
         this.currProcess = currProcess;
     }
 
@@ -365,11 +365,16 @@ class TeamspeakServer extends GenericServer {
     }
 }
 
+
+const serverClasses = {
+    "generic": GenericServer,
+    "minecraft": MinecraftServer,
+    "arma": ArmaServer,
+    "tsserver": TeamspeakServer,
+};
+
 module.exports = {
-    ArmaServer,
-    GenericServer,
-    MinecraftServer,
-    TeamspeakServer,
     statuses,
-    types
+    serverClasses,
+    serverTypes
 };

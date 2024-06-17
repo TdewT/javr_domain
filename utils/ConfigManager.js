@@ -8,6 +8,7 @@ const configTypes = {
     apiTokens: "api_tokens.json",
     minecraftJavaVer: "minecraft_java_ver.json",
     serversInfo: "servers_info.json",
+    discordBots: "discord_bots.json",
 };
 
 // Templates used for config generation
@@ -19,7 +20,8 @@ const fileTemplates = {
         }
     },
     "minecraft_java_ver.json": {},
-    "servers_info.json": {}
+    "servers_info.json": {},
+    "discord_bots.json": {},
 };
 
 class ConfigManager {
