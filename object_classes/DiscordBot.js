@@ -111,13 +111,13 @@ class DiscordBot {
         process.stderr.on('data', (err) => {
             err = String(err);
             // Filter out log spam when bot can't connect to lavalink
-            if (err.includes("Failed to authenticate Node") && err.includes(`identifier=${this.htmlID}`)) {
+            if (err.includes("Failed to authenticate Node") && err.includes(`identifier=${this.htmlID},`)) {
                 // Update connection state with lavalink
                 if (this.lavaConnected){
                     customLog(this.htmlID, "Lavalink Disconnected");
                     this.lavaConnected = false;
+                    this.sendResponse();
                 }
-                this.sendResponse();
             }
             // Log if it's a different error
             customLog(this.htmlID, err);
