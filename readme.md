@@ -2,8 +2,8 @@
   <img style="margin: auto;" src="Banner.png" alt="JAVR Domain banner">
 </p>
 
-# JAVR Domain
-This is a website made mainly for easy control of all servers I am hosting.
+# Welcome to JAVR Domain
+Here is the source code of a website we made mainly for easy control of the servers I am hosting. <br>
 Although it may have more features in the future.
 
 ## Currently available features:
