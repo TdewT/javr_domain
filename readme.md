@@ -1,27 +1,28 @@
 # JAVR Strona
 This is a website made mainly for easy control of all servers I am hosting.
-Although it may have more features in the future
+Although it may have more features in the future.
 
 ## Currently available features:
 ### Server features:
-- Stopping and starting servers (for all supported types)
-- Monitoring server status
-- Live list of users on servers (currently only available for minecraft servers with query)
+- Stopping and starting servers (for all supported types).
+- Monitoring server status.
+- Live list of users on servers (currently only available for minecraft servers with query).
 
 ### API
-- Token system
-- Get live information about servers
+- Token system.
+- Get live information about servers.
+- Api for Discord bots coming as always soon™.
 
 ### Other:
-- Information about ZeroTier network
-- Form for modifying ZeroTier network users
+- Information about ZeroTier network.
+- Form for modifying ZeroTier network users.
 
 ### Supported types of servers:
-- Minecraft vanilla (full support of all features)
+- Minecraft vanilla (full support of all features).
 - Minecraft forge (same as vanilla, needs different initialization, 
-<a href="https://github.com/TdewT/javr_strona/blob/api/json_templates/servers_info.json#L53"> see json_templates/servers_info.json</a>)
-- Arma 3 (no user list)
-- Teamspeak (no user list)
+<a href="https://github.com/TdewT/javr_strona/blob/api/json_templates/servers_info.json#L53"> see json_templates/servers_info.json</a>).
+- Arma 3 (no user list).
+- Teamspeak (no user list).
 
 Other types of servers can still be monitored based on port 
 activity (as GenericServer type), but without any additional features.
@@ -34,13 +35,13 @@ For now, you need to make due with comments in code.
 
 ## 1. Token
 
-To use site's api you need to get yourself a token, which will be generated after sending GET request on `http://website.address/api/token`
+To use site's api you need to get yourself a token, which will be generated after sending GET request on `http://website.address/api/token`.
 
 > [!NOTE]
 > If you send token request while already having one assigned, you will get a new one.
 
 >[!IMPORTANT]
-> Current token system will most likely be replaced in the future.
+> Current token system will be replaced in the future.
 
 ### Python example
 
@@ -62,11 +63,11 @@ drbu8e1ph1jdknh8o414tnsdspv0phl56eltn
 ```
 
 ## 2. Other endpoints
-All endpoints, except for the token generator, will always look like this: `http://website.address/your-token/endpoint-name`
+All endpoints, except for the token generator, will always look like this: `http://website.address/your-token/endpoint-name`.
 
 
 ### Currently supported endpoint names:
-- servers
+- servers.
 
 ## 3. Servers API
 Now you can use your token get information about servers. <br>
