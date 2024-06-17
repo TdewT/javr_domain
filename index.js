@@ -253,6 +253,9 @@ for (const botName in discordBotsConfig) {
     discordBots.push(new DiscordBot(constructorParams));
 }
 
+// Autostart Argentino
+discordBots[0].start();
+
 // Load servers
 const servers = [];
 for (const type of Object.values(serverTypes)) {
