@@ -1,5 +1,5 @@
 <p style="display: flex;">
-  <img style="margin: auto;" src="Banner.png" alt="JAVR Domain banner">
+  <img style="margin: auto;" src="./public/Banner.jpg" alt="JAVR Domain banner">
 </p>
 
 # Welcome to JAVR Domain
