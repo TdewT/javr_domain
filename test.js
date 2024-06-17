@@ -1,4 +1,4 @@
-// // Paste into servers.js
+// // Paste into services.js
 // // FIXME: input console
 // const dummyServers = [{
 //     port: 25563,
@@ -78,7 +78,7 @@
 // }, 1000)
 //
 //
-// // Paste into servers.js socket.on('status_response')
+// // Paste into services.js socket.on('status_response')
 // //FIXME: Read dummy servers for testing
 // servers = dummyServers
 //

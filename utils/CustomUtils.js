@@ -57,7 +57,10 @@ function customLog(name, str) {
     time = time.replaceAll("/", "-");
     time = time.replaceAll(",", " |");
 
-
+    // Trim the string and remove unwanted special chars
+    if (typeof str === "string"){
+        str = str.trim().replace(/[\r\n]+/gm, '');
+    }
     // Final log text
     const logTxt = `[${time}] [${name}]: ${str}`;
 
@@ -102,7 +105,6 @@ function createLogStream() {
     logStream = fs.createWriteStream(filePath, {flags: 'a'});
 }
 
-  
 
 module.exports = {
     killTask,

@@ -1,3 +1,15 @@
+// Generate all servers from list
+function syncServers(servers) {
+    for (let server of servers) {
+        if (!$(`#${server.htmlID}-server-status-box`)){
+            printServer(server);
+        }
+        else {
+            updateServer(server);
+        }
+    }
+}
+
 // Create server element
 function printServer(server) {
     if (server.type === "minecraft") {
@@ -7,7 +19,6 @@ function printServer(server) {
         createArmaElement(server)
     }
     else if (server.type === "tsserver"){
-        // Temporary fix
         createTeamspeakElement(server)
     }
     else {
@@ -39,19 +50,17 @@ function createGenericElement(server) {
     const serverElement = getGenericElement(server);
 
     // Add element to DOM
-    serverListElement.appendChild(serverElement);
+    serviceListElement.appendChild(serverElement);
 }
 function createMinecraftElement(server) {
     // Generate element with the function
     const serverElement = getMinecraftElement(server);
 
     // Add element to DOM
-    serverListElement.appendChild(serverElement);
+    serviceListElement.appendChild(serverElement);
 
     // Add playerList to the server
     generatePlayerList(server);
-
-    //TODO: Add connection with arma scripts to get info from the server
 
     // Send start request to server on press
     $(`#${server.htmlID}-button-start`).addEventListener('click', () => {
@@ -68,7 +77,7 @@ function createArmaElement(server) {
     const serverElement = getArmaServer(server);
 
     // Add element to DOM
-    serverListElement.appendChild(serverElement);
+    serviceListElement.appendChild(serverElement);
 
     // Send start request to server on press
     $(`#${server.htmlID}-button-start`).addEventListener('click', () => {
@@ -88,7 +97,7 @@ function createTeamspeakElement(server) {
     const serverElement = getTeamspeakServer(server);
 
     // Add element to DOM
-    serverListElement.appendChild(serverElement);
+    serviceListElement.appendChild(serverElement);
 
     // Send start request to server on press
     $(`#${server.htmlID}-button-start`).addEventListener('click', () => {
@@ -99,9 +108,6 @@ function createTeamspeakElement(server) {
     $(`#${server.htmlID}-button-stop`).addEventListener('click', () => {
         socket.emit('stop_server_request', server.htmlID);
     })
-
-
-    //TODO: Add connection with arma scripts to get info from the server
 }
 
 // Update existing server
@@ -124,14 +130,10 @@ function updateMinecraftServer(server) {
 function updateArmaServer(server) {
     // For now that's enough
     updateGenericServer(server);
-
-    //TODO: Add connection with arma scripts to get info from the server
 }
 function updateTeamspeakServer(server) {
     // For now that's enough
     updateGenericServer(server);
-
-    //TODO: Add connection with arma scripts to get info from the server
 }
 
 // Generate server element
