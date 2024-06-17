@@ -254,7 +254,10 @@ for (const botName in discordBotsConfig) {
 }
 
 // Autostart Argentino
-discordBots[0].start();
+const argentino = getDbotByHtmlID("JAVR_Argentino");
+if (argentino) {
+    argentino.start();
+}
 
 // Load servers
 const servers = [];
