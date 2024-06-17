@@ -96,7 +96,7 @@ class DiscordBot {
                 this.updateLavaStatus(statuses.ONLINE);
             }
             // Trigger when bot connects to lavalink
-            else if (data.includes("GET /v4/websocket, client=127.0.0.1")) {
+            else if (data.includes("Connection successfully established")) {
                 customLog(this.htmlID, "Lavalink Connected");
                 this.lavaConnected = true;
             }
