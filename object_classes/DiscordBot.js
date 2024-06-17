@@ -119,8 +119,10 @@ class DiscordBot {
                     this.sendResponse();
                 }
             }
-            // Log if it's a different error
-            customLog(this.htmlID, err);
+            else{
+                // Log if it's a different error
+                customLog(this.htmlID, err);
+            }
         });
         // Print out any errors
         process.on('error', (err) => {
