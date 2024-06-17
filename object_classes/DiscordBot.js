@@ -5,7 +5,7 @@ const {statuses} = require("./CustomServers");
 class DiscordBot {
     constructor({
                     dirPath, name, emitFunc, io, discordBots,
-                    lavaArgs = ["-jar", "Lavalink.jar"],
+                    lavaArgs = ["Lavalink.py"],
                     pythonPath = "python"
                 }) {
         // Current state of the bot
@@ -54,7 +54,7 @@ class DiscordBot {
     startLava() {
         // Start lavalink process
         this.lavaProcess = spawn(
-            "java",
+            `"${this.pythonPath}"`,
             this.lavaArgs,
             {cwd: this.dirPath, shell: true}
         );
