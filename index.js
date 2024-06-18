@@ -246,8 +246,8 @@ for (const botName in discordBotsConfig) {
     Object.assign(constructorParams, {
         emitFunc: emitDataGlobal,
         // FIXME: This is temporary work-around, will fix with general refactor
-        io: ()=> io,
-        discordBots:()=> discordBots,
+        io: () => io,
+        discordBots: () => discordBots,
     });
     // Create bot instance and add it to the list
     discordBots.push(new DiscordBot(constructorParams));
@@ -284,3 +284,9 @@ const apiHandler = new ApiHandler(app);
 apiHandler.newTokenEndpoint();
 // Create endpoints for all existing tokens
 apiHandler.createEndpoints(servers);
+
+
+// Setup redirects
+app.get('/servers.html', (req, res) => {
+    res.redirect(301, '/services.html');
+});
