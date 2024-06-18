@@ -62,7 +62,8 @@ Information about the server is gathered live using Minecraft query protocol.
 - Automatic shutdown if the server gets stuck while saving data.
 - Pick a proper java version for servers minecraft version (currently manually added to look-up file, see template [here](json_templates/minecraft_java_ver.json)).
 
-> [!IMPORTANT] Forge servers require different config structure. See [template file](json_templates/servers_info.json) for more information
+> [!IMPORTANT] 
+> Forge servers require different config structure. See [template file](json_templates/servers_info.json) for more information
 
 
 ### 2. Arma 3 and Teamspeak
