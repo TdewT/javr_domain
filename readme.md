@@ -77,6 +77,7 @@ Server status is determined by listening on port specified in the config.
 
 - Display current status of the server.
 
+> [!NOTE]
 > If you wish to find out how to properly make a config for a server checkout the template file [here](json_templates/servers_info.json)
 
 
@@ -92,6 +93,7 @@ That said, it does works, but is limited to bots launched through the website on
 - Start or stop bot manually with from the website.
 - Start bot with server.
 
+> [!NOTE]
 > If you wish to find out how to properly make a config for a Discord bot checkout the template file [here](json_templates/discord_bots.json)
 
 
@@ -109,7 +111,7 @@ To use site's api you need to get yourself a token, which will be generated afte
 > [!NOTE]
 > If you send token request while already having one assigned, you will get a new one.
 
->[!IMPORTANT]
+> [!IMPORTANT]
 > Current API is temporary and will eventually be replaced.
 
 ### Python example
