@@ -12,6 +12,8 @@ Although it may have more features in the future.
 
 
 
+<br>
+
 ## Currently available features:
 
 
@@ -41,13 +43,14 @@ For more information see [servers](#servers) section
 
 
 
-
+<br><br>
 # Services
 This section contains information on various server int
 > [!WARNING]
 > When creating any service object (server, bot, etc.), remember that the names should be unique!
 
 
+<br>
 
 ## Servers
 Here are the details of what features are available for different server types:
@@ -85,6 +88,8 @@ Server status is determined by listening on port specified in the config.
 
 
 
+<br>
+
 ## Discord Bots
 This is a feature that's early in development and currently is a mess, expect things to break.<br>
 That said, it does works, but is limited to bots launched through the website only.
@@ -103,11 +108,14 @@ That said, it does works, but is limited to bots launched through the website on
 
 
 
+<br><br>
 # Documentation
 There is currently no proper documentation, although it is planned (not so)soon™. <br>
 For now, you need to make due with comments in code.
 
+<br><br>
 # API
+
 
 ## 1. Token
 
@@ -138,12 +146,16 @@ print(token)
 drbu8e1ph1jdknh8o414tnsdspv0phl56eltn
 ```
 
+<br>
+
 ## 2. Other endpoints
 All endpoints, except for the token generator, will always look like this: `http://website.address/your-token/endpoint-name`.
 
 
 ### Currently supported endpoint names:
 - servers.
+
+<br>
 
 ## 3. Servers API
 Now you can use your token get information about servers. <br>
