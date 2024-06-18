@@ -2,14 +2,23 @@
   <img style="margin: auto;" src="./public/Banner.jpg" alt="JAVR Domain banner">
 </p>
 
+
+
+
 # Welcome to JAVR Domain
 Here is the source code of a website we made mainly for easy control of the servers I am hosting. <br>
 Although it may have more features in the future.
 
+
+
+
 ## Currently available features:
+
+
 ### Server features:
 - Stopping and starting servers (for all supported types).
-- Monitoring server status.
+- Monitoring server and Discord bots status.
+- Managing servers and Discord bots.
 - Live list of users on servers (currently only available for minecraft servers with query).
 
 ### API
@@ -22,14 +31,70 @@ Although it may have more features in the future.
 - Form for modifying ZeroTier network users.
 
 ### Supported types of servers:
-- Minecraft vanilla (full support of all features).
-- Minecraft forge (same as vanilla, needs different initialization, 
-<a href="https://github.com/TdewT/javr_strona/blob/api/json_templates/servers_info.json#L53"> see json_templates/servers_info.json</a>).
-- Arma 3 (no user list).
-- Teamspeak (no user list).
+- Minecraft vanilla (full support).
+- Minecraft forge (full support).
+- Arma 3 (basic support+).
+- Teamspeak (basic support+).
+- Other (basic support)
 
-Other types of servers can still be monitored based on port 
-activity (as GenericServer type), but without any additional features.
+For more information see [servers](#servers) section
+
+
+
+
+# Services
+This section contains information on various server int
+> [!WARNING]
+> When creating any service object (server, bot, etc.), remember that the names should be unique!
+
+
+
+## Servers
+Here are the details of what features are available for different server types:
+
+
+### 1. Minecraft
+Information about the server is gathered live using Minecraft query protocol.
+
+- Display current status of the server.
+- List of concurrent players on the server.
+- Option to turn the server off or on from web page.
+- Automatic shutdown if the server gets stuck while saving data.
+- Pick a proper java version for servers minecraft version (currently manually added to look-up file, see template [here](json_templates/minecraft_java_ver.json)).
+
+> [!IMPORTANT] Forge servers require different config structure. See [template file](json_templates/servers_info.json) for more information
+
+
+### 2. Arma 3 and Teamspeak
+Server status is determined by listening on port specified in the config.
+
+- Display current status of the server.
+- Option to turn the server off or on from web page.
+
+
+### 3. Other servers
+Server status is determined by listening on port specified in the config.
+
+- Display current status of the server.
+
+> If you wish to find out how to properly make a config for a server checkout the template file [here](json_templates/servers_info.json)
+
+
+
+## Discord Bots
+This is a feature that's early in development and currently is a mess, expect things to break.<br>
+That said, it does works, but is limited to bots launched through the website only.
+
+### Current features include:
+
+- Display live status of the bot.
+- Check if bot has connected to a lavalink server (required for music, currently not available from website).
+- Start or stop bot manually with from the website.
+- Start bot with server.
+
+> If you wish to find out how to properly make a config for a Discord bot checkout the template file [here](json_templates/discord_bots.json)
+
+
 
 # Documentation
 There is currently no proper documentation, although it is planned (not so)soon™. <br>
@@ -45,7 +110,7 @@ To use site's api you need to get yourself a token, which will be generated afte
 > If you send token request while already having one assigned, you will get a new one.
 
 >[!IMPORTANT]
-> Current token system will be replaced in the future.
+> Current API is temporary and will eventually be replaced.
 
 ### Python example
 
