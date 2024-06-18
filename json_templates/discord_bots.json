@@ -1,0 +1,16 @@
+{
+  "serverName (purely for reference in object initialisation)": {
+    "name":"Name that will be displayed on the website, this is also used to create bots htmlID (replaces spaces with '_')",
+    "dirPath": "Path to the bot",
+    "pythonPath": "path to the python.exe that the bot uses (if none is provided bot will use system default)"
+  },
+
+
+  "Example below": "",
+
+  "JavrArgentino": {
+    "name":"JAVR Argentino",
+    "dirPath": "E:\\GitHub\\JAVR_Bot",
+    "pythonPath": "E:\\Python ver\\JAVR_Bot\\Scripts\\python.exe"
+  }
+}
