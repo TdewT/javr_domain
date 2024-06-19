@@ -1,7 +1,7 @@
 {
   "tokens ": {
     "this websites api tokens along with the IP from which they were created (used when resetting token)": {
-      "{users:IP:address}": "{token}"
+      "{clients IP address divided by ':'}": "{token}"
     },
     "token for ZeroTier api (required for zt.html functionality)": "Bearer {token} (It's important to have 'Bearer' before the token)"
   },
