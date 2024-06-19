@@ -1,0 +1,18 @@
+{
+  "tokens ": {
+    "this websites api tokens along with the IP from which they were created (used when resetting token)": {
+      "{clients IP address divided by ':'}": "{token}"
+    },
+    "token for ZeroTier api (required for zt.html functionality)": "Bearer {token} (It's important to have 'Bearer' before the token)"
+  },
+
+
+  "Example config below": "",
+
+  "tokens": {
+    "javr-api": {
+      "::1": "afdsfe34aAD2Ja2Affeesdf2Gwefr246asd4x"
+    },
+    "zerotier": "Bearer AyDFghTYdfg5SDF45DSFsdgf4sdf5asd"
+  }
+}

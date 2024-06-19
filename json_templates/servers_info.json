@@ -9,7 +9,7 @@
     }
   },
 
-  "Examples": "Below",
+  "Few examples below": "",
 
   "generic": {
     "serverName (purely for reference in object initialisation)": {
@@ -38,6 +38,9 @@
       ],
       "minecraftVersion": "Version of minecraft that the server is on"
     },
+
+    "Few examples below": "",
+
     "vanilla-example": {
       "port": 25566,
       "htmlID": "test",
@@ -73,6 +76,11 @@
         "arguments (for now in one string)"
       ]
     },
+
+
+    "Example below": "",
+
+
     "antistasiCherno": {
       "port": 2302,
       "htmlID": "antistasi-cherno",
@@ -90,6 +98,11 @@
       "displayName": "Name displayed to clients from browser",
       "path": "windows path to shortcut to server's executable server.lnk (it can't be direct path to .exe)"
     },
+
+
+    "Example below": "",
+
+
     "main": {
       "port": 9987,
       "htmlID": "teamspeak-main",
