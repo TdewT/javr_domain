@@ -5,11 +5,9 @@
 
 
 
-# Welcome to JAVR Domain
-Here is the source code of a website we made mainly for easy control of the servers I am hosting. <br>
-Although it may have more features in the future.
-
-
+# Welcome to JAVR Domain Separated branch
+This Branch aims to separate the website functionalities into two webservers, one for managing servers ([Server_Manager](/Server_Manager)) and another that hosts only the website ([Website](/Website)). <br>
+This way, the more powerful server can be left offline until it's needed, keeping main site available on another. It will wake up on request from the main website. Once they establish connection with each other you will be able to use the web interface to manage servers the way same as the main branch.
 
 
 <br>
