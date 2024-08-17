@@ -5,7 +5,8 @@ const logName = "config-manager";
 
 // Dictionary of supported configs
 const configTypes = {
-    apiTokens: "api_tokens.json"
+    apiTokens: "api_tokens.json",
+    discordBots: "discord_bots.json"
 };
 
 // Templates used for config generation
@@ -15,7 +16,8 @@ const fileTemplates = {
             "javr-api": {},
             "zerotier": null
         }
-    }
+    },
+    "discord_bots.json": {}
 };
 
 class ConfigManager {
