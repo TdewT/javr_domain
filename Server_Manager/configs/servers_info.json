@@ -1,0 +1,55 @@
+{
+  "generic": {
+    "generic-example": {
+      "port": 1234,
+      "htmlID": "testos",
+      "displayName": "Generic: Testos",
+      "path": "E:\\servers\\generic"
+    }
+  },
+  "minecraft": {
+    "vanilla-example": {
+      "port": 25566,
+      "htmlID": "test",
+      "displayName": "Minecraft: test",
+      "path": "E:\\serwery\\test",
+      "startArgs": [
+        "-jar",
+        "minecraft_server.1.12.2.jar",
+        "nogui"
+      ],
+      "minecraftVersion": "1.12.2"
+    },
+    "forge-example": {
+      "port": 25567,
+      "htmlID": "forge-test",
+      "displayName": "Minecraft: forge test",
+      "path": "E:\\Serwery\\Minecraft Forge - test",
+      "startArgs": [
+        "@user_jvm_args.txt",
+        "@libraries/net/minecraftforge/forge/1.19.2-43.3.9/win_args.txt",
+        "%*"
+      ],
+      "minecraftVersion": "1.19.2"
+    }
+  },
+  "arma": {
+    "antistasiCherno": {
+      "port": 2302,
+      "htmlID": "antistasi-cherno",
+      "displayName": "Antistasi: Chernarus",
+      "path": "E:\\steamcmd\\steamapps\\common\\Arma 3 Server\\arma3server_x64.exe",
+      "startArgs": [
+      ]
+    }
+  },
+  "tsserver": {
+    "main": {
+      "port": 9987,
+      "htmlID": "teamspeak-main",
+      "displayName": "Teamspeak 3 Server",
+      "path": "E:\\Serwery\\teamspeak3-server_win64\\ts3server.lnk",
+      "startArgs": []
+    }
+  }
+}

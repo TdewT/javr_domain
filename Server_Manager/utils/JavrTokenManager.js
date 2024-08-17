@@ -3,7 +3,7 @@
 const {customLog} = require("./CustomUtils");
 const {configTypes, ConfigManager} = require("./ConfigManager");
 // Dynamic imports
-const {servers} = require("../index");
+const {servers} = require("../../Website");
 
 // Get apiTokens from json file
 const apiTokens = ConfigManager.getConfig(configTypes.apiTokens);

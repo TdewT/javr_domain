@@ -1,6 +1,6 @@
 const tokenManager = require("./JavrTokenManager");
 const {customLog} = require("./CustomUtils");
-const {servers} = require("../index");
+const {servers} = require("../../Website");
 
 // Name that will be displayed in logs
 const logName = "api-handler";
