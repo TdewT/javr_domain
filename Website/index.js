@@ -1,58 +1,68 @@
 // External imports
 const express = require('express');
 const socketIO = require('socket.io');
+const socketIOClient = require('socket.io-client');
 const axios = require('axios');
-
 // Local imports
-const {customLog} = require('./utils/CustomUtils');
+const {customLog, getDbotByHtmlID, getServerByHtmlID, emitDataGlobal} = require('./utils/CustomUtils');
+const {DiscordBot} = require('./object_classes/DiscordBot');
+const {ApiHandler} = require("./utils/ApiHandler");
+const {servers} = require('./utils/SharedVars');
 
 
+//
+// Initial setup
+//
+
+// Assign id-name to servers (for logs)
+const siteIDName = 'JAVR_Domain';
+const serverManagerID = 'JAVR_Server_Manager';
 // Create ConfigManager instance
 const {ConfigManager, configTypes} = require("./utils/ConfigManager");
-
 // Load configs
+customLog(siteIDName, "Loading configs");
 ConfigManager.loadConfigs();
-
 // Get loaded configs
-const serversInfo = ConfigManager.getConfig(configTypes.serversInfo);
 const apiTokens = ConfigManager.getConfig(configTypes.apiTokens);
 const discordBotsConfig = ConfigManager.getConfig(configTypes.discordBots);
-
 // Extract token for ZeroTier
 const zeroTierToken = apiTokens["tokens"]["zerotier"];
+
+
+//
+// Networking
+//
 
 // Setup express
 const app = express();
 app.use(express.static('public'));
+// Start servers
+// Note: website hosted on port 3000 should be forwarded to 80 by additional software like Apache
+const websiteServer = app.listen(3000, () => {
+    customLog(siteIDName, `Website Server started on port ${websiteServer.address().port}`);
+});
+// Start sockets
+// noinspection JSValidateTypes
+const websiteSocket = socketIO(websiteServer);
+const serverSocket = socketIOClient("http://localhost:3001");
 
-// Assign id-name to server (for logs)
-const siteIDName = 'JAVR_Strona';
+// When Server Manager connects
+let serverManagerConnected = false;
+serverSocket.on('connect', () => {
+    serverManagerConnected = true;
+    customLog(siteIDName, `${serverManagerID} connected`);
 
-// Start server
-const server = app.listen(80, () => {
-    customLog(siteIDName, `Server started on port ${server.address().port}`);
+    serverSocket.emit('status_request');
 
-    // Start checking ports for every defined server
-    for (const server of servers) {
-        customLog(server.htmlID, "Starting statusMonitor");
-        server.statusMonitor(emitDataGlobal, io, "status_response", {servers: servers})
-    }
+    serverSocket.on('disconnect', () => {
+        serverManagerConnected = false;
+        customLog(siteIDName, `${serverManagerID} disconnected`);
+    })
 });
 
-// Start socket
-const io = socketIO(server);
-
-//Find server in servers[] by server.htmlID
-const getServerByHtmlID = serverID => servers.filter((s) => {
-    return s.htmlID === serverID
-})[0];
-//Find Discord bot in discordBots[] by server.htmlID
-const getDbotByHtmlID = botID => discordBots.filter((b) => {
-    return b.htmlID === botID
-})[0];
-
 // When client connects to the server
-io.on('connection', socket => {
+websiteSocket.on('connection', socket => {
+
 
     let targetSite = socket.request.headers.referer.split('/');
     targetSite = targetSite[targetSite.length - 1];
@@ -66,7 +76,7 @@ io.on('connection', socket => {
         // Send back servers statuses
         if (socket) {
             customLog(siteIDName, `Status request received from ${ip}`);
-            io.to(socket.id).emit("status_response", {servers: servers, discordBots: discordBots});
+            websiteSocket.to(socket.id).emit("status_response", {servers: servers, discordBots: discordBots});
             customLog(siteIDName, `Status update sent ${ip}`);
         }
     });
@@ -78,19 +88,6 @@ io.on('connection', socket => {
         // Get requested server's status
         const server = getServerByHtmlID(serverID);
 
-        if (server) {
-            if (server.status === statuses.OFFLINE) {
-                server.startServer(emitDataGlobal, io, {servers: servers})
-            }
-            else {
-                customLog(serverID, `${ip} request denied, port is taken`);
-                io.to(socket.id).emit('request_failed', "Port jest zajęty")
-            }
-        }
-        else {
-            customLog(serverID, `${ip} request denied, Server not found`);
-            io.to(socket.id).emit('request_failed', "Nie znaleziono serwera")
-        }
     });
 
     // Requested server stop
@@ -98,20 +95,6 @@ io.on('connection', socket => {
         customLog(serverID, `${ip} requested server stop`);
 
         const server = getServerByHtmlID(serverID);
-
-        if (server) {
-            if (server.status !== statuses.OFFLINE) {
-                server.stopServer();
-            }
-            else {
-                customLog(serverID, `${ip} request denied, server is not running`);
-                io.to(socket.id).emit('request_failed', 'Serwer nie jest włączony')
-            }
-        }
-        else {
-            customLog(serverID, `${ip} request denied, Server not found`);
-            io.to(socket.id).emit('request_failed', "Nie znaleziono serwera")
-        }
 
     });
 
@@ -122,21 +105,6 @@ io.on('connection', socket => {
         // Search for bot in the list
         const bot = getDbotByHtmlID(botID);
 
-        // Check if bot was found
-        if (bot) {
-            // Check if bot isn't already on
-            if (bot.status === statuses.OFFLINE) {
-                bot.start()
-            }
-            else {
-                customLog(botID, `${ip} request denied, bot already on`);
-                io.to(socket.id).emit('request_failed', "Bot jest już włączony")
-            }
-        }
-        else {
-            customLog(botID, `${ip} request denied, Bot not found`);
-            io.to(socket.id).emit('request_failed', "Nie znaleziono bota")
-        }
     });
 
     // Requested server stop
@@ -146,30 +114,11 @@ io.on('connection', socket => {
         // Search for bot in the list
         const bot = getDbotByHtmlID(botID);
 
-        // Check if bot was found
-        if (bot) {
-            // Conditions broken down for clarity
-            const botOnline = bot.status === statuses.ONLINE;
-            const lavaOnline = bot.lavaStatus === statuses.ONLINE;
-            const botStarting = bot.status === statuses.STARTING;
-            const botStopping = bot.status === statuses.STOPPING;
-
-            // Check if conditions to stop the bot are met
-            if ((botOnline || lavaOnline) && !(botStarting || botStopping)) {
-                bot.stop();
-            }
-            else {
-                customLog(botID, `${ip} request denied, bot is not online`);
-                io.to(socket.id).emit('request_failed', 'bot nie jest w pełni włączony')
-            }
-        }
-        else {
-            customLog(botID, `${ip} request denied, Bot not found`);
-            io.to(socket.id).emit('request_failed', "Nie znaleziono bota")
-        }
-
     });
 
+    //
+    // ZeroTier
+    //
 
     //Handling ZeroTier Request
     socket.on('zt_request', () => {
@@ -184,9 +133,10 @@ io.on('connection', socket => {
             }
         };
 
+        // noinspection JSCheckFunctionSignatures
         axios.request(config)
             .then((response) => {
-                io.emit("zt_response", response.data)
+                websiteSocket.emit("zt_response", response.data)
             })
             .catch((error) => {
                 customLog(siteIDName, `Error fetching data from ZeroTier: ${error}`);
@@ -208,6 +158,7 @@ io.on('connection', socket => {
             }
         };
 
+        // noinspection JSCheckFunctionSignatures
         axios.request(postConfig)
             .then(() => {
                 customLog(siteIDName, `${ip} changed ZeroTier user - (${idUserJSON}) ${userJSON.name} ${userJSON.description}`);
@@ -221,13 +172,8 @@ io.on('connection', socket => {
 });
 
 
-// Sending servers statuses
-function emitDataGlobal(socket, event, data) {
-    socket.emit(event, data);
-}
-
 //
-// Services
+// Discord bots
 //
 
 // Load Discord bots
@@ -240,36 +186,23 @@ for (const botName in discordBotsConfig) {
     Object.assign(constructorParams, {
         emitFunc: emitDataGlobal,
         // FIXME: This is temporary work-around, will fix with general refactor
-        io: () => io,
+        io: () => websiteSocket,
         discordBots: () => discordBots,
     });
     // Create bot instance and add it to the list
     discordBots.push(new DiscordBot(constructorParams));
 }
-
 // Autostart Argentino
-const argentino = getDbotByHtmlID("JAVR_Argentino");
-if (argentino) {
-    argentino.start();
-}
-
-// Load servers
-const servers = [];
-for (const type of Object.values(serverTypes)) {
-    for (const serverName in serversInfo[type]) {
-        const server = (serversInfo[type][serverName]);
-        servers.push(new serverClasses[type](server))
-    }
-}
-module.exports = {servers};
+// const argentino = getDbotByHtmlID("JAVR_Argentino");
+// if (argentino) {
+//     argentino.start();
+// }
 
 
 //
 // API
 //
 
-// Local imports
-const {ApiHandler} = require("./utils/ApiHandler");
 // Initialise api-handler
 const apiHandler = new ApiHandler(app);
 
@@ -277,7 +210,7 @@ const apiHandler = new ApiHandler(app);
 // Create api-endpoint for generation of new tokens
 apiHandler.newTokenEndpoint();
 // Create endpoints for all existing tokens
-apiHandler.createEndpoints(servers);
+apiHandler.createEndpoints();
 
 
 // Setup redirects
