@@ -1,6 +1,6 @@
 const {spawn} = require('child_process');
 const {customLog} = require("../utils/CustomUtils");
-const {statuses} = require("./CustomServers");
+const {statuses} = require("../utils/SharedVars");
 
 class DiscordBot {
     constructor({

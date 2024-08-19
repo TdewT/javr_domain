@@ -3,17 +3,7 @@ const CustomUtils = require('../utils/CustomUtils');
 const MinecraftStatus = require("minecraft-status");
 const {customLog} = require("../utils/CustomUtils");
 const {ConfigManager, configTypes} = require("../utils/ConfigManager");
-
-
-const statuses = {
-    "ONLINE": "online", "STARTING": "starting", "BUSY": "busy", "STOPPING": "stopping", "OFFLINE": "offline",
-};
-const serverTypes = {
-    "GENERIC": "generic",
-    "MINECRAFT": "minecraft",
-    "ARMA": "arma",
-    "TSSERVER": "tsserver"
-};
+const {serverTypes, statuses} = require('../utils/SharedVars');
 
 class GenericServer {
     constructor({
