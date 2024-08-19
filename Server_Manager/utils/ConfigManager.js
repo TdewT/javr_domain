@@ -5,7 +5,6 @@ const logName = "config-manager";
 
 // Dictionary of supported configs
 const configTypes = {
-    apiTokens: "api_tokens.json",
     minecraftJavaVer: "minecraft_java_ver.json",
     serversInfo: "servers_info.json",
     discordBots: "discord_bots.json",
@@ -13,12 +12,6 @@ const configTypes = {
 
 // Templates used for config generation
 const fileTemplates = {
-    "api_tokens.json": {
-        tokens: {
-            "javr-api": {},
-            "zerotier": null
-        }
-    },
     "minecraft_java_ver.json": {},
     "servers_info.json": {},
     "discord_bots.json": {},
