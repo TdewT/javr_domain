@@ -115,8 +115,7 @@ class DiscordBot {
                 // Update connection state with lavalink
                 if (this.lavaConnected){
                     customLog(this.htmlID, "Lavalink Disconnected");
-                    this.lavaConnected = false;
-                    this.sendResponse();
+                    this.updateLavaStatus(false)
                 }
             }
             else{
