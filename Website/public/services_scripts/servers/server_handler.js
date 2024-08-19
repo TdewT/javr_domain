@@ -166,8 +166,8 @@ function getMinecraftElement(server) {
     // Add buttons
     serverElement.innerHTML +=
         `<span>` +
-        `<button type="button" class="button btn btn-success btn-sm ms-5" id="${server.htmlID}-button-start">START</button>` +
-        `<button type="button" class="button btn btn-danger btn-sm ms-5" id="${server.htmlID}-button-stop">STOP</button>` +
+        `<button type="button" class="button btn btn-success btn-sm services-button" id="${server.htmlID}-button-start">START</button>` +
+        `<button type="button" class="button btn btn-danger btn-sm services-button" id="${server.htmlID}-button-stop">STOP</button>` +
         `</span>`;
 
     return serverElement;
@@ -183,8 +183,8 @@ function getArmaServer(server) {
     // Add buttons
     serverElement.innerHTML +=
         `<span>` +
-        `<button type="button" class="button btn btn-success btn-sm ms-5" id="${server.htmlID}-button-start">START</button>` +
-        `<button type="button" class="button btn btn-danger btn-sm ms-5" id="${server.htmlID}-button-stop">STOP</button>` +
+        `<button type="button" class="button btn btn-success btn-sm services-button" id="${server.htmlID}-button-start">START</button>` +
+        `<button type="button" class="button btn btn-danger btn-sm services-button" id="${server.htmlID}-button-stop">STOP</button>` +
         `</span>`;
 
     return serverElement;
@@ -200,8 +200,8 @@ function getTeamspeakServer(server) {
     // Add buttons
     serverElement.innerHTML +=
         `<span>` +
-        `<button type="button" class="button btn btn-success btn-sm ms-5" id="${server.htmlID}-button-start">START</button>` +
-        `<button type="button" class="button btn btn-danger btn-sm ms-5" id="${server.htmlID}-button-stop">STOP</button>` +
+        `<button type="button" class="button btn btn-success btn-sm services-button" id="${server.htmlID}-button-start">START</button>` +
+        `<button type="button" class="button btn btn-danger btn-sm services-button" id="${server.htmlID}-button-stop">STOP</button>` +
         `</span>`;
 
     return serverElement;

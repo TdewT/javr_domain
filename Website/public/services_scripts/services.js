@@ -4,10 +4,6 @@ const $ = (e) => document.querySelector(e);
 
 let serviceListElement;
 
-socket.on('connect', () => {
-    socket.emit('status_request');
-});
-
 socket.on('status_response', (services) => {
     // Get list element
     serviceListElement = $("#service-list");

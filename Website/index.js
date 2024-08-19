@@ -7,14 +7,14 @@ const axios = require('axios');
 const {customLog, getElementByHtmlID, emitDataGlobal} = require('./utils/CustomUtils');
 const {DiscordBot} = require('./object_classes/DiscordBot');
 const {ApiHandler} = require("./utils/ApiHandler");
-const {servers} = require('./utils/SharedVars');
+let {servers} = require('./utils/SharedVars');
 
 
 //
 // Initial setup
 //
 
-// Assign id-name to servers (for logs)
+// Assign id-names to servers (for logs)
 const siteIDName = 'JAVR_Domain';
 const serverManagerID = 'JAVR_Server_Manager';
 // Create ConfigManager instance
@@ -52,70 +52,113 @@ serverSocket.on('connect', () => {
     serverManagerConnected = true;
     customLog(siteIDName, `${serverManagerID} connected`);
 
-    serverSocket.emit('status_request');
+    customLog(siteIDName, `Requested status data from ${serverManagerID}`);
+    serverSocket.emit('status_request', siteIDName);
 
     serverSocket.on('disconnect', () => {
         serverManagerConnected = false;
         customLog(siteIDName, `${serverManagerID} disconnected`);
-    })
+    });
+
+    serverSocket.on('status_response', (response) => {
+        servers = response.servers;
+        customLog(siteIDName, `Received status update from the ${serverManagerID}`);
+        websiteSocket.emit('status_response', {servers: servers, discordBots: discordBots});
+        customLog(siteIDName, `Global status update sent to all clients`);
+    });
+
+    // If the request is denied
+    serverSocket.on('request_failed', (response) => {
+        customLog(siteIDName, `Request failed "${response['reason']}"`);
+        websiteSocket.to(response['socket']).emit('request_failed', response['reason'])
+    });
 });
 
 // When client connects to the server
-websiteSocket.on('connection', socket => {
-
-
-    let targetSite = socket.request.headers.referer.split('/');
+websiteSocket.on('connection', clientSocket => {
+    let targetSite = clientSocket.request.headers.referer.split('/');
     targetSite = targetSite[targetSite.length - 1];
-    let ip = socket.handshake.address.split(':');
+    let ip = clientSocket.handshake.address.split(':');
     ip = ip[ip.length - 1];
 
     customLog(siteIDName, `Client ${ip} connected to site: ${targetSite}`);
+    // Send update on connection
+    clientSocket.emit('status_response', {servers: servers, discordBots: discordBots});
+    customLog(siteIDName, `Status response sent to client ${ip}`);
 
     // Respond to clients data request
-    socket.on('status_request', () => {
+    clientSocket.on('status_request', () => {
         // Send back servers statuses
-        if (socket) {
+        if (clientSocket) {
             customLog(siteIDName, `Status request received from ${ip}`);
-            websiteSocket.to(socket.id).emit("status_response", {servers: servers, discordBots: discordBots});
-            customLog(siteIDName, `Status update sent ${ip}`);
+            if (serverManagerConnected) {
+                customLog(siteIDName, `Forwarding request to ${serverManagerID}`);
+                serverSocket.emit('status_request', siteIDName);
+            }
+            else {
+                clientSocket.emit("status_response", {servers: servers, discordBots: discordBots});
+                customLog(siteIDName, `Status update sent ${ip}`);
+            }
         }
     });
 
     // Requested server start
-    socket.on('start_server_request', (serverID) => {
+    clientSocket.on('start_server_request', (serverID) => {
         customLog(serverID, `${ip} requested server start`);
 
         // Get requested server's status
-        const server = getServerByHtmlID(serverID);
-
+        if (serverManagerConnected) {
+            serverSocket.emit("start_server_request",  siteIDName, serverID, clientSocket.id);
+            customLog(siteIDName, `Request forwarded to ${serverManagerID}`);
+        }
+        else {
+            customLog(siteIDName, "Request failed, Server Manager not available");
+            clientSocket.emit('request_failed', "Server Manager not available");
+        }
     });
 
     // Requested server stop
-    socket.on('stop_server_request', (serverID) => {
+    clientSocket.on('stop_server_request', (serverID) => {
         customLog(serverID, `${ip} requested server stop`);
 
-        const server = getServerByHtmlID(serverID);
-
+        if (serverManagerConnected) {
+            serverSocket.emit("stop_server_request",  siteIDName, serverID, clientSocket.id);
+            customLog(siteIDName, `Request forwarded to ${serverManagerID}`);
+        }
+        else {
+            customLog(siteIDName, "Request failed, Server Manager not available");
+            clientSocket.emit('request_failed', "Server Manager not available");
+        }
     });
 
 
     // Request bot start
-    socket.on('start_dbot_request', (botID) => {
+    clientSocket.on('start_dbot_request', (botID) => {
 
         // Search for bot in the list
         const bot = getElementByHtmlID(discordBots, botID);
         if (serverManagerConnected) {
 
+        }
+        else {
+            customLog(siteIDName, "Request failed, Server Manager not available");
+            clientSocket.emit('request_failed', "Server Manager not available");
+        }
     });
 
     // Requested server stop
-    socket.on('stop_dbot_request', (botID) => {
+    clientSocket.on('stop_dbot_request', (botID) => {
         customLog(botID, `${ip} requested bot stop`);
 
         // Search for bot in the list
         const bot = getElementByHtmlID(discordBots, botID);
         if (serverManagerConnected) {
 
+        }
+        else {
+            customLog(siteIDName, "Request failed, Server Manager not available");
+            clientSocket.emit('request_failed', "Server Manager not available");
+        }
     });
 
     //
@@ -123,7 +166,7 @@ websiteSocket.on('connection', socket => {
     //
 
     //Handling ZeroTier Request
-    socket.on('zt_request', () => {
+    clientSocket.on('zt_request', () => {
         customLog(siteIDName, `${ip} requested ZeroTier information`);
 
         let config = {
@@ -146,7 +189,7 @@ websiteSocket.on('connection', socket => {
     });
 
     //Sending user edit form to ZeroTier api
-    socket.on('zt_send_form', (userJSON, idUserJSON, apiUrl) => {
+    clientSocket.on('zt_send_form', (userJSON, idUserJSON, apiUrl) => {
 
         customLog(siteIDName, `${ip} requested change of ZeroTier user - (${idUserJSON}) ${userJSON.name} ${userJSON.description}`);
 
@@ -179,7 +222,7 @@ websiteSocket.on('connection', socket => {
 //
 
 // Load Discord bots
-const discordBots = [];
+let discordBots = [];
 for (const botName in discordBotsConfig) {
     // Load initial parameters from config
     let constructorParams = discordBotsConfig[botName];
