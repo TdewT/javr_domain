@@ -105,11 +105,23 @@ function createLogStream() {
     logStream = fs.createWriteStream(filePath, {flags: 'a'});
 }
 
+//Find element by id in given list
+const getElementByHtmlID = (list, serverID) => list.filter((s) => {
+    return s.htmlID === serverID
+})[0];
+
+// Sending servers statuses
+function emitDataGlobal(socket, event, data) {
+    socket.emit(event, data);
+}
+
 
 module.exports = {
     killTask,
     removeDuplicateSpace,
     extractNums,
     customLog,
-    createLogStream
+    createLogStream,
+    getElementByHtmlID,
+    emitDataGlobal
 };

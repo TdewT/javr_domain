@@ -9,7 +9,7 @@ const {
     serverTypes,
     serverClasses,
 } = require("./object_classes/CustomServers");
-const {customLog} = require('./utils/CustomUtils');
+const {customLog, getElementByHtmlID, emitDataGlobal} = require('./utils/CustomUtils');
 const {DiscordBot} = require('./object_classes/DiscordBot');
 
 
@@ -82,7 +82,7 @@ io.on('connection', socket => {
         customLog(serverID, `${ip} requested server start`);
 
         // Get requested server's status
-        const server = getServerByHtmlID(serverID);
+        const server = getElementByHtmlID(servers, serverID);
 
         if (server) {
             if (server.status === statuses.OFFLINE) {
@@ -103,7 +103,7 @@ io.on('connection', socket => {
     socket.on('stop_server_request', (serverID) => {
         customLog(serverID, `${ip} requested server stop`);
 
-        const server = getServerByHtmlID(serverID);
+        const server = getElementByHtmlID(servers, serverID);
 
         if (server) {
             if (server.status !== statuses.OFFLINE) {
@@ -126,7 +126,7 @@ io.on('connection', socket => {
     socket.on('start_dbot_request', (botID) => {
 
         // Search for bot in the list
-        const bot = getDbotByHtmlID(botID);
+        const bot = getElementByHtmlID(discordBots, botID);
 
         // Check if bot was found
         if (bot) {
@@ -150,7 +150,7 @@ io.on('connection', socket => {
         customLog(botID, `${ip} requested bot stop`);
 
         // Search for bot in the list
-        const bot = getDbotByHtmlID(botID);
+        const bot = getElementByHtmlID(discordBots, botID);
 
         // Check if bot was found
         if (bot) {
