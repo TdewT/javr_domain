@@ -57,13 +57,9 @@ function createLogStream() {
     logStream = fs.createWriteStream(filePath, {flags: 'a'});
 }
 
-//Find server in servers[] by server.htmlID
-const getServerByHtmlID = (servers, serverID) => servers.filter((s) => {
+//Find element by id in given list
+const getElementByHtmlID = (list, serverID) => list.filter((s) => {
     return s.htmlID === serverID
-})[0];
-//Find Discord bot in discordBots[] by server.htmlID
-const getDbotByHtmlID = (discordBots,botID) => discordBots.filter((b) => {
-    return b.htmlID === botID
 })[0];
 
 // Sending servers statuses
@@ -73,7 +69,6 @@ function emitDataGlobal(socket, event, data) {
 
 module.exports = {
     customLog,
-    getServerByHtmlID,
-    getDbotByHtmlID,
+    getElementByHtmlID,
     emitDataGlobal,
 };

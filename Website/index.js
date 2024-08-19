@@ -4,7 +4,7 @@ const socketIO = require('socket.io');
 const socketIOClient = require('socket.io-client');
 const axios = require('axios');
 // Local imports
-const {customLog, getDbotByHtmlID, getServerByHtmlID, emitDataGlobal} = require('./utils/CustomUtils');
+const {customLog, getElementByHtmlID, emitDataGlobal} = require('./utils/CustomUtils');
 const {DiscordBot} = require('./object_classes/DiscordBot');
 const {ApiHandler} = require("./utils/ApiHandler");
 const {servers} = require('./utils/SharedVars');
@@ -103,7 +103,8 @@ websiteSocket.on('connection', socket => {
     socket.on('start_dbot_request', (botID) => {
 
         // Search for bot in the list
-        const bot = getDbotByHtmlID(botID);
+        const bot = getElementByHtmlID(discordBots, botID);
+        if (serverManagerConnected) {
 
     });
 
@@ -112,7 +113,8 @@ websiteSocket.on('connection', socket => {
         customLog(botID, `${ip} requested bot stop`);
 
         // Search for bot in the list
-        const bot = getDbotByHtmlID(botID);
+        const bot = getElementByHtmlID(discordBots, botID);
+        if (serverManagerConnected) {
 
     });
 
