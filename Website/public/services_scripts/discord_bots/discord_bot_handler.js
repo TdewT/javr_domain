@@ -30,8 +30,8 @@ function printBot(bot){
     // Add buttons
     botElement.innerHTML +=
         `<span>` +
-        `<button type="button" class="button btn btn-success btn-sm ms-5" id="${bot.htmlID}-button-start">START</button>` +
-        `<button type="button" class="button btn btn-danger btn-sm ms-5" id="${bot.htmlID}-button-stop">STOP</button>` +
+        `<button type="button" class="button btn btn-success btn-sm services-button" id="${bot.htmlID}-button-start">START</button>` +
+        `<button type="button" class="button btn btn-danger btn-sm services-button" id="${bot.htmlID}-button-stop">STOP</button>` +
         `</span>`;
 
     // Add element to DOM
