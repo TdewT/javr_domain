@@ -8,7 +8,8 @@
 # Welcome to JAVR Domain
 Here is the source code of a website we made mainly for easy control of the servers I am hosting. <br>
 Although it may have more features in the future.
-
+> [!WARNING]
+> This branch may not be fully up to date as I want to focus on the [separated branch](https://github.com/TdewT/javr_domain/tree/master-separated-servers)
 
 
 
