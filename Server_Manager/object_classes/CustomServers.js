@@ -119,8 +119,9 @@ class MinecraftServer extends GenericServer {
                 customLog(this.htmlID, `Status changed to "${this.status}"`);
                 emitFunc(socket, event, servers);
             }
-            if (this.currPlayers !== this.lastPlayers) {
-                emitFunc(socket, event, servers)
+            if (this.currPlayers.length !== this.lastPlayers.length) {
+                customLog(this.htmlID, `Player Count update sent"`);
+                emitFunc(socket, event, servers);
             }
             this.lastPlayers = this.currPlayers;
             this.lastStatus = this.status;
