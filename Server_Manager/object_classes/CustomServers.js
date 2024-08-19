@@ -107,11 +107,12 @@ class MinecraftServer extends GenericServer {
         this.minecraftVersion = minecraftVersion;
         this.failedQuery = 0;
         MinecraftServer.minecraftJavaVer = ConfigManager.getConfig(configTypes.minecraftJavaVer);
+
+        // This will be compared against to determine when the status has to be updated on client
+        this.lastStatus = this.status;
+        this.lastPlayers = this.currPlayers;
     }
 
-    // Run check periodically to see if the server is still up
-    lastStatus = statuses.OFFLINE;
-    lastPlayers = this.currPlayers;
 
     statusMonitor(emitFunc, socket, event, servers) {
         setInterval(() => {
