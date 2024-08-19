@@ -109,6 +109,12 @@ ul.striped-list > li:nth-of-type(odd) {
 // General
 //
 
+// Buttons to start/stop service
+.services-button {
+  margin-left: 2vw;
+  min-width: 60px;
+}
+
 // Custom right margin for services
 .me-name {
   margin-right: 12.68rem;
@@ -119,6 +125,25 @@ ul.striped-list > li:nth-of-type(odd) {
   max-width: 60vw;
 }
 
+
+//
+// Services
+//
+
+// Main list of services
+#service-list {
+  --bs-list-group-border-radius: 0;
+}
+// Content of a list child
+#service-list > li > span{
+  margin-top: auto;
+  margin-bottom: auto;
+}
+// Status indicator and status text
+#service-list > li > div{
+  margin-top: auto;
+  margin-bottom: auto;
+}
 
 //
 // ZeroTier
@@ -154,6 +179,18 @@ ul.striped-list > li:nth-of-type(odd) {
   }
 }
 
+@media (max-width: 395px){
+  .services-button{
+    margin: 4px 0 4px 2vw;
+  }
+}
+
+@media (max-width: 768px) {
+  .services-container{
+    border-radius: 0 !important;
+    --bs-gutter-x: 0;
+  }
+}
 
 @media (max-width: 992px) {
   // Section container scaling
