@@ -1,6 +1,7 @@
 // External imports
 const express = require('express');
 const socketIO = require('socket.io');
+const {exec} = require('child_process');
 
 // Local imports
 const {
@@ -8,7 +9,12 @@ const {
     serverTypes,
     serverClasses,
 } = require("./object_classes/CustomServers");
-const {customLog, getElementByHtmlID, emitDataGlobal} = require('./utils/CustomUtils');
+const {
+    customLog,
+    getElementByHtmlID,
+    emitDataGlobal,
+    anyServerUsed
+} = require('./utils/CustomUtils');
 const {DiscordBot} = require('./object_classes/DiscordBot');
 const {servers} = require('./utils/SharedVars');
 
@@ -24,7 +30,12 @@ ConfigManager.loadConfigs();
 // Get loaded configs
 const serversInfo = ConfigManager.getConfig(configTypes.serversInfo);
 const discordBotsConfig = ConfigManager.getConfig(configTypes.discordBots);
-
+// ID of sleep timer timeout
+let sleepTimerID;
+// Time of inactivity after which server manager goes to sleep
+const timeToSleep = 10;
+// If conditions are met, starts sleep timer, runs every minute
+sleepConditionDetector();
 
 //
 // Services
@@ -78,6 +89,7 @@ const server = app.listen(3001, () => {
 });
 
 // Start socket
+// noinspection JSValidateTypes
 const io = socketIO(server);
 
 // When client connects to the server
@@ -103,7 +115,8 @@ io.on('connection', socket => {
 
         if (server) {
             if (server.status === statuses.OFFLINE) {
-                server.startServer(emitDataGlobal, io, {servers: servers})
+                cancelSleepTimer();
+                server.startServer(emitDataGlobal, io, {servers: servers});
             }
             else {
                 customLog(serverID, `Request denied, port is taken`);
@@ -149,7 +162,8 @@ io.on('connection', socket => {
         if (bot) {
             // Check if bot isn't already on
             if (bot.status === statuses.OFFLINE) {
-                bot.start()
+                cancelSleepTimer();
+                bot.start();
             }
             else {
                 customLog(botID, `Request denied, bot already on`);
@@ -193,3 +207,48 @@ io.on('connection', socket => {
 
     });
 });
+
+
+//
+// Auto-sleep
+//
+
+// Check if any server is used every minute
+function sleepConditionDetector() {
+    setInterval(() => {
+        if (anyServerUsed(servers)) {
+            sleepTimerID = sleepTimer();
+        }
+    }, 60 * 1000);
+}
+// If they are not used for configured time enter sleep
+function sleepTimer() {
+    return setTimeout(() => {
+        // If servers are still offline
+        if (anyServerUsed(servers)) {
+            customLog(siteIDName, 'All servers offline since 10 min, entering sleep');
+            sleepTimerID = undefined;
+            sleepSystem();
+        }
+    }, timeToSleep * 60 * 1000);
+}
+// Enter command to sleep
+function sleepSystem() {
+    // Command for Windows
+    const command = 'rundll32.exe powrprof.dll, SetSuspendState Sleep';
+
+    exec(command, (error, stdout, stderr) => {
+        if (error) {
+            console.error(`Error putting system to sleep: ${error.message}`);
+        }
+        if (stderr) {
+            console.error(`Error output: ${stderr}`);
+        }
+    });
+}
+
+function cancelSleepTimer() {
+    if (sleepTimerID)
+        clearTimeout(sleepTimerID);
+        sleepTimerID = undefined;
+}

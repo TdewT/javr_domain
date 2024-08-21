@@ -1,5 +1,6 @@
 const {exec} = require('child_process');
 const fs = require("node:fs");
+const {statuses} = require("./SharedVars");
 let logStream;
 
 function killTask(name, PID) {
@@ -58,7 +59,7 @@ function customLog(name, str) {
     time = time.replaceAll(",", " |");
 
     // Trim the string and remove unwanted special chars
-    if (typeof str === "string"){
+    if (typeof str === "string") {
         str = str.trim().replace(/[\r\n]+/gm, '');
     }
     // Final log text
@@ -115,13 +116,27 @@ function emitDataGlobal(socket, event, data) {
     socket.emit(event, data);
 }
 
+function anyServerUsed(servers) {
+    let emptyServers = 0;
+    for (let server of servers) {
+        if (server.status === statuses.OFFLINE) {
+            emptyServers++;
+        }
+        else if (server.status === statuses.ONLINE && server.currPlayers){
+            if (server.currPlayers.length === 0) {
+                emptyServers++;
+            }
+        }
+    }
+    return emptyServers === servers.length;
+}
 
 module.exports = {
     killTask,
     removeDuplicateSpace,
     extractNums,
     customLog,
-    createLogStream,
     getElementByHtmlID,
-    emitDataGlobal
+    emitDataGlobal,
+    anyServerUsed
 };
