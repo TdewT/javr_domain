@@ -8,6 +8,7 @@ function syncServers(servers) {
             updateServer(server);
         }
     }
+    deleteUnavailableServers(servers)
 }
 
 // Create server element
@@ -141,6 +142,7 @@ function getGenericElement(server) {
     // Create element and set it's classes
     const serverElement = document.createElement("li");
     serverElement.className = "list-group-item d-flex";
+    serverElement.id = `${server.htmlID}-body`;
 
     // Display status
     serverElement.innerHTML +=
@@ -205,4 +207,35 @@ function getTeamspeakServer(server) {
         `</span>`;
 
     return serverElement;
+}
+
+// Returns htmlID of all displayed servers
+function availableHtmlIDs(servers) {
+    let htmlIDs = [];
+    for (let server of servers) {
+        htmlIDs.push(server.htmlID);
+    }
+    return htmlIDs;
+}
+function deleteUnavailableServers(servers) {
+    const allElements = $(`#service-list`).children;
+    const htmlIDs = availableHtmlIDs(servers);
+    let elementsToRemove = [];
+
+    // Iterate over all children elements of the services list
+    for (let element of allElements){
+        if (element.id){
+            const elementHtmlID = getHtmlID(element.id);
+            if (element.id && !htmlIDs.includes(elementHtmlID))
+                // Mark every entry that is not listed in received servers list for deletion
+                elementsToRemove.push(element);
+        }
+    }
+    // Remove all elements marked for deletion
+    for (let element of elementsToRemove) {
+        element.remove();
+    }
+}
+function getHtmlID(id) {
+    return  id.replace('-body', '');
 }
