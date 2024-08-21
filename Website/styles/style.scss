@@ -80,7 +80,8 @@ $linear_gradient_bottom: linear-gradient(0deg, rgba(255, 255, 255, .04), rgba(25
   padding: 0 0 50px 0;
   text-align: center;
 }
-.style-main-tile > *{
+
+.style-main-tile > * {
   text-shadow: $text_border;
 }
 
@@ -109,6 +110,10 @@ ul.striped-list > li:nth-of-type(odd) {
 // General
 //
 
+.me-3\.5 {
+  margin-right: 1.16rem !important;
+}
+
 // Buttons to start/stop service
 .services-button {
   margin-left: 2vw;
@@ -134,13 +139,34 @@ ul.striped-list > li:nth-of-type(odd) {
 #service-list {
   --bs-list-group-border-radius: 0;
 }
+
 // Content of a list child
-#service-list > li > span{
+#service-list > li > span {
   margin-top: auto;
   margin-bottom: auto;
 }
+
 // Status indicator and status text
-#service-list > li > div{
+#service-list > li > div {
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+// Server manager status bar
+#server-manager {
+  margin-right: auto;
+  background-color: #3e318fF7;
+  border: 1px solid #594eea;
+  border-bottom: 0;
+  padding: 8px 16px 8px 16px;
+}
+
+#server-manager > span {
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+#server-manager-status-box {
   margin-top: auto;
   margin-bottom: auto;
 }
@@ -166,7 +192,7 @@ ul.striped-list > li:nth-of-type(odd) {
 // Responsiveness
 //
 
-@media (max-width: 768px){
+@media (max-width: 768px) {
   // Section container scaling
   .style-main-tile {
     margin-top: 0;
@@ -179,14 +205,14 @@ ul.striped-list > li:nth-of-type(odd) {
   }
 }
 
-@media (max-width: 395px){
-  .services-button{
+@media (max-width: 395px) {
+  .services-button {
     margin: 4px 0 4px 2vw;
   }
 }
 
 @media (max-width: 768px) {
-  .services-container{
+  .services-container {
     border-radius: 0 !important;
     --bs-gutter-x: 0;
   }

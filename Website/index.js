@@ -3,6 +3,7 @@ const express = require('express');
 const socketIO = require('socket.io');
 const socketIOClient = require('socket.io-client');
 const axios = require('axios');
+const wol = require('wake_on_lan');
 // Local imports
 const {customLog, getElementByHtmlID, emitDataGlobal} = require('./utils/CustomUtils');
 const {DiscordBot} = require('./object_classes/DiscordBot');
@@ -17,6 +18,8 @@ let {servers} = require('./utils/SharedVars');
 // Assign id-names to servers (for logs)
 const siteIDName = 'JAVR_Domain';
 const serverManagerID = 'JAVR_Server_Manager';
+// Mac address of the Server Manager machine
+const serverManagerMac = "80:FA:5B:83:12:46";
 // Create ConfigManager instance
 const {ConfigManager, configTypes} = require("./utils/ConfigManager");
 // Load configs
@@ -58,12 +61,21 @@ serverSocket.on('connect', () => {
     serverSocket.on('disconnect', () => {
         serverManagerConnected = false;
         customLog(siteIDName, `${serverManagerID} disconnected`);
+        websiteSocket.emit('status_response', {
+            servers: servers,
+            discordBots: discordBots,
+            serverManager: serverManagerConnected
+        });
     });
 
     serverSocket.on('status_response', (response) => {
         servers = response.servers;
         customLog(siteIDName, `Received status update from the ${serverManagerID}`);
-        websiteSocket.emit('status_response', {servers: servers, discordBots: discordBots});
+        websiteSocket.emit('status_response', {
+            servers: servers,
+            discordBots: discordBots,
+            serverManager: serverManagerConnected
+        });
         customLog(siteIDName, `Global status update sent to all clients`);
     });
 
@@ -83,7 +95,11 @@ websiteSocket.on('connection', clientSocket => {
 
     customLog(siteIDName, `Client ${ip} connected to site: ${targetSite}`);
     // Send update on connection
-    clientSocket.emit('status_response', {servers: servers, discordBots: discordBots});
+    clientSocket.emit('status_response', {
+        servers: servers,
+        discordBots: discordBots,
+        serverManager: serverManagerConnected
+    });
     customLog(siteIDName, `Status response sent to client ${ip}`);
 
     // Respond to clients data request
@@ -96,10 +112,29 @@ websiteSocket.on('connection', clientSocket => {
                 serverSocket.emit('status_request', siteIDName);
             }
             else {
-                clientSocket.emit("status_response", {servers: servers, discordBots: discordBots});
+                clientSocket.emit("status_response", {
+                    servers: servers,
+                    discordBots: discordBots,
+                    serverManager: serverManagerConnected
+                });
                 customLog(siteIDName, `Status update sent ${ip}`);
             }
         }
+    });
+
+    // Requested server manager start
+    clientSocket.on('start_server_manager_request', () => {
+        customLog(siteIDName, `${ip} requested ${serverManagerID} start`);
+        wol.wake(serverManagerMac, error => {
+            if (error) {
+                customLog(siteIDName, "Failed to send wake up packet");
+                clientSocket.emit('request_failed', "Menedżer serwerów niedostępny");
+            }
+            else {
+                customLog(siteIDName, `Wake up packet sent to ${serverManagerID}`);
+                clientSocket.emit('request_failed', "Menedżer serwerów wstaje, poczekaj");
+            }
+        });
     });
 
     // Requested server start
@@ -108,12 +143,22 @@ websiteSocket.on('connection', clientSocket => {
 
         // Get requested server's status
         if (serverManagerConnected) {
-            serverSocket.emit("start_server_request",  siteIDName, serverID, clientSocket.id);
+            serverSocket.emit("start_server_request", siteIDName, serverID, clientSocket.id);
             customLog(siteIDName, `Request forwarded to ${serverManagerID}`);
         }
         else {
-            customLog(siteIDName, "Request failed, Server Manager not available");
-            clientSocket.emit('request_failed', "Server Manager not available");
+            customLog(siteIDName, `${serverManagerID} not offline, sending wake up packet`);
+            wol.wake(serverManagerMac, error => {
+                if (error) {
+                    customLog(siteIDName, "Failed to send wake up packet");
+                    customLog(siteIDName, "Request failed, Server Manager not available");
+                    clientSocket.emit('request_failed', "Menedżer serwerów niedostępny");
+                }
+                else {
+                    customLog(siteIDName, `Wake up packet sent to ${serverManagerID}`);
+                    clientSocket.emit('request_failed', "Menedżer serwerów wstaje, poczekaj");
+                }
+            });
         }
     });
 
@@ -122,12 +167,22 @@ websiteSocket.on('connection', clientSocket => {
         customLog(serverID, `${ip} requested server stop`);
 
         if (serverManagerConnected) {
-            serverSocket.emit("stop_server_request",  siteIDName, serverID, clientSocket.id);
+            serverSocket.emit("stop_server_request", siteIDName, serverID, clientSocket.id);
             customLog(siteIDName, `Request forwarded to ${serverManagerID}`);
         }
         else {
-            customLog(siteIDName, "Request failed, Server Manager not available");
-            clientSocket.emit('request_failed', "Server Manager not available");
+            customLog(siteIDName, `${serverManagerID} not offline, sending wake up packet`);
+            wol.wake(serverManagerMac, error => {
+                if (error) {
+                    customLog(siteIDName, "Failed to send wake up packet");
+                    customLog(siteIDName, "Request failed, Server Manager not available");
+                    clientSocket.emit('request_failed', "Server Manager unreachable");
+                }
+                else {
+                    customLog(siteIDName, `Wake up packet sent to ${serverManagerID}`);
+                    clientSocket.emit('request_failed', "Menedżer serwerów wstaje, poczekaj");
+                }
+            });
         }
     });
 
