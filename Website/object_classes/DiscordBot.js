@@ -1,10 +1,10 @@
 const {spawn} = require('child_process');
 const {customLog} = require("../utils/CustomUtils");
-const {statuses} = require("../utils/SharedVars");
+const {statuses, servers, discordBots} = require("../utils/SharedVars");
 
 class DiscordBot {
     constructor({
-                    dirPath, name, emitFunc, io, discordBots,
+                    dirPath, name, emitFunc, io,
                     lavaArgs = ["Lavalink.py"],
                     pythonPath = "python"
                 }) {
@@ -34,7 +34,6 @@ class DiscordBot {
         this.emitFunc = emitFunc;
         // FIXME: This is temporary work-around, will fix with general refactor
         this.io = io;
-        this.discordBots = discordBots;
     }
 
     start() {
@@ -175,7 +174,10 @@ class DiscordBot {
     }
 
     sendResponse() {
-        this.emitFunc(this.io(), "status_response", {discordBots: this.discordBots()});
+        this.emitFunc(this.io(), "status_response", {
+            servers: servers,
+            discordBots: discordBots,
+        });
     }
 }
 
