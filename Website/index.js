@@ -60,6 +60,7 @@ serverSocket.on('connect', () => {
 
     serverSocket.on('disconnect', () => {
         serverManagerConnected = false;
+        servers = [];
         customLog(siteIDName, `${serverManagerID} disconnected`);
         websiteSocket.emit('status_response', {
             servers: servers,
