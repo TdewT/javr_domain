@@ -133,7 +133,7 @@ websiteSocket.on('connection', clientSocket => {
             }
             else {
                 customLog(siteIDName, `Wake up packet sent to ${serverManagerID}`);
-                clientSocket.emit('request_failed', "Menedżer serwerów wstaje, poczekaj");
+                clientSocket.emit('request_failed', "Wysłano pakiet wybudzający, jeśli menedżer serwerów nie wstanie po paru minutach to kaplica.");
             }
         });
     });
@@ -157,7 +157,7 @@ websiteSocket.on('connection', clientSocket => {
                 }
                 else {
                     customLog(siteIDName, `Wake up packet sent to ${serverManagerID}`);
-                    clientSocket.emit('request_failed', "Menedżer serwerów wstaje, poczekaj");
+                    clientSocket.emit('request_failed', "Wysłano pakiet wybudzający, jeśli menedżer serwerów nie wstanie po paru minutach to kaplica.");
                 }
             });
         }
@@ -181,7 +181,7 @@ websiteSocket.on('connection', clientSocket => {
                 }
                 else {
                     customLog(siteIDName, `Wake up packet sent to ${serverManagerID}`);
-                    clientSocket.emit('request_failed', "Menedżer serwerów wstaje, poczekaj");
+                    clientSocket.emit('request_failed', "Wysłano pakiet wybudzający, jeśli menedżer serwerów nie wstanie po paru minutach to kaplica.");
                 }
             });
         }
