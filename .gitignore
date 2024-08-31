@@ -237,3 +237,4 @@ fabric.properties
 /.ts3server_license_accepted
 /Website/configs/*
 /Server_Manager/configs/*
+/Website/public/style.css.map
