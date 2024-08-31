@@ -6,7 +6,7 @@
 
 
 # Welcome to JAVR Domain
-Functionality of the website is now divided between to webserver, one for managing servers ([Server_Manager](/Server_Manager)) and another that hosts only the website ([Website](/Website)). <br>
+Functionality of the website is now divided between to webservers, one for managing servers ([Server_Manager](/Server_Manager)) and another that hosts only the website ([Website](/Website)). <br>
 This way, the more powerful server can be left offline until it's needed, keeping main site available on another. It will wake up on request from the main website. Once they establish connection with each other you will be able to use the web interface to manage servers the way same as the main branch.
 
 
