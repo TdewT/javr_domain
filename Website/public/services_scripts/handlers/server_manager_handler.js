@@ -1,6 +1,6 @@
 function syncServerManager(serverManagers) {
     for (const serverManager of serverManagers) {
-        const managerElement = $(`#${serverManager.name}`);
+        const managerElement = $(`#${serverManager[0]}-status-box`);
         if (!managerElement) {
             createManagerElement(serverManager);
         }
@@ -35,13 +35,13 @@ function createManagerElement(manager) {
 }
 function updateManager(manager) {
     const managerID = manager[0];
-    const managerState = manager[1];
+    const managerStatus = manager[1];
 
     // Get relevant elements
     const indicatorElement = $(`#${managerID}-status`);
     const statusTxtElement = $(`#${managerID}-status-text`);
 
     // Change values
-    indicatorElement.innerText = statusIndicators[status];
-    statusTxtElement.innerText = status.charAt(0).toUpperCase() + status.slice(1);
+    indicatorElement.innerText = statusIndicators[managerStatus];
+    statusTxtElement.innerText = getStatusText({type: 'serverManager', status: managerStatus});
 }
