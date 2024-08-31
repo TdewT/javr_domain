@@ -22,7 +22,7 @@ function createManagerElement(manager) {
         <span class="me-3.5" id="${managerID}-status">${statusIndicators[managerStatus]}</span>
         <span class="me-4" id="${managerID}-status-text">${getStatusText({type: 'serverManager', status: managerStatus})}</span>
     </div>
-    <span>${managerID}</span>
+    <span>${managerID.replaceAll('_', " ")}</span>
     <button type="button" class="button btn btn-success btn-sm services-button" id="${managerID}-button-start">START</button>
     `;
 
