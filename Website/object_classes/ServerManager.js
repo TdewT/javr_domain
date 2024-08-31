@@ -54,7 +54,6 @@ class ServerManager {
                     customLog(this.name, `Connected`);
 
                     customLog(this.name, `Sending status request`);
-                    console.log("abc");
                     SocketEvents.statusRequest(this.socket);
 
                     this.socket.on('disconnect', () => {
