@@ -58,6 +58,7 @@ class ServerManager {
 
                     this.socket.on('disconnect', () => {
                         this.status = Statuses.OFFLINE;
+                        this.#socketOpen = false;
                         ServerList.updateServers(this.name, []);
                         SocketEvents.statusResponse(websiteIO);
                         this.socket.off();
