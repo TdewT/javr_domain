@@ -111,6 +111,7 @@ io.on('connection', socket => {
 
     // Requested server start
     socket.on('start_server_request', (serverID, socketID) => {
+        cancelSleepTimer();
         customLog(serverID, `${ip} requested server start`);
 
         // Get requested server's status
@@ -134,6 +135,7 @@ io.on('connection', socket => {
 
     // Requested server stop
     socket.on('stop_server_request', (serverID, socketID) => {
+        cancelSleepTimer();
         customLog(serverID, `${ip} requested server stop`);
 
         const server = getElementByHtmlID(servers, serverID);
@@ -157,7 +159,7 @@ io.on('connection', socket => {
 
     // Request bot start
     socket.on('start_dbot_request', (botID, socketID) => {
-
+        cancelSleepTimer();
         // Search for bot in the list
         const bot = getElementByHtmlID(discordBots, botID);
 
@@ -181,6 +183,7 @@ io.on('connection', socket => {
 
     // Requested server stop
     socket.on('stop_dbot_request', (botID, socketID) => {
+        cancelSleepTimer();
         customLog(botID, `${ip} requested bot stop`);
 
         // Search for bot in the list
