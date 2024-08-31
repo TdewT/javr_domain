@@ -1,10 +1,11 @@
 const {spawn} = require('child_process');
 const {customLog} = require("../utils/CustomUtils");
-const {statuses, servers, discordBots} = require("../utils/SharedVars");
+const {statuses} = require("../utils/SharedVars");
+const {statusResponse} = require("../utils/SocketEvents");
 
 class DiscordBot {
     constructor({
-                    dirPath, name, emitFunc, io,
+                    dirPath, name, io,
                     lavaArgs = ["Lavalink.py"],
                     pythonPath = "python"
                 }) {
@@ -31,7 +32,6 @@ class DiscordBot {
         this.botProcess = null;
 
         // Pass variables and functions needed for updating client's info
-        this.emitFunc = emitFunc;
         // FIXME: This is temporary work-around, will fix with general refactor
         this.io = io;
     }
@@ -165,19 +165,12 @@ class DiscordBot {
     // Small helper methods
     updateBotStatus(status) {
         this.status = status;
-        this.sendResponse();
+        statusResponse(this.io)
     }
 
     updateLavaStatus(status) {
         this.lavaStatus = status;
-        this.sendResponse();
-    }
-
-    sendResponse() {
-        this.emitFunc(this.io(), "status_response", {
-            servers: servers,
-            discordBots: discordBots,
-        });
+        statusResponse(this.io)
     }
 }
 

@@ -9,7 +9,7 @@ socket.on('status_response', (services) => {
     serviceListElement = $("#service-list");
     const servers = services.servers;
     const discordBots = services.discordBots;
-    const serverManager = services.serverManager;
+    const serverManager = services.serverManagers;
 
     if (typeof serverManager === "boolean"){
         syncServerManager(serverManager);
@@ -29,4 +29,8 @@ socket.on('status_response', (services) => {
 
 socket.on('request_failed', err => {
     alert('Errer, albowiem: ' + err)
+});
+
+socket.on('info', info => {
+    alert(info);
 });

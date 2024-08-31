@@ -10,7 +10,7 @@ function customLog(name, str) {
     time = time.replaceAll(",", " |");
 
     // Trim the string and remove unwanted special chars
-    if (typeof str === "string"){
+    if (typeof str === "string") {
         str = str.trim().replace(/[\r\n]+/gm, '');
     }
     // Final log text
@@ -62,13 +62,7 @@ const getElementByHtmlID = (list, serverID) => list.filter((s) => {
     return s.htmlID === serverID
 })[0];
 
-// Sending servers statuses
-function emitDataGlobal(socket, event, data) {
-    socket.emit(event, data);
-}
-
 module.exports = {
     customLog,
     getElementByHtmlID,
-    emitDataGlobal,
 };

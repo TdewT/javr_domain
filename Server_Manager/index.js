@@ -94,21 +94,24 @@ const io = socketIO(server);
 
 // When client connects to the server
 io.on('connection', socket => {
+    let ip = socket.handshake.address.split(':');
+    ip = ip[ip.length - 1];
+
     customLog(siteIDName, `Established connection with website server`);
 
     // Respond to clients data request
-    socket.on('status_request', (senderID) => {
+    socket.on('status_request', () => {
         // Send back servers statuses
         if (socket) {
-            customLog(siteIDName, `Status request received from ${senderID}`);
+            customLog(siteIDName, `Status request received from ${ip}`);
             socket.emit("status_response", {servers: servers, discordBots: discordBots});
-            customLog(siteIDName, `Status update sent ${senderID}`);
+            customLog(siteIDName, `Status update sent ${ip}`);
         }
     });
 
     // Requested server start
-    socket.on('start_server_request', (senderID, serverID, socketID) => {
-        customLog(serverID, `${senderID} requested server start`);
+    socket.on('start_server_request', (serverID, socketID) => {
+        customLog(serverID, `${ip} requested server start`);
 
         // Get requested server's status
         const server = getElementByHtmlID(servers, serverID);
@@ -130,8 +133,8 @@ io.on('connection', socket => {
     });
 
     // Requested server stop
-    socket.on('stop_server_request', (senderID, serverID, socketID) => {
-        customLog(serverID, `${senderID} requested server stop`);
+    socket.on('stop_server_request', (serverID, socketID) => {
+        customLog(serverID, `${ip} requested server stop`);
 
         const server = getElementByHtmlID(servers, serverID);
 
@@ -153,7 +156,7 @@ io.on('connection', socket => {
 
 
     // Request bot start
-    socket.on('start_dbot_request', (senderID, botID, socketID) => {
+    socket.on('start_dbot_request', (botID, socketID) => {
 
         // Search for bot in the list
         const bot = getElementByHtmlID(discordBots, botID);
@@ -177,8 +180,8 @@ io.on('connection', socket => {
     });
 
     // Requested server stop
-    socket.on('stop_dbot_request', (senderID, botID, socketID) => {
-        customLog(botID, `${senderID} requested bot stop`);
+    socket.on('stop_dbot_request', (botID, socketID) => {
+        customLog(botID, `${ip} requested bot stop`);
 
         // Search for bot in the list
         const bot = getElementByHtmlID(discordBots, botID);

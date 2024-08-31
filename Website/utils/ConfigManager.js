@@ -1,7 +1,7 @@
 const {readdirSync, readFileSync, writeFileSync, mkdirSync, existsSync} = require("node:fs");
 const {customLog} = require("./CustomUtils");
 
-const logName = "config-manager";
+const logName = "Config_Manager";
 
 // Dictionary of supported configs
 const configTypes = {

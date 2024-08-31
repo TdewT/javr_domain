@@ -1,6 +1,6 @@
 const tokenManager = require("./JavrTokenManager");
 const {customLog} = require("./CustomUtils");
-const {servers} = require('./SharedVars');
+const {allServers} = require('../object_classes/ServerList');
 
 // Name that will be displayed in logs
 const logName = "api-handler";
@@ -43,7 +43,7 @@ class ApiHandler {
                     resp.json(body);
                 }
                 else{
-                    // If not send back 403 fobidden
+                    // If not send back 403 forbidden
                     resp.status(403).send({
                         message: "Token expired",
                     })
@@ -94,7 +94,7 @@ class ApiHandler {
 
                 // Convert servers to a format that's more comprehensible in JSON
                 let serversJSON = {};
-                for (const server of servers) {
+                for (const server of allServers) {
                     // Assign server objects to entry with their htmlID
                     serversJSON[server.htmlID] = server;
                 }

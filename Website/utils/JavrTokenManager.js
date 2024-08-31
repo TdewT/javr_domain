@@ -2,7 +2,7 @@
 // Static imports
 const {customLog} = require("./CustomUtils");
 const {configTypes, ConfigManager} = require("./ConfigManager");
-const {servers} = require('./SharedVars');
+const {allServers} = require('../object_classes/ServerList');
 
 // Name to be displayed in logs
 const logName = "token-manager";
@@ -29,7 +29,7 @@ function generateToken(identifier, apiHandler) {
     saveToken(token, identifier);
 
     // Create endpoints for the new token
-    apiHandler.createEndpoints(servers);
+    apiHandler.createEndpoints(allServers);
 
     return token;
 }
