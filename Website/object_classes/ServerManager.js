@@ -4,7 +4,6 @@ const {customLog} = require("../utils/CustomUtils");
 const {wake} = require("wake_on_lan");
 const SocketEvents = require("../utils/SocketEvents");
 // import for docstrings
-const socketIO = require("socket.io");
 const {Statuses} = require("../utils/SharedVars");
 
 /**
@@ -12,7 +11,7 @@ const {Statuses} = require("../utils/SharedVars");
  * @classdesc This class's purpose is to create object for easy management of connection with a remote server manager.
  * @property {string} name - Name of the server manager, used for logs and keeping track of what servers are under each manager.
  * @property {string} mac - Mac address of the server manager, used for Wake On Lan feature.
- * @property {websocket} serverScoket - Websocket which connects to the Server Manager's node webserver.
+ * @property {socketIOClient} serverScoket - Websocket which connects to the Server Manager's node webserver.
  * @property {string} ip - IP/url that `serverSocket` is going to listen on. String value.
  * @property {Statuses} status - Keeps track of the state of websocket connection. `true` if connected `false` otherwise.
  */
@@ -44,7 +43,7 @@ class ServerManager {
 
     /**
      * Creates websocket client connection with specified server.
-     * @param websiteIO - Websocket used for connection with the website's frontend clients.
+     * @param {socket.io} websiteIO - Websocket used for connection with the website's frontend clients.
      */
     startConnection(websiteIO) {
         setInterval(() => {
@@ -85,7 +84,7 @@ class ServerManager {
 
     /**
      * @desc Sends a wake-up signal to the manager
-     * @param clientSocket
+     * @param clientSocket - Socket that connects specific user with website.
      */
     wakeUp(clientSocket) {
         return wake(this.mac, error => {

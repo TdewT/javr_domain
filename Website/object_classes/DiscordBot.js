@@ -3,7 +3,30 @@ const {customLog} = require("../utils/CustomUtils");
 const {Statuses} = require("../utils/SharedVars");
 const {statusResponse} = require("../utils/SocketEvents");
 
+/**
+ * @class DiscordBot
+ * @desc Object class representing Discord bot. Allows for launching and stopping bot from the website. Currently only python bots are supported
+ * @property {Statuses} status - Current status of the bot.
+ * @property {string} htmlID - Is created upon construction based on name property, used for logs and as frontend id-prefix.
+ * @property {boolean} lavaConnected - Is set to `true` if Lavalink is connected and `false` if not.
+ * @property {ChildProcess} botProcess - Contains bot's child process instance, `null` if bot is not spawned.
+ * @property {ChildProcess} lavaProcess - Contains Lavalink's child process instance, `null` if lava is not spawned.
+ *
+ * @property {string} dirPath - Path to the directory containing the bot.
+ * @property {string} name - Name of the bot, displayed on the website frontend.
+ * @property io - Main socket.io of the website.
+ * @property {[string]} lavaArgs - Arguments passed to Lavalink on launch.
+ * @property {string} pythonPath - Path to the python required to run the bot.
+ */
 class DiscordBot {
+    /**
+     * @constructor
+     * @param {string} dirPath - Path to the directory containing the bot.
+     * @param {string} name - Name of the bot.
+     * @param io - Main socket.io of the website.
+     * @param {[string]} lavaArgs - Arguments passed to Lavalink on launch.
+     * @param {string} pythonPath - Path to the python required to run the bot.
+     */
     constructor({
                     dirPath, name, io,
                     lavaArgs = ["Lavalink.py"],
@@ -36,6 +59,9 @@ class DiscordBot {
         this.io = io;
     }
 
+    /**
+     * @desc Spawns bot and Lavalink child processes.
+     */
     start() {
         customLog(this.htmlID, "Bot starting...");
         this.updateBotStatus(Statuses.STARTING);
@@ -50,6 +76,9 @@ class DiscordBot {
         this.startBot();
     }
 
+    /**
+     * @desc Spawn Lavalink with arguments from lavaArgs
+     */
     startLava() {
         // Start lavalink process
         this.lavaProcess = spawn(
@@ -61,6 +90,9 @@ class DiscordBot {
         this.lavalinkHandler();
     }
 
+    /**
+     * @desc Starts discord bot's `main.py` with python installation specified in pythonPath
+     */
     startBot() {
         // Start bot process
         this.botProcess = spawn(`"${this.pythonPath}"`, ['main.py'], {cwd: this.dirPath, shell: true});
@@ -68,7 +100,9 @@ class DiscordBot {
         this.discordProcessHandler();
     }
 
-    // Handle bots console output
+    /**
+     * @desc Handles bot's console output and errors.
+     */
     discordProcessHandler() {
         // On processes output
         this.botProcess.stdout.on('data', (data) => {
@@ -84,7 +118,9 @@ class DiscordBot {
         this.errorHandler(this.botProcess);
     }
 
-    // Handle Lavalinks console output
+    /**
+     * @desc Handles Lavalink's console output.
+     */
     lavalinkHandler() {
         // On processes output
         this.lavaProcess.stdout.on('data', (data) => {
@@ -105,7 +141,10 @@ class DiscordBot {
         this.errorHandler(this.lavaProcess)
     }
 
-    // Generalised error handler for both Discord bot and Lavalink
+    /**
+     * @desc Generalised error handler for both Discord bot and Lavalink
+     * @param {ChildProcess} process - ChildProcess instance of Lavalink or discord bot
+     */
     errorHandler(process) {
         process.stderr.on('data', (err) => {
             err = String(err);
@@ -143,6 +182,9 @@ class DiscordBot {
         });
     }
 
+    /**
+     * @desc Stops bot and Lavalink
+     */
     stop() {
         if (this.status === Statuses.ONLINE) {
             // Set status to stopping before they stop
@@ -162,12 +204,19 @@ class DiscordBot {
         }
     }
 
-    // Small helper methods
+    /**
+     * @desc Decomposition of bot status updates.
+     * @param status
+     */
     updateBotStatus(status) {
         this.status = status;
         statusResponse(this.io)
     }
 
+    /**
+     * @desc Decomposition of Lavalink status updates.
+     * @param status
+     */
     updateLavaStatus(status) {
         this.lavaStatus = status;
         statusResponse(this.io)

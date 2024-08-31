@@ -36,7 +36,7 @@ const website = new MainWebsite({
 customLog(logName, "Starting main website");
 website.startWebsite();
 customLog(logName, 'Loading Server Managers');
-ServerManagerList.loadServerManagers(website.websiteIO);
+ServerManagerList.startServerManagers(website.websiteIO);
 customLog(logName, "Creating server list");
 ServerList.init();
 

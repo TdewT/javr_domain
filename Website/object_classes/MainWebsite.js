@@ -16,10 +16,21 @@ const SocketEvents = require("../utils/SocketEvents");
 const app = express();
 app.use(express.static('public'));
 
+/**
+ * @class MainWebsite
+ * @desc Object class for easier management of the main website server. Can have only one instance.
+ * @property instance - After first initialisation stores class instance. It is returned if class has already been initialised.
+ */
 class MainWebsite {
     // Holds static reference to an initialised instance
     static instance = null;
 
+    /**
+     * @constructor
+     * @param siteName - Name of the website.
+     * @param port - Port on which the website is hosted.
+     * @returns {this} - If instance is already initialised it returns that instance.
+     */
     constructor({
                     siteName: siteName,
                     port: port,
@@ -35,6 +46,9 @@ class MainWebsite {
         this.port = port;
     }
 
+    /**
+     * @desc Starts the website and its components.
+     */
     startWebsite() {
         const websiteServer = app.listen(this.port, () => {
             customLog(this.name, `Server started on port ${websiteServer.address().port}`);
@@ -45,6 +59,9 @@ class MainWebsite {
         this.initialiseAPI();
     }
 
+    /**
+     * @desc Loads all the bots from configs to `discordBots` array.
+     */
     loadDiscordBots() {
         customLog(this.name, 'Loading DiscordBots');
         // Get bots and their parameters from config file
@@ -70,6 +87,10 @@ class MainWebsite {
         // }
     }
 
+    /**
+     * @desc Starts socket that connects back and front-end.
+     * @param websiteServer - Express server instance.
+     */
     createSocket(websiteServer) {
         customLog(this.name, 'Creating websocket');
         // noinspection JSValidateTypes
@@ -240,6 +261,9 @@ class MainWebsite {
         });
     }
 
+    /**
+     * @desc Initialises `APIHandler` and creates API endpoints.
+     */
     initialiseAPI() {
         customLog(this.name, 'Initialising API');
         // Initialise api-handler

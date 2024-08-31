@@ -32,7 +32,7 @@ class SocketEvents {
             data['discordBots'] = discordBots;
         }
         if (sendServerManagers) {
-            data['serverManagers'] = ServerManagerList.getManagersStates();
+            data['serverManagers'] = ServerManagerList.getManagersStatuses();
         }
 
         websocket.emit(this.events.STATUS_RESPONSE, data);

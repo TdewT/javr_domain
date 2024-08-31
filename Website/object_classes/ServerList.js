@@ -4,9 +4,17 @@ const {serverManagers} = require('../utils/SharedVars');
 const logName = "Server_List";
 let allServers = [];
 
+/**
+ * @class ServerList
+ * @desc Keeps the track of all available servers and handles all operations on server lists.
+ * @property {{string: [GenericServer]}} managersWithServers - Dictionary containing all managers (as keys) and array of their servers (as values)
+ */
 class ServerList {
     static managersWithServers = {};
 
+    /**
+     * @desc Creates entries for each serverManagers in managersWithServers
+     */
     static init() {
         customLog(logName, "Initialising");
         for (let serverManager of serverManagers) {
@@ -14,6 +22,11 @@ class ServerList {
         }
     }
 
+    /**
+     * @desc Updates both server lists with given parameters.
+     * @param {string} managerName - Name of the server manager that sent update.
+     * @param {GenericServer} servers - List of servers.
+     */
     static updateServers(managerName, servers) {
         customLog(logName, `Updating server list for ${managerName}`);
         // Update server list for the manager
@@ -22,6 +35,9 @@ class ServerList {
         this.updateAllServers();
     }
 
+    /**
+     * @desc Updates allServers array.
+     */
     static updateAllServers() {
         // Get all servers
         let serverListArr = Object.values(ServerList.managersWithServers);
@@ -35,9 +51,14 @@ class ServerList {
         }
     }
 
+    /**
+     * @desc Searches for a server manager that contains server.
+     * @param serverID - HtmlID of the server by which manager will be searched.
+     * @returns {boolean|string} - Returns name of the manager if succeeded or `false` if it was not found.
+     */
     static getManagerNameByServer(serverID) {
         for (const managerName of Object.keys(ServerList.managersWithServers)) {
-            const serverNames = ServerList.getServerNames(ServerList.managersWithServers[managerName]);
+            const serverNames = ServerList.getServerHtmlIDs(ServerList.managersWithServers[managerName]);
             if (serverNames.includes(serverID)) {
                 return managerName;
             }
@@ -46,7 +67,12 @@ class ServerList {
         return false;
     }
 
-    static getServerNames(servers) {
+    /**
+     * @desc Extracts htmlIDs from an array of servers.
+     * @param {[GenericServer]} servers - Array of server instances.
+     * @returns {[string]} - array of htmlIDs;
+     */
+    static getServerHtmlIDs(servers) {
         let names = [];
         for (const server of servers) {
             names.push(server.htmlID);
