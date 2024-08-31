@@ -5,6 +5,7 @@ const {wake} = require("wake_on_lan");
 const SocketEvents = require("../utils/SocketEvents");
 // import for docstrings
 const socketIO = require("socket.io");
+const {Statuses} = require("../utils/SharedVars");
 
 /**
  * @class ServerManager
@@ -13,11 +14,11 @@ const socketIO = require("socket.io");
  * @property {string} mac - Mac address of the server manager, used for Wake On Lan feature.
  * @property {websocket} serverScoket - Websocket which connects to the Server Manager's node webserver.
  * @property {string} ip - IP/url that `serverSocket` is going to listen on. String value.
- * @property {boolean} isConnected - Keeps track of the state of websocket connection. `true` if connected `false` otherwise.
+ * @property {Statuses} status - Keeps track of the state of websocket connection. `true` if connected `false` otherwise.
  */
 class ServerManager {
     socket;
-    isConnected = false;
+    status = Statuses.OFFLINE;
     #socketOpen = false;
 
     /**
@@ -50,7 +51,7 @@ class ServerManager {
             if (!this.#socketOpen) {
                 this.#socketOpen = true;
                 this.socket.once('connect', () => {
-                    this.isConnected = true;
+                    this.status = Statuses.ONLINE;
                     customLog(this.name, `Connected`);
 
                     customLog(this.name, `Sending status request`);
@@ -58,7 +59,7 @@ class ServerManager {
                     SocketEvents.statusRequest(this.socket);
 
                     this.socket.on('disconnect', () => {
-                        this.isConnected = false;
+                        this.status = Statuses.OFFLINE;
                         ServerList.updateServers(this.name, []);
                         SocketEvents.statusResponse(websiteIO);
                         this.socket.off();

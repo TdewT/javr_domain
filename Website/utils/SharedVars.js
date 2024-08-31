@@ -1,11 +1,20 @@
 let discordBots = [];
 let serverManagers = [];
-const statuses = {
+
+/**
+ * @enum Statuses
+ * @property {string} ONLINE
+ * @property {string} STARTING
+ * @property {string} BUSY
+ * @property {string} STOPPING
+ * @property {string} OFFLINE
+ */
+const Statuses = {
     "ONLINE": "online", "STARTING": "starting", "BUSY": "busy", "STOPPING": "stopping", "OFFLINE": "offline",
 };
 
 module.exports = {
-    statuses,
+    Statuses,
     discordBots,
     serverManagers
 };

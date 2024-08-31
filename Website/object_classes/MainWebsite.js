@@ -6,7 +6,7 @@ const axios = require("axios");
 const {ApiHandler} = require("../utils/ApiHandler");
 const {DiscordBot} = require("./DiscordBot");
 const {customLog, getElementByHtmlID} = require("../utils/CustomUtils");
-const {discordBots} = require("../utils/SharedVars");
+const {discordBots, Statuses} = require("../utils/SharedVars");
 const {ServerManagerList} = require("./ServerManagerList");
 const {ConfigManager, configTypes} = require("../utils/ConfigManager");
 const ServerManager = require("./ServerManager");
@@ -129,7 +129,7 @@ class MainWebsite {
                 const serverManager = ServerManagerList.getManagerByServerID(serverID);
 
                 // Get requested server's status
-                if (serverManager && serverManager.isConnected) {
+                if (serverManager && serverManager.status === Statuses.ONLINE) {
                     SocketEvents.startServerRequest(serverManager.socket, serverID, clientSocket.id);
 
                     customLog(this.name, `Request forwarded to ${serverManager.name}`);
@@ -149,7 +149,7 @@ class MainWebsite {
 
                 const serverManager = ServerManagerList.getManagerByServerID(serverID);
 
-                if (serverManager && serverManager.isConnected) {
+                if (serverManager && serverManager.status === Statuses.ONLINE) {
                     SocketEvents.stopServerRequest(serverManager.socket, serverID, clientSocket.id);
                     customLog(this.name, `Request forwarded to ${serverManager.name}`);
                 }

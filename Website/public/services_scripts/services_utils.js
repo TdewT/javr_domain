@@ -3,15 +3,15 @@ const statusIndicators = {
 };
 
 
-function getStatusText(server) {
-    if (server.type === "minecraft" && server.currPlayers && server.maxPlayers > 0) {
-        if (server.status === 'online') return server.currPlayers.length + '/' + server.maxPlayers;
+function getStatusText(serviceObject) {
+    if (serviceObject.type === "minecraft" && serviceObject.currPlayers && serviceObject.maxPlayers > 0) {
+        if (serviceObject.status === 'online') return serviceObject.currPlayers.length + '/' + serviceObject.maxPlayers;
     }
-    if (server.status === 'online') return 'Online';
-    if (server.status === 'starting') return "Starting...";
-    if (server.status === 'busy') return "Port is busy";
-    if (server.status === 'stopping') return 'Stopping...';
-    if (server.status === 'offline') return 'Offline';
+    if (serviceObject.status === 'online') return 'Online';
+    if (serviceObject.status === 'starting') return "Starting...";
+    if (serviceObject.status === 'busy') return "Port is busy";
+    if (serviceObject.status === 'stopping') return 'Stopping...';
+    if (serviceObject.status === 'offline') return 'Offline';
     return 'Starting...';
 }
 

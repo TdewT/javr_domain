@@ -1,6 +1,6 @@
 const {ServerList} = require("./ServerList");
 const {customLog} = require("../utils/CustomUtils");
-const {serverManagers} = require('../utils/SharedVars');
+const {serverManagers, Statuses} = require('../utils/SharedVars');
 
 const logName = 'Server_Managers';
 
@@ -8,7 +8,7 @@ class ServerManagerList {
 
     static anyManagerConnected() {
         for (const serverManager of serverManagers) {
-            if (serverManager.isConnected) {
+            if (serverManager.status === Statuses.ONLINE) {
                 return true;
             }
         }
@@ -25,7 +25,7 @@ class ServerManagerList {
     static getConnectedManagers() {
         let connected = [];
         for (const serverManager of serverManagers) {
-            if (serverManager.isConnected) {
+            if (serverManager.status === Statuses.ONLINE) {
                 connected.push(serverManager);
             }
         }
@@ -56,7 +56,7 @@ class ServerManagerList {
     static getManagersStates(){
         let states = [];
         for (const serverManager of serverManagers) {
-            states.push([serverManager.name, serverManager.isConnected]);
+            states.push([serverManager.name, serverManager.status]);
         }
         return states;
     }

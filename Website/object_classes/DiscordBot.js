@@ -1,6 +1,6 @@
 const {spawn} = require('child_process');
 const {customLog} = require("../utils/CustomUtils");
-const {statuses} = require("../utils/SharedVars");
+const {Statuses} = require("../utils/SharedVars");
 const {statusResponse} = require("../utils/SocketEvents");
 
 class DiscordBot {
@@ -10,7 +10,7 @@ class DiscordBot {
                     pythonPath = "python"
                 }) {
         // Current state of the bot
-        this.status = statuses.OFFLINE;
+        this.status = Statuses.OFFLINE;
         // Path to the bots folder
         this.dirPath = dirPath;
         // Path to python installation that is supposed to run bot
@@ -23,7 +23,7 @@ class DiscordBot {
         // Arguments for lavalink spawn (generally best to leave default)
         this.lavaArgs = lavaArgs;
         // Lavalink status
-        this.lavaStatus = statuses.OFFLINE;
+        this.lavaStatus = Statuses.OFFLINE;
         // Whether it is connected to Discord bot
         this.lavaConnected = false;
 
@@ -38,7 +38,7 @@ class DiscordBot {
 
     start() {
         customLog(this.htmlID, "Bot starting...");
-        this.updateBotStatus(statuses.STARTING);
+        this.updateBotStatus(Statuses.STARTING);
 
         // Start lavalink before bot (lavalink takes longer to boot up)
         customLog(this.htmlID, "Launching Lavalink...");
@@ -76,7 +76,7 @@ class DiscordBot {
             // Trigger when the bot reports it's online
             if (data.includes("online")) {
                 customLog(this.htmlID, "Bot is now online");
-                this.updateBotStatus(statuses.ONLINE);
+                this.updateBotStatus(Statuses.ONLINE);
             }
         });
 
@@ -92,7 +92,7 @@ class DiscordBot {
             // Trigger when Lavalink reports it's online
             if (data.includes("Lavalink is ready to accept connections.")) {
                 customLog(this.htmlID, "Successfully started lavalink");
-                this.updateLavaStatus(statuses.ONLINE);
+                this.updateLavaStatus(Statuses.ONLINE);
             }
             // Trigger when bot connects to lavalink
             else if (data.includes("Connection successfully established")) {
@@ -137,17 +137,17 @@ class DiscordBot {
             }
             else {
                 this.botProcess = null;
-                this.updateBotStatus(statuses.OFFLINE);
+                this.updateBotStatus(Statuses.OFFLINE);
                 customLog(this.htmlID, "Bot closed");
             }
         });
     }
 
     stop() {
-        if (this.status === statuses.ONLINE) {
+        if (this.status === Statuses.ONLINE) {
             // Set status to stopping before they stop
-            this.updateBotStatus(statuses.STOPPING);
-            this.updateLavaStatus(statuses.STOPPING);
+            this.updateBotStatus(Statuses.STOPPING);
+            this.updateLavaStatus(Statuses.STOPPING);
 
             // Kill the processes
             // Updates are done by their exit handlers

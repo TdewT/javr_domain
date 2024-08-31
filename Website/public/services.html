@@ -45,14 +45,8 @@
 
     <div class="container services-container mx-lg-auto mt-md-5 p-lg-5 d-flex flex-column align-items-center max-width-4">
         <h2 class="d-md-block mt-4">Aktualny stan serwerów/botów</h2>
-        <div id="server-manager" class="d-flex mt-5">
-            <div id="server-manager-status-box" class="me-auto flex">
-                <span class="me-3.5" id="server-manager-status">🔴</span>
-                <span class="me-4" id="server-manager-status-text">Offline</span>
-            </div>
-            <span>Server Manager</span>
-            <button type="button" class="button btn btn-success btn-sm services-button" id="server-manager-button-start">START</button>
-        </div>
+        <ul id="manager-list" class="list-group striped-list border-dark me-auto">
+        </ul>
         <div class="container-fluid p-md-0 no-padding-md">
             <ul id="service-list" class="list-group striped-list border-dark">
             </ul>

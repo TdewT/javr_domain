@@ -86,20 +86,16 @@ ul.striped-list > li:nth-of-type(odd) {
   margin-bottom: auto;
 }
 
-#server-manager {
-  margin-right: auto;
-  background-color: rgba(62, 49, 143, 0.968627451);
-  border: 1px solid #594eea;
-  border-bottom: 0;
-  padding: 8px 16px 8px 16px;
+#manager-list {
+  margin: 40px 0 20px 0;
 }
 
-#server-manager > span {
+#manager-list > li > div {
   margin-top: auto;
   margin-bottom: auto;
 }
 
-#server-manager-status-box {
+#manager-list > li > span {
   margin-top: auto;
   margin-bottom: auto;
 }

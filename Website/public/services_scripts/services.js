@@ -9,10 +9,10 @@ socket.on('status_response', (services) => {
     serviceListElement = $("#service-list");
     const servers = services.servers;
     const discordBots = services.discordBots;
-    const serverManager = services.serverManagers;
+    const serverManagers = services.serverManagers;
 
-    if (typeof serverManager === "boolean"){
-        syncServerManager(serverManager);
+    if (serverManagers){
+        syncServerManager(serverManagers);
     }
 
     // Generate or update elements for Discord bots
