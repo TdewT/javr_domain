@@ -25,7 +25,7 @@ class ServerList {
     /**
      * @desc Updates both server lists with given parameters.
      * @param {string} managerName - Name of the server manager that sent update.
-     * @param {GenericServer} servers - List of servers.
+     * @param {[GenericServer]} servers - List of servers.
      */
     static updateServers(managerName, servers) {
         customLog(logName, `Updating server list for ${managerName}`);
