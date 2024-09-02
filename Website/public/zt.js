@@ -48,7 +48,7 @@ function generateDataElements(data, listElement) {
         displayName = member.config.id;
       }
 
-      //Coloring diffrent options for easier seeing (green - authorised, red - unauthorised)
+      //Coloring different options for easier seeing (green - authorised, red - unauthorised)
       if (member.config.authorized) {
         selectElement.innerHTML += `<option class="authorised" value="${[member.config.id, member.name, member.description, member.config.authorized]}">${displayName}</option>`
       }
