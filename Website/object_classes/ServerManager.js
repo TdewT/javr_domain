@@ -5,6 +5,7 @@ const {wake} = require("wake_on_lan");
 const SocketEvents = require("../utils/SocketEvents");
 // import for docstrings
 const {Statuses} = require("../utils/SharedVars");
+const events = require("node:events");
 
 /**
  * @class ServerManager
@@ -49,14 +50,14 @@ class ServerManager {
         setInterval(() => {
             if (!this.#socketOpen) {
                 this.#socketOpen = true;
-                this.socket.once('connect', () => {
+                this.socket.once(SocketEvents.events.CONNECT, () => {
                     this.status = Statuses.ONLINE;
                     customLog(this.name, `Connected`);
 
                     customLog(this.name, `Sending status request`);
                     SocketEvents.statusRequest(this.socket);
 
-                    this.socket.on('disconnect', () => {
+                    this.socket.on(SocketEvents.events.DISCONNECT, () => {
                         this.status = Statuses.OFFLINE;
                         this.#socketOpen = false;
                         ServerList.updateServers(this.name, []);
@@ -65,7 +66,7 @@ class ServerManager {
                         customLog(this.name, 'Disconnected');
                     });
 
-                    this.socket.on('status_response', (response) => {
+                    this.socket.on(SocketEvents.events.STATUS_RESPONSE, (response) => {
                         customLog(this.name, `Received status update`);
                         ServerList.updateServers(this.name, response.servers);
                         SocketEvents.statusResponse(websiteIO);
@@ -73,7 +74,7 @@ class ServerManager {
                     });
 
                     // If the request is denied
-                    this.socket.on('request_failed', (response) => {
+                    this.socket.on(SocketEvents.events.REQUEST_FAILED, (response) => {
                         customLog(this.name, `Request failed "${response['reason']}"`);
                         SocketEvents.requestFailed(websiteIO.to(response['socket']), response['reason']);
                     });

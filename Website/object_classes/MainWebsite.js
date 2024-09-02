@@ -97,7 +97,7 @@ class MainWebsite {
         this.websiteIO = socketIO(websiteServer);
 
         // When client connects to the server
-        this.websiteIO.on('connection', clientSocket => {
+        this.websiteIO.on(SocketEvents.events.CONNECTION, clientSocket => {
             let targetSite = clientSocket.request.headers.referer.split('/');
             targetSite = targetSite[targetSite.length - 1];
             let ip = clientSocket.handshake.address.split(':');
@@ -109,7 +109,7 @@ class MainWebsite {
             customLog(this.name, `Status response sent to client ${ip}`);
 
             // Respond to clients data request
-            clientSocket.on('status_request', () => {
+            clientSocket.on(SocketEvents.events.STATUS_REQUEST, () => {
                 // Send back servers statuses
                 if (clientSocket) {
                     customLog(this.name, `Status request received from ${ip}`);
@@ -138,14 +138,14 @@ class MainWebsite {
             });
 
             // Requested server manager start
-            clientSocket.on('start_server_manager_request', managerName => {
+            clientSocket.on(SocketEvents.events.START_SERVER_MANAGER_REQUEST, managerName => {
                 const serverManager = ServerManagerList.getManagerByName(managerName);
                 customLog(this.name, `${ip} requested ${serverManager.name} start`);
                 serverManager.wakeUp(clientSocket);
             });
 
             // Requested server start
-            clientSocket.on('start_server_request', (serverID) => {
+            clientSocket.on(SocketEvents.events.START_SERVER_REQUEST, (serverID) => {
                 customLog(serverID, `${ip} requested server start`);
                 const serverManager = ServerManagerList.getManagerByServerID(serverID);
 
@@ -165,7 +165,7 @@ class MainWebsite {
             });
 
             // Requested server stop
-            clientSocket.on('stop_server_request', (serverID) => {
+            clientSocket.on(SocketEvents.events.STOP_SERVER_REQUEST, (serverID) => {
                 customLog(serverID, `${ip} requested server stop`);
 
                 const serverManager = ServerManagerList.getManagerByServerID(serverID);
@@ -185,7 +185,7 @@ class MainWebsite {
 
 
             // Request bot start
-            clientSocket.on('start_dbot_request', (botID) => {
+            clientSocket.on(SocketEvents.events.START_DBOT_REQUEST, (botID) => {
                 customLog(botID, `${ip} requested ${botID}'s start`);
 
                 // Search for bot in the list
@@ -194,7 +194,7 @@ class MainWebsite {
             });
 
             // Requested server stop
-            clientSocket.on('stop_dbot_request', (botID) => {
+            clientSocket.on(SocketEvents.events.STOP_DBOT_REQUEST, (botID) => {
                 customLog(botID, `${ip} requested ${botID}'s stop`);
 
                 // Search for bot in the list
@@ -210,7 +210,7 @@ class MainWebsite {
             const zeroTierToken = apiTokens["tokens"]["zerotier"];
 
             //Handling ZeroTier Request
-            clientSocket.on('zt_request', () => {
+            clientSocket.on(SocketEvents.events.ZT_REQUEST, () => {
 
                 customLog(this.name, `${ip} requested ZeroTier information`);
 
@@ -234,7 +234,7 @@ class MainWebsite {
             });
 
             //Sending user edit form to ZeroTier api
-            clientSocket.on('zt_send_form', (userJSON, idUserJSON, apiUrl) => {
+            clientSocket.on(SocketEvents.events.ZT_SEND_FORM, (userJSON, idUserJSON, apiUrl) => {
 
                 customLog(this.name, `${ip} requested change of ZeroTier user - (${idUserJSON}) ${userJSON.name} ${userJSON.description}`);
 
