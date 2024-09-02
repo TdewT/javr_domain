@@ -62,7 +62,7 @@ class SocketEvents {
      * @param {JSON} data - data from ZeroTier's API.
      */
     static ztResponse(websocket, data){
-        websocket.emit(this.events.ZT_RESPONSE, websocket, data)
+        websocket.emit(this.events.ZT_RESPONSE, data)
     }
 
     /**
