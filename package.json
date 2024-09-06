@@ -2,7 +2,7 @@
   "name": "javr_strona",
   "version": "0.1.0",
   "description": "Magnificent JAVR web page",
-  "main": "index.js",
+  "main": "Website/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -14,6 +14,8 @@
     "minecraft-status": "^1.1.0",
     "process-exists": "^5.0.0",
     "socket.io": "^4.7.5",
-    "tcp-port-used": "^1.0.2"
+    "socket.io-client": "^4.7.5",
+    "tcp-port-used": "^1.0.2",
+    "wake_on_lan": "^1.0.0"
   }
 }
