@@ -111,7 +111,6 @@ io.on('connection', socket => {
 
     // Requested server start
     socket.on('start_server_request', (serverID, socketID) => {
-        cancelSleepTimer();
         customLog(serverID, `${ip} requested server start`);
 
         // Get requested server's status
@@ -135,7 +134,6 @@ io.on('connection', socket => {
 
     // Requested server stop
     socket.on('stop_server_request', (serverID, socketID) => {
-        cancelSleepTimer();
         customLog(serverID, `${ip} requested server stop`);
 
         const server = getElementByHtmlID(servers, serverID);
@@ -159,7 +157,7 @@ io.on('connection', socket => {
 
     // Request bot start
     socket.on('start_dbot_request', (botID, socketID) => {
-        cancelSleepTimer();
+
         // Search for bot in the list
         const bot = getElementByHtmlID(discordBots, botID);
 
@@ -183,7 +181,6 @@ io.on('connection', socket => {
 
     // Requested server stop
     socket.on('stop_dbot_request', (botID, socketID) => {
-        cancelSleepTimer();
         customLog(botID, `${ip} requested bot stop`);
 
         // Search for bot in the list
@@ -222,7 +219,7 @@ io.on('connection', socket => {
 // Check if any server is used every minute
 function sleepConditionDetector() {
     setInterval(() => {
-        if (anyServerUsed(servers)) {
+        if (anyServerUsed(servers) && !sleepTimerID) {
             sleepTimerID = sleepTimer();
         }
     }, 60 * 1000);
@@ -232,9 +229,12 @@ function sleepTimer() {
     return setTimeout(() => {
         // If servers are still offline
         if (anyServerUsed(servers)) {
-            customLog(siteIDName, 'All servers offline since 10 min, entering sleep');
-            sleepTimerID = undefined;
+            customLog(siteIDName, `No servers were used for ${timeToSleep} minutes, entering sleep`);
+            cancelSleepTimer();
             sleepSystem();
+        }
+        else{
+            cancelSleepTimer()
         }
     }, timeToSleep * 60 * 1000);
 }
@@ -256,5 +256,5 @@ function sleepSystem() {
 function cancelSleepTimer() {
     if (sleepTimerID)
         clearTimeout(sleepTimerID);
-        sleepTimerID = undefined;
+    sleepTimerID = undefined;
 }
