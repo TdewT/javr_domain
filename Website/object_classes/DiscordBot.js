@@ -1,7 +1,7 @@
 const {spawn} = require('child_process');
 const {customLog} = require("../utils/CustomUtils");
 const {Statuses} = require("../utils/SharedVars");
-const {statusResponse} = require("../utils/SocketEvents");
+const SocketEvents = require("../utils/SocketEvents");
 
 /**
  * @class DiscordBot
@@ -25,7 +25,7 @@ class DiscordBot {
      * @param {string} name - Name of the bot.
      * @param io - Main socket.io of the website.
      * @param {[string]} lavaArgs - Arguments passed to Lavalink on launch.
-     * @param {string} pythonPath - Path to the python required to run the bot.
+     * @param {string} pythonPath - Path to the python.exe required to run the bot.
      */
     constructor({
                     dirPath, name, io,
@@ -55,7 +55,6 @@ class DiscordBot {
         this.botProcess = null;
 
         // Pass variables and functions needed for updating client's info
-        // FIXME: This is temporary work-around, will fix with general refactor
         this.io = io;
     }
 
@@ -63,16 +62,16 @@ class DiscordBot {
      * @desc Spawns bot and Lavalink child processes.
      */
     start() {
-        customLog(this.htmlID, "Bot starting...");
+        customLog(this.htmlID, "Bot starting");
         this.updateBotStatus(Statuses.STARTING);
 
         // Start lavalink before bot (lavalink takes longer to boot up)
-        customLog(this.htmlID, "Launching Lavalink...");
+        customLog(this.htmlID, "Launching Lavalink");
         this.startLava();
 
 
         // Start the bot process
-        customLog(this.htmlID, "Launching bot...");
+        customLog(this.htmlID, "Launching bot");
         this.startBot();
     }
 
@@ -107,7 +106,7 @@ class DiscordBot {
         // On processes output
         this.botProcess.stdout.on('data', (data) => {
             data = String(data);
-            // Trigger when the bot reports it's online
+            // Trigger when the bot reports that it's online
             if (data.includes("online")) {
                 customLog(this.htmlID, "Bot is now online");
                 this.updateBotStatus(Statuses.ONLINE);
@@ -125,7 +124,7 @@ class DiscordBot {
         // On processes output
         this.lavaProcess.stdout.on('data', (data) => {
             data = String(data);
-            // Trigger when Lavalink reports it's online
+            // Trigger when Lavalink reports that it's online
             if (data.includes("Lavalink is ready to accept connections.")) {
                 customLog(this.htmlID, "Successfully started lavalink");
                 this.updateLavaStatus(Statuses.ONLINE);
@@ -153,7 +152,7 @@ class DiscordBot {
                 // Update connection state with lavalink
                 if (this.lavaConnected){
                     customLog(this.htmlID, "Lavalink Disconnected");
-                    this.updateLavaStatus(false)
+                    this.updateLavaStatus(Statuses.OFFLINE)
                 }
             }
             else{
@@ -170,8 +169,9 @@ class DiscordBot {
         process.on('exit', () => {
             // Check which app closed
             if (process === this.lavaProcess) {
-                this.lavaStatus = false;
+                this.updateLavaStatus(Statuses.OFFLINE);
                 this.lavaProcess = null;
+                this.lavaConnected = false;
                 customLog(this.htmlID, "Lavalink closed");
             }
             else {
@@ -210,7 +210,7 @@ class DiscordBot {
      */
     updateBotStatus(status) {
         this.status = status;
-        statusResponse(this.io)
+        SocketEvents.statusResponse(this.io, false, true, false);
     }
 
     /**
@@ -219,7 +219,7 @@ class DiscordBot {
      */
     updateLavaStatus(status) {
         this.lavaStatus = status;
-        statusResponse(this.io)
+        SocketEvents.statusResponse(this.io, false, true, false);
     }
 }
 
