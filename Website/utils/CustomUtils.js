@@ -57,12 +57,6 @@ function createLogStream() {
     logStream = fs.createWriteStream(filePath, {flags: 'a'});
 }
 
-//Find element by id in given list
-const getElementByHtmlID = (list, serverID) => list.filter((s) => {
-    return s.htmlID === serverID
-})[0];
-
 module.exports = {
     customLog,
-    getElementByHtmlID,
 };
