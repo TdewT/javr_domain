@@ -1,6 +1,6 @@
 function syncServerManager(serverManagers) {
     for (const serverManager of serverManagers) {
-        const managerElement = $(`#${serverManager[0]}-status-box`);
+        const managerElement = $(`#${serverManager.htmlID}-status-box`);
         if (!managerElement) {
             createManagerElement(serverManager);
         }
@@ -10,8 +10,8 @@ function syncServerManager(serverManagers) {
     }
 }
 function createManagerElement(manager) {
-    const managerID = manager[0];
-    const managerStatus = manager[1];
+    const managerID = manager.htmlID;
+    const managerStatus = manager.status;
 
     const serviceList = $(`#manager-list`);
 
@@ -34,8 +34,8 @@ function createManagerElement(manager) {
     });
 }
 function updateManager(manager) {
-    const managerID = manager[0];
-    const managerStatus = manager[1];
+    const managerID = manager.htmlID;
+    const managerStatus = manager.status;
 
     // Get relevant elements
     const indicatorElement = $(`#${managerID}-status`);

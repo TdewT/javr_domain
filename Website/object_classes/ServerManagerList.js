@@ -83,10 +83,10 @@ class ServerManagerList {
      * @desc Gets statuses of all defined server managers.
      * @returns {[string, Statuses]} - Array of two values, manager name and it's state
      */
-    static getManagersStatuses(){
+    static getManagersStatuses() {
         let states = [];
         for (const serverManager of serverManagers) {
-            states.push([serverManager.name, serverManager.status]);
+            states.push({htmlID: serverManager.name, status: serverManager.status});
         }
         return states;
     }

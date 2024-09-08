@@ -27,8 +27,9 @@ class MainWebsite {
 
     /**
      * @constructor
-     * @param siteName - Name of the website.
-     * @param port - Port on which the website is hosted.
+     * @param {string} siteName - Name of the website.
+     * @param {number} port - Port on which the website is hosted.
+     * @param {string[]} discordBotAutostart - List of bot names to automatically start with the website
      * @returns {this} - If instance is already initialised it returns that instance.
      */
     constructor({

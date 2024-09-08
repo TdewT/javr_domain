@@ -45,8 +45,10 @@ class ServerList {
         allServers.length = 0;
         // Extract individual servers and add them to allServers
         for (const serverArr of serverListArr) {
-            for (const server of serverArr) {
-                allServers.push(server)
+            if (serverArr != null){
+                for (const server of serverArr) {
+                    allServers.push(server)
+                }
             }
         }
     }
