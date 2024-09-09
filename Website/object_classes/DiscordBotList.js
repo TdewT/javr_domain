@@ -51,6 +51,27 @@ class DiscordBotList {
     static getBotByHtmlID = (botID) => discordBots.filter((s) => {
         return s.htmlID === botID
     })[0];
+
+    static getBotsHtmlIDs(bots) {
+        let names = [];
+        if (bots){
+            for (const bot of bots) {
+                names.push(bot.htmlID);
+            }
+        }
+        return names;
+    }
+
+    static getManagerNameByServer(botHtmlID){
+        for (const managerName of Object.keys(DiscordBotList.discordBotsWithHosts)) {
+            const botNames = DiscordBotList.getBotsHtmlIDs(DiscordBotList.discordBotsWithHosts[managerName]);
+            if (botNames.includes(botHtmlID)) {
+                return managerName;
+            }
+        }
+
+        return false;
+    }
 }
 
 module.exports = DiscordBotList;

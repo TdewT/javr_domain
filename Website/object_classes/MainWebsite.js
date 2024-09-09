@@ -5,8 +5,9 @@ const axios = require("axios");
 // Local imports
 const {ApiHandler} = require("../utils/ApiHandler");
 const {DiscordBot} = require("./DiscordBot");
-const {customLog, getElementByHtmlID} = require("../utils/CustomUtils");
-const {discordBots, Statuses} = require("../utils/SharedVars");
+const DiscordBotList = require("./DiscordBotList");
+const {customLog} = require("../utils/CustomUtils");
+const {Statuses, discordBots} = require("../utils/SharedVars");
 const {ServerManagerList} = require("./ServerManagerList");
 const {ConfigManager, configTypes} = require("../utils/ConfigManager");
 const ServerManager = require("./ServerManager");
@@ -35,6 +36,7 @@ class MainWebsite {
     constructor({
                     siteName: siteName,
                     port: port,
+                    discordBotAutostart: discordBotAutostart,
                 }) {
 
         // Ensure that only one instance of the class can be initialised at a time
@@ -45,6 +47,7 @@ class MainWebsite {
 
         this.name = siteName;
         this.port = port;
+        this.discordBotStart = discordBotAutostart;
     }
 
     /**
@@ -56,37 +59,10 @@ class MainWebsite {
         });
 
         this.createSocket(websiteServer);
-        this.loadDiscordBots();
+        this.startDiscordBots();
         this.initialiseAPI();
     }
 
-    /**
-     * @desc Loads all the bots from configs to `discordBots` array.
-     */
-    loadDiscordBots() {
-        customLog(this.name, 'Loading DiscordBots');
-        // Get bots and their parameters from config file
-        const discordBotsConfig = ConfigManager.getConfig(configTypes.discordBots);
-
-        for (const botName in discordBotsConfig) {
-            // Load initial parameters from config
-            let constructorParams = discordBotsConfig[botName];
-
-            // Add missing parameters
-            Object.assign(constructorParams, {
-                // FIXME: This is temporary work-around, will fix with general refactor
-                io: () => this.websiteIO,
-                discordBots: () => discordBots,
-            });
-            // Create bot instance and add it to the list
-            discordBots.push(new DiscordBot(constructorParams));
-        }
-        // Autostart Argentino
-        // const argentino = getDbotByHtmlID("JAVR_Argentino");
-        // if (argentino) {
-        //     argentino.start();
-        // }
-    }
 
     /**
      * @desc Starts socket that connects back and front-end.
@@ -162,6 +138,7 @@ class MainWebsite {
                 }
                 else{
                     customLog(this.name, `Server Manager for ${serverID} not found`);
+                    SocketEvents.requestFailed(clientSocket, `Server manager for ${serverID} not found`);
                 }
             });
 
@@ -181,6 +158,7 @@ class MainWebsite {
                 }
                 else{
                     customLog(this.name, `Server Manager for ${serverID} not found`);
+                    SocketEvents.requestFailed(clientSocket, `Server manager for ${serverID} not found`);
                 }
             });
 
@@ -190,7 +168,30 @@ class MainWebsite {
                 customLog(botID, `${ip} requested ${botID}'s start`);
 
                 // Search for bot in the list
-                const bot = getElementByHtmlID(discordBots, botID);
+                const bot = DiscordBotList.getBotByHtmlID(botID);
+
+                const serverManager = ServerManagerList.getManagerByBotID(botID);
+
+                // Check if bot is on local machine
+                if (serverManager.name === 'local'){
+                    bot.start();
+                }
+                else{
+                    // Get requested server's status
+                    if (serverManager && serverManager.status === Statuses.ONLINE) {
+                        SocketEvents.startDBotRequest(serverManager.socket, botID, clientSocket.id);
+
+                        customLog(this.name, `Request forwarded to ${serverManager.name}`);
+                    }
+                    else if (serverManager) {
+                        customLog(this.name, `${serverManager.name} not online, sending wake up packet`);
+                        serverManager.wakeUp(clientSocket);
+                    }
+                    else{
+                        customLog(this.name, `Server Manager for ${botID} not found`);
+                        SocketEvents.requestFailed(clientSocket, `Server Manager for ${botID} not found`);
+                    }
+                }
 
             });
 
@@ -199,7 +200,30 @@ class MainWebsite {
                 customLog(botID, `${ip} requested ${botID}'s stop`);
 
                 // Search for bot in the list
-                const bot = getElementByHtmlID(discordBots, botID);
+                const bot = DiscordBotList.getBotByHtmlID(botID);
+
+                const serverManager = ServerManagerList.getManagerByBotID(botID);
+
+                // Check if bot is on local machine
+                if (serverManager.name === 'local'){
+                    bot.stop();
+                }
+                else{
+                    // Get requested server's status
+                    if (serverManager && serverManager.status === Statuses.ONLINE) {
+                        SocketEvents.stopDBotRequest(serverManager.socket, botID, clientSocket.id);
+
+                        customLog(this.name, `Request forwarded to ${serverManager.name}`);
+                    }
+                    else if (serverManager) {
+                        customLog(this.name, `${serverManager.name} not online, sending wake up packet`);
+                        serverManager.wakeUp(clientSocket);
+                    }
+                    else{
+                        customLog(this.name, `Server Manager for ${botID} not found`);
+                        SocketEvents.requestFailed(clientSocket, `Server Manager for ${botID} not found`);
+                    }
+                }
 
             });
 
@@ -260,6 +284,37 @@ class MainWebsite {
 
             })
         });
+    }
+
+    startDiscordBots(){
+        customLog(this.name, "Starting Discord bots");
+
+        // Get bots and their parameters from config file
+        const discordBotsConfig = ConfigManager.getConfig(configTypes.discordBots);
+
+        // Temporary variable holding local bots
+        let discordBots = [];
+        for (const botName in discordBotsConfig) {
+            // Load initial parameters from config
+            let constructorParams = discordBotsConfig[botName];
+            // Add socket info
+            constructorParams['io'] = this.websiteIO;
+            
+            // Create bot instance and add it to the list
+            discordBots.push(new DiscordBot(constructorParams));
+        }
+        DiscordBotList.updateBots('local', discordBots);
+
+        // Autostart bots
+        for (const name of this.discordBotStart) {
+            const bot = DiscordBotList.getBotByHtmlID(name);
+            if (bot) {
+                bot.start();
+            }
+            else{
+                customLog(this.name, `${name} failed to start: Bot not defined`);
+            }
+        }
     }
 
     /**

@@ -1,6 +1,7 @@
 const {allServers} = require("../object_classes/ServerList");
 const {discordBots} = require("./SharedVars");
 const {ServerManagerList} = require("../object_classes/ServerManagerList");
+const DiscordBotList = require("../object_classes/DiscordBotList");
 
 class SocketEvents {
 
@@ -36,7 +37,7 @@ class SocketEvents {
             data['servers'] = allServers;
         }
         if (sendDiscordBots) {
-            data['discordBots'] = discordBots;
+            data['discordBots'] = DiscordBotList.getBotsStatuses();
         }
         if (sendServerManagers) {
             data['serverManagers'] = ServerManagerList.getManagersStatuses();
@@ -81,7 +82,7 @@ class SocketEvents {
     }
 
     /**
-     * @desc Sends request to start a server to provided server manager's socket.
+     * @desc Sends a request to start a server to provided server manager's socket.
      * @param websocket - Socket. io websocket, over which the request will be sent.
      * @param serverID - HtmlID of the server.
      * @param clientSocketID - ID of the socket of the user who sent the request.
@@ -91,13 +92,33 @@ class SocketEvents {
     }
 
     /**
-     * @desc Sends request to stop a server to provided server manager's socket.
+     * @desc Sends a request to stop a server to provided server manager's socket.
      * @param websocket - Socket. io websocket, over which the request will be sent.
      * @param serverID - HtmlID of the server.
      * @param clientSocketID - ID of the socket of the user who sent the request.
      */
     static stopServerRequest(websocket, serverID, clientSocketID) {
         websocket.emit(this.events.STOP_SERVER_REQUEST, serverID, clientSocketID);
+    }
+
+    /**
+     * @desc Sends a request to start a Discord bot to provided server manager's socket.
+     * @param websocket - Socket. io websocket, over which the request will be sent.
+     * @param botID - HtmlID of the bot.
+     * @param clientSocketID - ID of the socket of the user who sent the request.
+     */
+    static startDBotRequest(websocket, botID, clientSocketID) {
+        websocket.emit(this.events.START_DBOT_REQUEST, botID, clientSocketID);
+    }
+
+    /**
+     * @desc Sends a request to stop a Discord bot to provided server manager's socket.
+     * @param websocket - Socket. io websocket, over which the request will be sent.
+     * @param botID - HtmlID of the bot.
+     * @param clientSocketID - ID of the socket of the user who sent the request.
+     */
+    static stopDBotRequest(websocket, botID, clientSocketID) {
+        websocket.emit(this.events.STOP_DBOT_REQUEST, botID, clientSocketID);
     }
 }
 

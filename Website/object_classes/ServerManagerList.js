@@ -1,6 +1,7 @@
 const {ServerList} = require("./ServerList");
 const {customLog} = require("../utils/CustomUtils");
 const {serverManagers, Statuses} = require('../utils/SharedVars');
+const DiscordBotList = require("./DiscordBotList");
 
 const logName = 'Server_Managers';
 
@@ -25,7 +26,7 @@ class ServerManagerList {
 
     /**
      * @desc Starts all defined serverManagers
-     * @param {socket.io} websiteIO - Socket.io instance from the main server.
+     * @param websiteIO - Socket.io instance from the main server.
      */
     static startServerManagers(websiteIO) {
         for (const serverManager of serverManagers) {
@@ -89,6 +90,22 @@ class ServerManagerList {
             states.push({htmlID: serverManager.name, status: serverManager.status});
         }
         return states;
+    }
+
+    static getManagerByBotID(botHtmlID){
+        // Get name from bot list
+        const managerName = DiscordBotList.getManagerNameByServer(botHtmlID);
+
+        if (managerName === 'local'){
+            return {name: 'local'}
+        }
+
+        for (const serverManager of serverManagers) {
+            if (serverManager.name === managerName) {
+                return serverManager;
+            }
+        }
+        return false;
     }
 }
 
