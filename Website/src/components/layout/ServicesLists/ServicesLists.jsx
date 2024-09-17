@@ -78,7 +78,6 @@ function ServerList() {
     if (servers.length !== 0) {
         return (
             <>
-                {/*TODO: Check if all classes are required*/}
                 <table id="service-list" className={tableClasses}>
                     <tbody className={tbodyClasses}>
                     <tr>
@@ -108,7 +107,6 @@ function DiscordBotList() {
     if (discordBots.length !== 0) {
         return (
             <>
-                {/*TODO: Check if all classes are required*/}
                 <table id="service-list" className={tableClasses}>
                     <tbody className={tbodyClasses}>
                     <tr>
