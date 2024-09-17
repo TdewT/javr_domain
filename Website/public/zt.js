@@ -92,7 +92,7 @@ function generateForm() {
   $('#description').value = memberToEdit[2];
 }
 
-//Send data to index.js where axios will send that data to ZeroTier api
+//Send data to server.js where axios will send that data to ZeroTier api
 function sendData() {
   let postData =
   {

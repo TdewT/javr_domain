@@ -15,17 +15,17 @@
 }
 
 .bg-img-main {
-  background: #120b49 url("./res//bg-main.jpg") no-repeat center fixed;
+  background: #120b49 url("./background/bg-main.jpg") no-repeat center fixed;
   background-size: cover;
 }
 
 .bg-img-services {
-  background: #120b49 url("./res//bg-services.jpg") no-repeat center fixed;
+  background: #120b49 url("./background/bg-services.jpg") no-repeat center fixed;
   background-size: cover;
 }
 
 .bg-img-zt {
-  background: #120b49 url("./res//bg-zt.jpg") no-repeat center fixed;
+  background: #120b49 url("./background/bg-zt.jpg") no-repeat center fixed;
   background-size: cover;
 }
 

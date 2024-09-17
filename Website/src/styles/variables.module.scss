@@ -1,0 +1,25 @@
+// Text styling
+$h1-small-screen: 2rem;
+$h5-small-screen: 1.1rem;
+$text-border: 1px 0px 1px black;
+
+// Color theme
+$color-main: #120b49;
+$color-main-transparent: #120b49 + F7;
+$color-aux: #594eea;
+
+// Server list/table
+$table-color-main: rgba(39, 29, 103, 0.97);
+
+$table-color-background: lighten(adjust-hue($table-color-main, 1deg), 18%);
+$table-color-background-nth: lighten(adjust-hue($table-color-main, -2deg), 15%);
+$table-color-header-background: $table-color-main;
+$table-color-header-background-nth: lighten($table-color-main, 5%);
+$table-color-border: lighten(adjust-hue($table-color-main, -7deg), 32%);
+
+// Path to images, etc.
+$backgrounds-path: "/background/";
+
+// Gradients applied with `background-image:`
+$linear-gradient-top: linear-gradient(180deg, rgba(255, 255, 255, .04), rgba(255, 255, 255, 0));
+$linear-gradient-bottom: linear-gradient(0deg, rgba(255, 255, 255, .04), rgba(255, 255, 255, 0));

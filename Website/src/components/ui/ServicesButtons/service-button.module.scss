@@ -1,0 +1,9 @@
+.servicesButton {
+  width: 55px;
+}
+
+@media (max-width: 430px) {
+  .servicesButton {
+    margin: 4px 0 4px 2vw;
+  }
+}
