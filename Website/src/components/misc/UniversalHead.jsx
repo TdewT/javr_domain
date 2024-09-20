@@ -1,6 +1,4 @@
 import Head from 'next/head';
-import Link from "next/link";
-import {Meta} from "next/dist/lib/metadata/generate/meta";
 
 function UniversalHead({children}) {
     return (
