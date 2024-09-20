@@ -1,36 +1,21 @@
-const {events, servers, discordBots, serverManagers, serverList} = require("@server-lib/globals.js");
+const {events, serverList, arduinoBoards} = require("@server-lib/globals.js");
 
 class SocketEvents {
 
 
     /**
-     * @desc This static sends status response over given websocket, can be configured to send only some of the statuses. By default, sends update for all statuses.
+     * @desc Sends status response with all servers over given websocket.
      * @param websocket - Socket.io websocket, over which the data will be sent.
-     * @param {boolean} updateServers - Should servers be sent.
-     * @param {boolean} updateDiscordBots - Should Discord bots be sent.
-     * @param {boolean} updateServerManagers - Should server managers be sent.
      */
-    static statusResponse(websocket, {
-        // Default values if not all perimeters are specified e.g. statusResponse(websocket, {updateServers: true})
-        updateServers = true,
-        updateDiscordBots = true,
-        updateServerManagers = true
-        // Default value when no object is provided statusResponse(websocket)
-    } = {updateServers: true, updateDiscordBots: true, updateServerManagers: true}) {
-
-        let data = {};
-
-        if (updateServers) {
-            data['servers'] = serverList;
-        }
-        if (updateDiscordBots) {
-            const DiscordBotList = require("@server-lib/DiscordBotList.cjs");
-            data['discordBots'] = DiscordBotList.getStatuses();
-        }
-        if (updateServerManagers) {
-            const ServerManagerList = require("@server-lib/ServerManagerList.cjs");
-            data['serverManagers'] = ServerManagerList.getStatuses();
-        }
+    static statusResponse(websocket) {
+        const ServerManagerList = require("@server-lib/ServerManagerList.cjs");
+        const DiscordBotList = require("@server-lib/DiscordBotList.cjs");
+        let data = {
+            servers: serverList,
+            discordBots: DiscordBotList.getStatuses(),
+            serverManagers: ServerManagerList.getStatuses(),
+            arduinoBoards: arduinoBoards,
+        };
 
         websocket.emit(events.STATUS_RESPONSE, data);
     }

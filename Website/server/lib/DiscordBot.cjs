@@ -210,7 +210,7 @@ class DiscordBot {
      */
     updateBotStatus(status) {
         this.status = status;
-        SocketEvents.statusResponse(this.io, {updateDiscordBots: true});
+        SocketEvents.statusResponse(this.io);
     }
 
     /**
@@ -219,7 +219,7 @@ class DiscordBot {
      */
     updateLavaStatus(status) {
         this.lavaStatus = status;
-        SocketEvents.statusResponse(this.io, {updateDiscordBots: true});
+        SocketEvents.statusResponse(this.io);
     }
 }
 

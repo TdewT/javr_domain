@@ -60,6 +60,7 @@ class ServerManager {
                         this.#socketOpen = false;
                         ServerList.updateServers(this.name, []);
                         SocketEvents.statusResponse(websiteIO, {updateServerManagers: true});
+                        SocketEvents.statusResponse(websiteIO);
                         this.socket.off();
                         customLog(this.name, 'Disconnected');
                     });
@@ -69,6 +70,7 @@ class ServerManager {
                         ServerList.updateServers(this.name, response.servers);
                         SocketEvents.statusResponse(websiteIO, {updateServerManagers: true});
                         customLog(this.name, `Global status update sent to all clients`);
+                        SocketEvents.statusResponse(websiteIO);
                     });
 
                     // If the request is denied
