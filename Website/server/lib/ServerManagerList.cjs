@@ -1,4 +1,4 @@
-const {ServerList} = require("@server-lib/ServerList.cjs");
+const ServerList = require('@server-lib/ServerList.cjs');
 const {customLog} = require("@server-utils/custom-utils.cjs");
 const {Statuses, serverManagers} = require('@server-lib/globals.js');
 const DiscordBotList = require("@server-lib/DiscordBotList.cjs");
@@ -30,7 +30,7 @@ class ServerManagerList {
      */
     static loadServerManagers(websiteIO) {
         for (const serverManager of serverManagers) {
-            customLog(logName, `${serverManager.name} started`);
+            customLog(logName, `${serverManager.htmlID} started`);
             serverManager.startConnection(websiteIO);
         }
     }
@@ -56,11 +56,10 @@ class ServerManagerList {
      */
     static getManagerByName(name) {
         for (const serverManager of serverManagers) {
-            if (serverManager.name === name) {
+            if (serverManager.htmlID === name) {
                 return serverManager;
             }
         }
-        return false;
     }
 
     /**
@@ -73,11 +72,10 @@ class ServerManagerList {
         const managerName = ServerList.getManagerNameByServer(serverID);
 
         for (const serverManager of serverManagers) {
-            if (serverManager.name === managerName) {
+            if (serverManager.htmlID === managerName) {
                 return serverManager;
             }
         }
-        return false;
     }
 
     /**
@@ -87,25 +85,35 @@ class ServerManagerList {
     static getStatuses() {
         let states = [];
         for (const serverManager of serverManagers) {
-            states.push({htmlID: serverManager.name, status: serverManager.status});
+            states.push({htmlID: serverManager.htmlID, status: serverManager.status});
         }
         return states;
+    }
+
+    /**
+     * @desc Extract names from an array of ServerManager objects.
+     * @returns {string[]} - Array of strings containing names of managers.
+     */
+    static getConnectedManagersNames() {
+        let names = [];
+        for (const manager of this.getConnectedManagers()) {
+            names.push(manager.htmlID)
+        }
+        return names;
     }
 
     static getManagerByBotID(botHtmlID){
         // Get name from bot list
         const managerName = DiscordBotList.getManagerNameByServer(botHtmlID);
-
         if (managerName === 'local'){
-            return {name: 'local'}
+            return {htmlID: 'local'}
         }
 
         for (const serverManager of serverManagers) {
-            if (serverManager.name === managerName) {
+            if (serverManager.htmlID === managerName) {
                 return serverManager;
             }
         }
-        return false;
     }
 }
 

@@ -3,16 +3,12 @@ const {wake} = require("wake_on_lan");
 const ServerList = require("@server-lib/ServerList.cjs");
 const {customLog} = require("@server-utils/custom-utils.cjs");
 const SocketEvents = require("@server-lib/SocketEvents.cjs");
-const {Statuses, events, serverManagers} = require("@server-lib/globals.js");
+const {Statuses, events} = require("@server-lib/globals.js");
+const DiscordBotList = require("@server-lib/DiscordBotList.cjs");
 
 /**
  * @class ServerManager
  * @classdesc This class's purpose is to create object for easy management of connection with a remote server manager.
- * @property {string} name - Name of the server manager, used for logs and keeping track of what servers are under each manager.
- * @property {string} mac - Mac address of the server manager, used for Wake On Lan feature.
- * @property {socketIOClient} serverScoket - Websocket which connects to the Server Manager's node webserver.
- * @property {string} ip - IP/url that `serverSocket` is going to listen on. String value.
- * @property {Statuses} status - Keeps track of the state of websocket connection. `true` if connected `false` otherwise.
  */
 class ServerManager {
     socket;
@@ -22,18 +18,18 @@ class ServerManager {
     /**
      * @constructor
      * @desc Parameters passed in an object.
-     * @param {string} serverManagerName - Name of the server manager, used for logs and keeping track of what servers are under each manager.
+     * @param {string} htmlID - Name of the server manager, used for logs and keeping track of what servers are under each manager.
      * @param {string} serverManagerMac - Mac address of the server manager, used for Wake On Lan feature.
      * @param {string} serverManagerIP - IP/url that `serverSocket` is going to listen on. String value.
      * @param {number} serverManagerPort - port of the server manager.
      */
     constructor({
-                    serverManagerName: serverManagerName,
+                    serverManagerName: name,
                     serverManagerMac: serverManagerMac,
                     serverManagerIP: serverManagerIP,
                     serverManagerPort: serverManagerPort
                 }) {
-        this.name = serverManagerName;
+        this.htmlID = name.replace(' ', '_');
         this.mac = serverManagerMac;
         this.ip = serverManagerIP;
         this.port = serverManagerPort;
@@ -50,32 +46,33 @@ class ServerManager {
                 this.#socketOpen = true;
                 this.socket.once(events.CONNECT, () => {
                     this.status = Statuses.ONLINE;
-                    customLog(this.name, `Connected`);
+                    customLog(this.htmlID, `Connected`);
 
-                    customLog(this.name, `Sending status request`);
+                    customLog(this.htmlID, `Sending status request`);
                     SocketEvents.statusRequest(this.socket);
 
                     this.socket.on(events.DISCONNECT, () => {
                         this.status = Statuses.OFFLINE;
                         this.#socketOpen = false;
-                        ServerList.updateServers(this.name, []);
-                        SocketEvents.statusResponse(websiteIO, {updateServerManagers: true});
+                        ServerList.updateServers(this.htmlID, []);
                         SocketEvents.statusResponse(websiteIO);
                         this.socket.off();
-                        customLog(this.name, 'Disconnected');
+                        customLog(this.htmlID, 'Disconnected');
                     });
 
                     this.socket.on(events.STATUS_RESPONSE, (response) => {
-                        customLog(this.name, `Received status update`);
-                        ServerList.updateServers(this.name, response.servers);
-                        SocketEvents.statusResponse(websiteIO, {updateServerManagers: true});
-                        customLog(this.name, `Global status update sent to all clients`);
+                        customLog(this.htmlID, `Received status update`);
+                        if (response.servers)
+                            ServerList.updateServers(this.htmlID, response.servers);
+                        if (response.discordBots)
+                            DiscordBotList.updateBots(this.htmlID, response.discordBots);
                         SocketEvents.statusResponse(websiteIO);
+                        customLog(this.htmlID, `Global status update sent to all clients`);
                     });
 
                     // If the request is denied
                     this.socket.on(events.REQUEST_FAILED, (response) => {
-                        customLog(this.name, `Request failed "${response['reason']}"`);
+                        customLog(this.htmlID, `Request failed "${response['reason']}"`);
                         SocketEvents.requestFailed(websiteIO.to(response['socket']), response['reason']);
                     });
                 });
@@ -88,29 +85,20 @@ class ServerManager {
      * @param clientSocket - Socket that connects specific user with website.
      */
     wakeUp(clientSocket) {
-        return wake(this.mac, error => {
+        wake(this.mac, error => {
             if (error) {
-                customLog(this.name, "Failed to send wake up packet");
+                customLog(this.htmlID, "Failed to send wake up packet");
                 SocketEvents.requestFailed(clientSocket, "Menedżer serwerów niedostępny")
             }
             else {
-                customLog(this.name, `Wake up packet sent to ${this.name}`);
+                customLog(this.htmlID, `Wake up packet sent to ${this.htmlID}`);
                 SocketEvents.info(clientSocket, "Wysłano pakiet wybudzający, jeśli menedżer serwerów nie wstanie po paru minutach to kaplica.")
             }
         });
     }
 
-    /**
-     * @desc Extract names from an array of ServerManager objects.
-     * @param {Array[ServerManager]} managers - Array of ServerManager instances to extract names from.
-     * @returns {string[]} - Array of strings containing names of managers.
-     */
-    static getManagersNames(managers) {
-        let names = [];
-        for (const manager of managers) {
-            names.push(manager.name)
-        }
-        return names;
+    sleep(clientSocket) {
+        // TODO
     }
 }
 

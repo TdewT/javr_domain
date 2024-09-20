@@ -11,7 +11,6 @@ const {customLog} = require("@server-utils/custom-utils.cjs");
 const {Statuses, events} = require("@server-lib/globals.js");
 const ServerManagerList = require("@server-lib/ServerManagerList.cjs");
 const {ConfigManager, configTypes} = require("@server-utils/config-manager.cjs");
-const ServerManager = require("@server-lib/ServerManager.cjs");
 const SocketEvents = require("@server-lib/SocketEvents.cjs");
 
 /**
@@ -20,6 +19,8 @@ const SocketEvents = require("@server-lib/SocketEvents.cjs");
  * @property instance - After first initialisation stores class instance. It is returned if class has already been initialised.
  */
 class ServerInstance {
+    // Main IO for client communication
+    static websiteIO;
     // Holds static reference to an initialised instance
     static #instance;
     // Type of next environment
@@ -57,14 +58,14 @@ class ServerInstance {
     /**
      * @desc Starts the website and its components.
      */
-    startWebsite() {
+    async startWebsite() {
         // Server setup
         const dev = process.env.NODE_ENV !== this.#processEnv;
         this.#app = next({dev});
         const handle = this.#app.getRequestHandler();
 
         // Ready the app
-        this.#app.prepare().then(() => {
+        await this.#app.prepare().then(() => {
             // Start the http server
             this.websiteServer = createServer((req, res) => {
                 // noinspection JSIgnoredPromiseFromCall
@@ -74,7 +75,7 @@ class ServerInstance {
             // Listen on the port
             this.websiteServer.listen(this.port, (err) => {
                 if (err) throw err;
-                customLog(this.name, `Server started on http://localhost:${this.websiteServer.address().port}`);
+                customLog(this.name, `Server listening on http://localhost:${this.websiteServer.address().port}`);
             });
 
             // Initializer functions
@@ -91,7 +92,7 @@ class ServerInstance {
     createSocket() {
         customLog(this.name, 'Creating websocket');
         // noinspection JSValidateTypes
-        this.websiteIO = socketIO(this.websiteServer, {
+        ServerInstance.websiteIO = socketIO(this.websiteServer, {
             cors: {
                 origin: '*',
                 methods: ['GET', 'POST'],
@@ -99,7 +100,7 @@ class ServerInstance {
         });
 
         // When client connects to the server
-        this.websiteIO.on(events.CONNECTION, clientSocket => {
+        ServerInstance.websiteIO.on(events.CONNECTION, clientSocket => {
             let ip = clientSocket.handshake.address.split(':');
             ip = ip[ip.length - 1];
 
@@ -114,7 +115,7 @@ class ServerInstance {
                     if (connectedManagers.length > 0) {
 
                         // Get names for logs
-                        let managerNames = ServerManager.getManagersNames(connectedManagers);
+                        let managerNames = ServerManagerList.getConnectedManagersNames();
                         managerNames = managerNames.toString().replace(',', ', ');
                         customLog(this.name, `Forwarding request/s to ${managerNames}`);
 
@@ -132,12 +133,51 @@ class ServerInstance {
                 }
             });
 
+
             // Requested server manager start
             clientSocket.on(events.START_SERVER_MANAGER_REQUEST, managerID => {
                 const serverManager = ServerManagerList.getManagerByName(managerID);
-                customLog(this.name, `${ip} requested ${serverManager.name} start`);
-                serverManager.wakeUp(clientSocket);
+                customLog(this.name, `${ip} requested ${managerID} start`);
+
+                if (serverManager) {
+                    if (serverManager.status === Statuses.OFFLINE) {
+                        customLog(this.name, `Sending wakeup packet to ${managerID}`);
+                        serverManager.wakeUp(clientSocket);
+                    }
+                    else {
+                        customLog(this.name, `Request denied, manager is not offline`);
+                        SocketEvents.requestFailed(clientSocket, "Menadżer nie jest offline");
+                    }
+                }
+                else {
+                    customLog(this.name, `Request denied ${managerID} not found`);
+                    SocketEvents.requestFailed(clientSocket, `Nie znaleziono menadżera ${managerID}`)
+                }
             });
+
+            // Requested server manager stop
+            clientSocket.on(events.STOP_SERVER_MANAGER_REQUEST, managerID => {
+                const serverManager = ServerManagerList.getManagerByName(managerID);
+                customLog(this.name, `${ip} requested ${managerID} stop`);
+
+                SocketEvents.requestFailed(clientSocket, "Opcja tymczasowo niedostępna");
+
+                // if (serverManager) {
+                //     if (serverManager.status === Statuses.ONLINE) {
+                //         customLog(this.name, `Sending sleep request to ${managerID}`);
+                //         serverManager.sleep(clientSocket);
+                //     }
+                //     else {
+                //         customLog(this.name, `Request denied, manager is not online`);
+                //         SocketEvents.requestFailed(clientSocket, "Menadżer nie jest online");
+                //     }
+                // }
+                // else {
+                //     customLog(this.name, `Request denied ${managerID} not found`);
+                //     SocketEvents.requestFailed(clientSocket, `Nie znaleziono menadżera ${managerID}`)
+                // }
+            });
+
 
             // Requested server start
             clientSocket.on(events.START_SERVER_REQUEST, (serverID) => {
@@ -148,15 +188,15 @@ class ServerInstance {
                 if (serverManager && serverManager.status === Statuses.ONLINE) {
                     SocketEvents.startServerRequest(serverManager.socket, serverID, clientSocket.id);
 
-                    customLog(this.name, `Request forwarded to ${serverManager.name}`);
+                    customLog(this.name, `Request forwarded to ${serverManager.htmlID}`);
                 }
                 else if (serverManager) {
-                    customLog(this.name, `${serverManager.name} not online, sending wake up packet`);
+                    customLog(this.name, `${serverManager.htmlID} not online, sending wake up packet`);
                     serverManager.wakeUp(clientSocket);
                 }
-                else{
+                else {
                     customLog(this.name, `Server Manager for ${serverID} not found`);
-                    SocketEvents.requestFailed(clientSocket, `Nie znaleziono managera dla ${serverID}`);
+                    SocketEvents.requestFailed(clientSocket, `Nie znaleziono menadżera dla ${serverID}`);
                 }
             });
 
@@ -168,15 +208,15 @@ class ServerInstance {
 
                 if (serverManager && serverManager.status === Statuses.ONLINE) {
                     SocketEvents.stopServerRequest(serverManager.socket, serverID, clientSocket.id);
-                    customLog(this.name, `Request forwarded to ${serverManager.name}`);
+                    customLog(this.name, `Request forwarded to ${serverManager.htmlID}`);
                 }
                 else if (serverManager) {
-                    customLog(this.name, `${serverManager.name} not online, sending wake up packet`);
+                    customLog(this.name, `${serverManager.htmlID} not online, sending wake up packet`);
                     serverManager.wakeUp(clientSocket);
                 }
-                else{
+                else {
                     customLog(this.name, `Server Manager for ${serverID} not found`);
-                    SocketEvents.requestFailed(clientSocket, `Nie znaleziono managera dla ${serverID}`);
+                    SocketEvents.requestFailed(clientSocket, `Nie znaleziono menadżera dla ${serverID}`);
                 }
             });
 
@@ -190,8 +230,13 @@ class ServerInstance {
 
                 const serverManager = ServerManagerList.getManagerByBotID(botID);
 
+                // Check if server manager was found
+                if (!serverManager) {
+                    customLog(this.name, `Server Manager for ${botID} not found`);
+                    SocketEvents.requestFailed(clientSocket, `Nie znaleziono menadżera dla ${botID}`);
+                }
                 // Check if bot is on local machine
-                if (serverManager.name === 'local'){
+                else if (serverManager.htmlID === 'local') {
                     if (bot.status === Statuses.OFFLINE)
                         bot.start();
                     else {
@@ -199,20 +244,16 @@ class ServerInstance {
                         SocketEvents.requestFailed(clientSocket, "Bot nie jest offline")
                     }
                 }
-                else{
+                else {
                     // Get requested server's status
-                    if (serverManager && serverManager.status === Statuses.ONLINE) {
+                    if (serverManager.status === Statuses.ONLINE) {
                         SocketEvents.startDBotRequest(serverManager.socket, botID, clientSocket.id);
 
-                        customLog(this.name, `Request forwarded to ${serverManager.name}`);
+                        customLog(this.name, `Request forwarded to ${serverManager.htmlID}`);
                     }
-                    else if (serverManager) {
-                        customLog(this.name, `${serverManager.name} not online, sending wake up packet`);
+                    else {
+                        customLog(this.name, `${serverManager.htmlID} not online, sending wake up packet`);
                         serverManager.wakeUp(clientSocket);
-                    }
-                    else{
-                        customLog(this.name, `Server Manager for ${botID} not found`);
-                        SocketEvents.requestFailed(clientSocket, `Nie znaleziono managera dla ${botID}`);
                     }
                 }
 
@@ -228,29 +269,29 @@ class ServerInstance {
                 const serverManager = ServerManagerList.getManagerByBotID(botID);
 
                 // Check if bot is on local machine
-                if (serverManager.name === 'local'){
+                if (!serverManager) {
+                    customLog(this.name, `Server Manager for ${botID} not found`);
+                    SocketEvents.requestFailed(clientSocket, `Nie znaleziono menadżera dla ${botID}`);
+                }
+                else if (serverManager.htmlID === 'local') {
                     if (bot.status === Statuses.ONLINE || bot.status === Statuses.STARTING) {
                         bot.stop();
                     }
-                    else{
+                    else {
                         SocketEvents.requestFailed(clientSocket, "Bot nie jest online");
                         customLog(this.name, "Request failed, bot not online")
                     }
                 }
-                else{
+                else {
                     // Get requested server's status
-                    if (serverManager && serverManager.status === Statuses.ONLINE) {
+                    if (serverManager.status === Statuses.ONLINE) {
                         SocketEvents.stopDBotRequest(serverManager.socket, botID, clientSocket.id);
 
-                        customLog(this.name, `Request forwarded to ${serverManager.name}`);
+                        customLog(this.name, `Request forwarded to ${serverManager.htmlID}`);
                     }
-                    else if (serverManager) {
-                        customLog(this.name, `${serverManager.name} not online, sending wake up packet`);
+                    else {
+                        customLog(this.name, `${serverManager.htmlID} not online, sending wake up packet`);
                         serverManager.wakeUp(clientSocket);
-                    }
-                    else{
-                        customLog(this.name, `Server Manager for ${botID} not found`);
-                        SocketEvents.requestFailed(clientSocket, `Nie znaleziono managera dla ${botID}`);
                     }
                 }
 
@@ -280,7 +321,7 @@ class ServerInstance {
                 // noinspection JSCheckFunctionSignatures
                 axios.request(config)
                     .then((response) => {
-                        SocketEvents.ztResponse(this.websiteIO, response.data);
+                        SocketEvents.ztResponse(ServerInstance.websiteIO, response.data);
                     })
                     .catch((error) => {
                         customLog(this.name, `Error fetching data from ZeroTier: ${error}`);
@@ -318,7 +359,7 @@ class ServerInstance {
     /**
      * @desc Starts all discord bots mentioned in `this.discordBotStart`
      */
-    startDiscordBots(){
+    startDiscordBots() {
         customLog(this.name, "Starting Discord bots");
 
         // Get bots and their parameters from config file
@@ -330,8 +371,8 @@ class ServerInstance {
             // Load initial parameters from config
             let constructorParams = discordBotsConfig[botName];
             // Add socket info
-            constructorParams['io'] = this.websiteIO;
-            
+            constructorParams['io'] = ServerInstance.websiteIO;
+
             // Create bot instance and add it to the list
             discordBots.push(new DiscordBot(constructorParams));
         }
@@ -343,7 +384,7 @@ class ServerInstance {
             if (bot) {
                 bot.start();
             }
-            else{
+            else {
                 customLog(this.name, `${name} failed to start: Bot not defined`);
             }
         }
