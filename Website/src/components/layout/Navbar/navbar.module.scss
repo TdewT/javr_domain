@@ -11,6 +11,9 @@
 
 // Navbar container
 .styleNavbar {
+  // So that it is always visible
+  z-index: 4;
+
   // Font
   font-family: Helvetica, sans-serif;
   font-size: large;
