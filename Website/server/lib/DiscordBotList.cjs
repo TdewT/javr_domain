@@ -6,16 +6,6 @@ const logName = "Discord_Bot_List";
 class DiscordBotList {
     static autostart = [];
 
-    static init(websiteIO) {
-        discordBotsWithHosts['local'] = null;
-        for (const argument of arguments) {
-            customLog(logName, "Initialising");
-            for (let serverManager of serverManagers) {
-                discordBotsWithHosts[serverManager.name] = null;
-            }
-        }
-    }
-
     static updateBots(managerName, bots) {
         customLog(logName, `Updating bot list for ${managerName}`);
         // Update Discord bot list for the manager
@@ -68,8 +58,6 @@ class DiscordBotList {
                 return managerName;
             }
         }
-
-        return false;
     }
 }
 

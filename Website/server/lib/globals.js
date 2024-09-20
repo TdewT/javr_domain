@@ -1,11 +1,3 @@
-/**
- * @enum Statuses
- * @property {string} ONLINE
- * @property {string} STARTING
- * @property {string} BUSY
- * @property {string} STOPPING
- * @property {string} OFFLINE
- */
 const Statuses = {
     "ONLINE": "online", "STARTING": "starting", "BUSY": "busy", "STOPPING": "stopping", "OFFLINE": "offline",
 };
@@ -15,7 +7,7 @@ const StatusIndicators = {
 const statusDisplayNames = {
     "online": "Online", "starting": "Starting...", "busy": "Port busy", "stopping": "Stoping...", "offline": "Offline",
 };
-const serverTypes = {
+const ServerTypes = {
     "GENERIC": "generic",
     "MINECRAFT": "minecraft",
     "ARMA": "arma",
@@ -45,6 +37,9 @@ const events = {
     DISCONNECT: 'disconnect',
 };
 
+// Arduino arrays
+let arduinoBoards = [];
+
 // Discord bots arrays
 let discordBotsWithHosts = {};
 let discordBots = [];
@@ -66,5 +61,6 @@ module.exports = {
     serversWithHosts,
     serverList,
     serverManagers,
-    serverTypes,
+    ServerTypes,
+    arduinoBoards,
 };

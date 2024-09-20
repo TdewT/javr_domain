@@ -1,5 +1,5 @@
 const {customLog} = require("@server-utils/custom-utils.cjs");
-const {serverManagers, serversWithHosts, mana, serverList} = require("@server-lib/globals.js");
+const {serversWithHosts, mana, serverList} = require("@server-lib/globals.js");
 
 const logName = "Server_List";
 
@@ -8,17 +8,6 @@ const logName = "Server_List";
  * @desc Keeps the track of all available servers and handles all operations on server lists.
  */
 class ServerList {
-
-    /**
-     * @desc Creates entries for each serverManagers in managersWithServers
-     */
-    static init() {
-        customLog(logName, "Initialising");
-        for (let serverManager of serverManagers) {
-            serversWithHosts[serverManager.name] = null;
-        }
-    }
-
     /**
      * @desc Updates both server lists with given parameters.
      * @param {string} managerName - Name of the server manager that sent update.
@@ -56,10 +45,10 @@ class ServerList {
      * @returns {boolean|string} - Returns name of the manager if succeeded or `false` if it was not found.
      */
     static getManagerNameByServer(serverID) {
-        for (const managerName of Object.keys(serversWithHosts)) {
-            const serverNames = ServerList.getServerHtmlIDs(serversWithHosts[managerName]);
+        for (const managerHtmlID of Object.keys(serversWithHosts)) {
+            const serverNames = ServerList.getServerHtmlIDs(serversWithHosts[managerHtmlID]);
             if (serverNames.includes(serverID)) {
-                return managerName;
+                return managerHtmlID;
             }
         }
 
