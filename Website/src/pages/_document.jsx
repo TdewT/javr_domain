@@ -9,6 +9,10 @@ export default function _document() {
                           rel="stylesheet"
                           integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
                           crossOrigin="anonymous"/>
+
+                    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+                    <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin = "anonymous"/>
+                    <link href="https://fonts.googleapis.com/css2?family=Jersey+25&display=swap" rel="stylesheet"/>
                 </Head>
                 <body>
                     <Main/>
