@@ -1,4 +1,4 @@
-import UniversalHead from "@/src/components/misc/UniversalHead.jsx";
+import UniversalHead from "@components/misc/UniversalHead.jsx";
 import NavBar from "@/src/components/layout/Navbar/NavBar.jsx";
 import Footer from "@/src/components/layout/Footer/Footer.jsx";
 import {
@@ -9,6 +9,7 @@ import {
 import {createContext, useEffect, useState} from "react";
 import {initSocket, requestData} from "@utils/socket-util.js";
 import styles from "@/src/styles/services.module.scss"
+import {mainDivClass} from "@styles/global.bootstrap.js";
 
 export const ServicesContext = createContext({servers: [], discordBots: [], serverManagers: []});
 
@@ -41,11 +42,16 @@ function MainContent() {
 function Services() {
     return (
         <>
+            {/* Head */}
             <UniversalHead/>
-            <div className={`${styles.bgImgServices} min-vh-100 d-flex flex-column`}>
+
+            {/* Body */}
+            <div className={`${styles.bgImgServices} ${mainDivClass}`}>
                 <NavBar/>
                 <MainContent/>
             </div>
+
+            {/* Footer */}
             <Footer/>
         </>
     )
