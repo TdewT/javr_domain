@@ -4,11 +4,12 @@ import { events } from "@server-lib/globals.js";
 export const socket = io();
 
 export const initSocket = (setData) => {
-    socket.on(events.STATUS_RESPONSE, (services) => {
+    socket.on(events.STATUS_RESPONSE, (data) => {
         const res = {
-            serverManagers: services.serverManagers || [],
-            discordBots: services.discordBots || [],
-            servers: services.servers || [],
+            serverManagers: data.serverManagers || [],
+            discordBots: data.discordBots || [],
+            servers: data.servers || [],
+            arduinoBoards: data.arduinoBoards || [],
         };
         setData(res);
     });
