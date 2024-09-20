@@ -1,4 +1,4 @@
-require ('module-alias/register');
+require('module-alias/register');
 const {customLog} = require("@/server/utils/custom-utils.cjs");
 const {ConfigManager} = require("@/server/utils/config-manager.cjs");
 const ServerManager = require("@/server/lib/ServerManager.cjs");
