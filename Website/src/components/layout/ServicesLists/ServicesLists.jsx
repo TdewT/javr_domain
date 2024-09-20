@@ -1,16 +1,23 @@
-import {serverTypes, ServiceTypes, StatusIndicators} from "@server-lib/globals.js";
+import {ServerTypes, ServiceTypes, Statuses, StatusIndicators} from "@server-lib/globals.js";
 import React, {useContext} from "react";
 import {ServicesContext} from '@pages/services.jsx';
 import ServiceButton from "@components/ui/ServicesButtons/ServiceButton.jsx";
 
 import styles from "./ServicesLists.module.scss";
+import Accordion from "@components/ui/Accordion/Accordion.jsx";
+import StripedList from "@components/ui/StripedList/StripedList.jsx";
 
 const tableClasses = `${styles.servicesTable} table table-responsive`;
 const tbodyClasses = "align-middle text-center";
 
-function TableElement(data) {
-    const service = data.service;
-    const type = data.type;
+function hasPlayerList(serviceData) {
+    return serviceData.type === ServiceTypes.SERVER && serviceData.service.currPlayers
+}
+
+function TableElement(serviceData) {
+    const service = serviceData.service;
+    const serviceType = serviceData.type;
+
     return (
         <>
             <tr>
@@ -27,26 +34,57 @@ function TableElement(data) {
 
                 <td>
                     {/*Check if service is generic server (since that's the only one rendered without buttons)*/}
-                    {type === ServiceTypes.SERVER && service.type === serverTypes.GENERIC ? (
+                    {serviceType === ServiceTypes.SERVER && service.type === ServerTypes.GENERIC ? (
                         <div>Unavailable</div>
                     ) : (
                         <span>
-                        <ServiceButton serviceType={type} serviceID={service.htmlID} purpose="start"/>
-                        <ServiceButton serviceType={type} serviceID={service.htmlID} purpose="stop"/>
+                        <ServiceButton serviceType={serviceType} serviceID={service.htmlID} purpose="start"/>
+                        <ServiceButton serviceType={serviceType} serviceID={service.htmlID} purpose="stop"/>
                     </span>
                     )
                     }
                 </td>
             </tr>
+
+            {/* If service is a server with players property and is online, generate player list */}
+            {hasPlayerList(serviceData) && service.status === Statuses.ONLINE ?
+                (
+                    <>
+                        <tr>
+                            <td colSpan={3} className="p-0 m-0">
+                                <Accordion title={`Current players: ${service.currPlayers.length}/${service.maxPlayers}`}>
+                                    {/* Check if anyone is online */}
+                                    {service.currPlayers.length > 0 ? (
+                                        // If yes generate list of players
+                                        <div className="m-3 mt-1 mb-3">
+                                            <StripedList>
+                                                {service.currPlayers.map((player, index) => (
+                                                    player
+                                                ))}
+                                            </StripedList>
+                                        </div>
+                                    ) : (
+                                        // If not leave blank
+                                        <></>
+                                    )}
+                                </Accordion>
+                            </td>
+                        </tr>
+                    </>
+                ) : (
+                    // If not leave empty
+                    <></>
+                )
+            }
         </>
     )
 }
 
 function ManagerList() {
-    const services = useContext(ServicesContext);
+    const data = useContext(ServicesContext);
     let managers = [];
-    if (services) {
-        managers = services.serverManagers || [];
+    if (data) {
+        managers = data.serverManagers || [];
     }
     if (managers.length !== 0) {
         return (
@@ -70,10 +108,10 @@ function ManagerList() {
 }
 
 function ServerList() {
-    const services = useContext(ServicesContext);
+    const data = useContext(ServicesContext);
     let servers = [];
-    if (services) {
-        servers = services.servers || [];
+    if (data) {
+        servers = data.servers || [];
     }
     if (servers.length !== 0) {
         return (
@@ -99,10 +137,10 @@ function ServerList() {
 }
 
 function DiscordBotList() {
-    const services = useContext(ServicesContext);
+    const data = useContext(ServicesContext);
     let discordBots = [];
-    if (services) {
-        discordBots = services.discordBots || [];
+    if (data) {
+        discordBots = data.discordBots || [];
     }
     if (discordBots.length !== 0) {
         return (
@@ -127,4 +165,6 @@ function DiscordBotList() {
     }
 }
 
-export {ManagerList, ServerList, DiscordBotList};
+export {
+    ManagerList, ServerList, DiscordBotList
+};
