@@ -36,17 +36,12 @@ class ArduinoBoard {
                     name: name,
                     serialPort: serialPort,
                     baudRate: baudRate,
-                    sensors: sensors,
                 }) {
         this.name = name;
         this.serialPort = new SerialPort({
             path: serialPort.path,
             baudRate: baudRate
         });
-
-        for (const sensor of sensors) {
-            this.sensors[sensor] = null;
-        }
     }
 
     startCommunication() {
@@ -79,8 +74,6 @@ class ArduinoBoard {
                     }
                 }
             }
-
-            // If message is
         })
     }
 }
