@@ -58,7 +58,7 @@ function TableElement(serviceData) {
                                         // If yes generate list of players
                                         <div className="m-3 mt-1 mb-3">
                                             <StripedList>
-                                                {service.currPlayers.map((player, index) => (
+                                                {service.currPlayers.map((player) => (
                                                     player
                                                 ))}
                                             </StripedList>
