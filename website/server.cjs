@@ -18,7 +18,6 @@ ConfigManager.loadConfigs();
 const arduinos = {
     1002: {
         name: "Arduino_R4_WIFI",
-        sensors:['DHT11_0', 'DHT11_1'],
         baudRate: 9600,
     }
 };

@@ -1,5 +1,5 @@
 const {SerialPort, ReadlineParser} = require("serialport");
-const {arduinoBoards, serverList} = require("@server-lib/globals.js");
+const {arduinoBoards} = require("@server-lib/globals.js");
 const {customLog} = require("@server-utils/custom-utils.cjs");
 const SocketEvents = require("@server-lib/SocketEvents.cjs");
 
@@ -36,17 +36,12 @@ class ArduinoBoard {
                     name: name,
                     serialPort: serialPort,
                     baudRate: baudRate,
-                    sensors: sensors,
                 }) {
         this.name = name;
         this.serialPort = new SerialPort({
             path: serialPort.path,
             baudRate: baudRate
         });
-
-        for (const sensor of sensors) {
-            this.sensors[sensor] = null;
-        }
     }
 
     startCommunication() {
@@ -79,8 +74,6 @@ class ArduinoBoard {
                     }
                 }
             }
-
-            // If message is
         })
     }
 }

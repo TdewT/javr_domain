@@ -33,16 +33,31 @@ function MainContent() {
         return cleanup;
     }, []);
 
-    const sensors = data.arduinoBoards[0].sensors;
-
+    // Define sensor readings
     let hotSensor, coldSensor;
+    // Get arduino
+    const board = data.arduinoBoards[0];
+    // Try to get sensors
+    let sensors;
+    if (board) sensors = board.sensors;
 
-    if (sensors.DHT11_0.temp > sensors.DHT11_1.temp) {
-        hotSensor = sensors.DHT11_0;
-        coldSensor = sensors.DHT11_1;
-    } else {
-        hotSensor = sensors.DHT11_1;
-        coldSensor = sensors.DHT11_0;
+    if (board && sensors && sensors.DHT11_0 && sensors.DHT11_1) {
+        const sensors = data.arduinoBoards[0].sensors;
+
+
+        if (sensors.DHT11_0.temp > sensors.DHT11_1.temp) {
+            hotSensor = sensors.DHT11_0;
+            coldSensor = sensors.DHT11_1;
+        }
+        else {
+            hotSensor = sensors.DHT11_1;
+            coldSensor = sensors.DHT11_0;
+
+        }
+    }
+    else{
+        hotSensor = {temp: "n/a", humidity: "n/a"};
+        coldSensor = {temp: "n/a", humidity: "n/a"};
     }
 
 
