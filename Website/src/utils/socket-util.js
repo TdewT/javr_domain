@@ -5,13 +5,7 @@ export const socket = io();
 
 export const initSocket = (setData) => {
     socket.on(events.STATUS_RESPONSE, (data) => {
-        const res = {
-            serverManagers: data.serverManagers || [],
-            discordBots: data.discordBots || [],
-            servers: data.servers || [],
-            arduinoBoards: data.arduinoBoards || [],
-        };
-        setData(res);
+        setData(data);
     });
 
     socket.on(events.REQUEST_FAILED, (err) => {
