@@ -1,5 +1,5 @@
 import { io } from "socket.io-client";
-import { events } from "@server-lib/globals.js";
+import {events} from "@server-lib/globals.js";
 
 export const socket = io();
 
