@@ -44,17 +44,17 @@ const serverManagerIP2 = "192.168.233.50";
 const serverManagerPort2 = 3001;
 
 serverManagers.push(new ServerManager({
-    serverManagerName: serverManagerName,
-    serverManagerMac: serverManagerMac,
-    serverManagerIP: serverManagerIP,
-    serverManagerPort: serverManagerPort,
-}),
-new ServerManager({
-    serverManagerName: serverManagerName2,
-    serverManagerMac: serverManagerMac2,
-    serverManagerIP:serverManagerIP2,
-    serverManagerPort: serverManagerPort2,
-}));
+        serverManagerName: serverManagerName,
+        serverManagerMac: serverManagerMac,
+        serverManagerIP: serverManagerIP,
+        serverManagerPort: serverManagerPort,
+    }),
+    new ServerManager({
+        serverManagerName: serverManagerName2,
+        serverManagerMac: serverManagerMac2,
+        serverManagerIP: serverManagerIP2,
+        serverManagerPort: serverManagerPort2,
+    }));
 
 // Website initialisation
 const server = new ServerInstance({
