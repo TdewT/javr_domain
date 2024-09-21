@@ -302,6 +302,6 @@ fabric.properties
 /server_manager/package-lock.json
 
 # Website
-/Website/configs/*
-/Website/logs/*
+/website/configs/*
+/website/logs/*
 /website/package-lock.json

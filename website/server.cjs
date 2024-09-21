@@ -25,8 +25,8 @@ const arduinos = {
 
 // Website definition
 const mainName = "JAVR_Domain";
-const mainPort = 3000;
-const discordBotAutostart = ['JAVR_Argentino',];
+const mainPort = 3002;
+const discordBotAutostart = [];
 for (const botHtmlID of discordBotAutostart) {
     botHtmlID.replace(' ', '_');
 }
@@ -36,13 +36,25 @@ const processEnv = 'development';
 // Managers initialisation
 const serverManagerName = 'JAVR_Server_Manager';
 const serverManagerMac = "80:FA:5B:83:12:46";
-const serverManagerIP = "localhost";
+const serverManagerIP = "192.168.233.52";
 const serverManagerPort = 3001;
+
+const serverManagerName2 = 'Test_Server_Manager';
+const serverManagerMac2 = "00:D8:61:2F:E2:D7";
+const serverManagerIP2 = "192.168.233.50";
+const serverManagerPort2 = 3001;
+
 serverManagers.push(new ServerManager({
     serverManagerName: serverManagerName,
     serverManagerMac: serverManagerMac,
     serverManagerIP: serverManagerIP,
     serverManagerPort: serverManagerPort,
+}),
+new ServerManager({
+    serverManagerName: serverManagerName2,
+    serverManagerMac: serverManagerMac2,
+    serverManagerIP:serverManagerIP2,
+    serverManagerPort: serverManagerPort2,
 }));
 
 // Website initialisation
