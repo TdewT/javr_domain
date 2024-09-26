@@ -29,7 +29,6 @@ class ArduinoUtils {
 }
 
 class ArduinoBoard {
-    currEvent;
     sensors = {};
 
     constructor({
@@ -44,35 +43,53 @@ class ArduinoBoard {
         });
     }
 
-    startCommunication() {
+    sendTimeResponse() {
+        const time = Date.now();
+        const message = ArduinoUtils.Events.TIME_UPDATE_RESPONSE + time + ArduinoUtils.Events.MESSAGE_END;
+        this.serialPort.write(message, (err) => {
+            if (err) {
+                customLog(this.name, `Error sending data: ${err}`)
+            }
+        });
+    }
+
+    startListening() {
         const parser = this.serialPort.pipe(new ReadlineParser({delimiter: '\n'}));
 
         this.serialPort.on("error", (err) => {
-           customLog(this.name, err)
+            customLog(this.name, err)
         });
 
         parser.on('data', (data) => {
             data = data.trim();
-            // If message received is status update
-            const isStatusUpdate = data === ArduinoUtils.Events.STATUS_UPDATE;
-            const isCurrStatusUpdate = this.currEvent === ArduinoUtils.Events.STATUS_UPDATE;
-            if (isCurrStatusUpdate || isStatusUpdate){
-                // Set currently receiving message
-                if (!isCurrStatusUpdate) {
-                    this.currEvent = ArduinoUtils.Events.STATUS_UPDATE;
-                }
-                // Clear current event on message end
-                else if (data === ArduinoUtils.Events.MESSAGE_END) {
-                    this.currEvent = null;
-                }
-                // Filter out the header
-                else if(!isStatusUpdate) {
-                    const ServerInstance = require("@server-lib/ServerInstance.cjs");
+            if (!data.endsWith(ArduinoUtils.Events.MESSAGE_END)) {
+                customLog(this.name, "Error reading message");
+            }
+            else {
+                // Remove message end
+                data = data.replace(ArduinoUtils.Events.MESSAGE_END, "")
+            }
+
+            // If message is status update
+            if (data.startsWith(ArduinoUtils.Events.STATUS_UPDATE)) {
+                // Remove header
+                data = data.replace(ArduinoUtils.Events.STATUS_UPDATE, "");
+
+                // Update data and send update
+                const ServerInstance = require("@server-lib/ServerInstance.cjs");
+                try {
                     this.sensors = JSON.parse(data);
-                    if (ServerInstance.websiteIO){
-                        SocketEvents.statusResponse(ServerInstance.websiteIO);
-                    }
                 }
+                catch (err) {
+                    customLog(this.name, `Error parsing data: ${err}`)
+                }
+                if (ServerInstance.websiteIO) {
+                    SocketEvents.statusResponse(ServerInstance.websiteIO);
+                }
+            }
+
+            else if (data.startsWith(ArduinoUtils.Events.TIME_UPDATE_REQUEST)) {
+                this.sendTimeResponse();
             }
         })
     }
