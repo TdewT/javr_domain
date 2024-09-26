@@ -5,7 +5,7 @@ const ServerManager = require("@/server/lib/ServerManager.cjs");
 const ServerInstance = require("@/server/lib/ServerInstance.cjs");
 const ServerManagerList = require("@/server/lib/ServerManagerList.cjs");
 const {serverManagers} = require("@/server/lib/globals.js");
-const {ArduinoUtils} = require("@server-lib/Arduino.js");
+const {ArduinoUtils} = require("@server-lib/Arduino.cjs");
 
 // Name of module used for logs
 const logName = "INIT";
