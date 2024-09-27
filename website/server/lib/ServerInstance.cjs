@@ -4,14 +4,15 @@ const axios = require("axios");
 const {createServer} = require("http");
 const next = require("next");
 // Local imports
+const {Statuses, Events, setWebsiteIO, getWebsiteIO} = require("@server-lib/globals.js");
 const ApiHandler = require("@server-lib/ApiHandler.cjs");
 const {DiscordBot} = require("./DiscordBot.cjs");
 const DiscordBotList = require("@server-lib/DiscordBotList.cjs");
 const {customLog} = require("@server-utils/custom-utils.cjs");
-const {Statuses, events} = require("@server-lib/globals.js");
 const ServerManagerList = require("@server-lib/ServerManagerList.cjs");
 const {ConfigManager, configTypes} = require("@server-utils/config-manager.cjs");
 const SocketEvents = require("@server-lib/SocketEvents.cjs");
+const {getBoardByPID} = require("@server-utils/arduino-utils.cjs");
 
 /**
  * @class ServerInstance
@@ -19,8 +20,6 @@ const SocketEvents = require("@server-lib/SocketEvents.cjs");
  * @property instance - After first initialisation stores class instance. It is returned if class has already been initialised.
  */
 class ServerInstance {
-    // Main IO for client communication
-    static websiteIO;
     // Holds static reference to an initialised instance
     static #instance;
     // Type of next environment
@@ -92,20 +91,26 @@ class ServerInstance {
     createSocket() {
         customLog(this.name, 'Creating websocket');
         // noinspection JSValidateTypes
-        ServerInstance.websiteIO = socketIO(this.websiteServer, {
+        const websiteIO = socketIO(this.websiteServer, {
             cors: {
                 origin: '*',
                 methods: ['GET', 'POST'],
             },
         });
 
+         setWebsiteIO(websiteIO);
+
         // When client connects to the server
-        ServerInstance.websiteIO.on(events.CONNECTION, clientSocket => {
+        websiteIO.on(Events.CONNECTION, clientSocket => {
             let ip = clientSocket.handshake.address.split(':');
             ip = ip[ip.length - 1];
 
+            //
+            // Services
+            //
+
             // Respond to clients data request
-            clientSocket.on(events.STATUS_REQUEST, () => {
+            clientSocket.on(Events.STATUS_REQUEST, () => {
                 // Send back servers statuses
                 if (clientSocket) {
                     customLog(this.name, `Status request received from ${ip}`);
@@ -135,7 +140,7 @@ class ServerInstance {
 
 
             // Requested server manager start
-            clientSocket.on(events.START_SERVER_MANAGER_REQUEST, managerID => {
+            clientSocket.on(Events.START_SERVER_MANAGER_REQUEST, managerID => {
                 const serverManager = ServerManagerList.getManagerByName(managerID);
                 customLog(this.name, `${ip} requested ${managerID} start`);
 
@@ -156,7 +161,7 @@ class ServerInstance {
             });
 
             // Requested server manager stop
-            clientSocket.on(events.STOP_SERVER_MANAGER_REQUEST, managerID => {
+            clientSocket.on(Events.STOP_SERVER_MANAGER_REQUEST, managerID => {
                 const serverManager = ServerManagerList.getManagerByName(managerID);
                 customLog(this.name, `${ip} requested ${managerID} stop`);
 
@@ -180,7 +185,7 @@ class ServerInstance {
 
 
             // Requested server start
-            clientSocket.on(events.START_SERVER_REQUEST, (serverID) => {
+            clientSocket.on(Events.START_SERVER_REQUEST, (serverID) => {
                 customLog(serverID, `${ip} requested server start`);
                 const serverManager = ServerManagerList.getManagerByServerID(serverID);
 
@@ -201,7 +206,7 @@ class ServerInstance {
             });
 
             // Requested server stop
-            clientSocket.on(events.STOP_SERVER_REQUEST, (serverID) => {
+            clientSocket.on(Events.STOP_SERVER_REQUEST, (serverID) => {
                 customLog(serverID, `${ip} requested server stop`);
 
                 const serverManager = ServerManagerList.getManagerByServerID(serverID);
@@ -222,7 +227,7 @@ class ServerInstance {
 
 
             // Request bot start
-            clientSocket.on(events.START_DBOT_REQUEST, (botID) => {
+            clientSocket.on(Events.START_DBOT_REQUEST, (botID) => {
                 customLog(botID, `${ip} requested ${botID}'s start`);
 
                 // Search for bot in the list
@@ -260,7 +265,7 @@ class ServerInstance {
             });
 
             // Requested server stop
-            clientSocket.on(events.STOP_DBOT_REQUEST, (botID) => {
+            clientSocket.on(Events.STOP_DBOT_REQUEST, (botID) => {
                 customLog(botID, `${ip} requested ${botID}'s stop`);
 
                 // Search for bot in the list
@@ -305,7 +310,7 @@ class ServerInstance {
             const zeroTierToken = apiTokens["tokens"]["zerotier"];
 
             //Handling ZeroTier Request
-            clientSocket.on(events.ZT_REQUEST, () => {
+            clientSocket.on(Events.ZT_REQUEST, () => {
 
                 customLog(this.name, `${ip} requested ZeroTier information`);
 
@@ -321,7 +326,7 @@ class ServerInstance {
                 // noinspection JSCheckFunctionSignatures
                 axios.request(config)
                     .then((response) => {
-                        SocketEvents.ztResponse(ServerInstance.websiteIO, response.data);
+                        SocketEvents.ztResponse(websiteIO, response.data);
                     })
                     .catch((error) => {
                         customLog(this.name, `Error fetching data from ZeroTier: ${error}`);
@@ -329,7 +334,7 @@ class ServerInstance {
             });
 
             //Sending user edit form to ZeroTier api
-            clientSocket.on(events.ZT_SEND_FORM, (userJSON, idUserJSON, apiUrl) => {
+            clientSocket.on(Events.ZT_SEND_FORM, (userJSON, idUserJSON, apiUrl) => {
 
                 customLog(this.name, `${ip} requested change of ZeroTier user - (${idUserJSON}) ${userJSON.name} ${userJSON.description}`);
 
@@ -352,6 +357,21 @@ class ServerInstance {
                         customLog(this.name, `Error fetching data from ZeroTier: ${error.response.data}`);
                     });
 
+            });
+
+            //
+            // Arduino
+            //
+
+            clientSocket.on(Events.ARDUINO_MODIFY_LIGHT, (arduinoPID, lightParams) => {
+                const board = getBoardByPID(arduinoPID);
+                if (board) {
+                    lightParams["override"] = Number(lightParams["override"]);
+                    board.setLight(lightParams);
+                }
+                else {
+                    customLog(this.name, `Failed to forward light update for board ${arduinoPID}: Board not found`)
+                }
             })
         });
     }
@@ -371,7 +391,7 @@ class ServerInstance {
             // Load initial parameters from config
             let constructorParams = discordBotsConfig[botName];
             // Add socket info
-            constructorParams['io'] = ServerInstance.websiteIO;
+            constructorParams['io'] = getWebsiteIO();
 
             // Create bot instance and add it to the list
             discordBots.push(new DiscordBot(constructorParams));

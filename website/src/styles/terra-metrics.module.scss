@@ -23,20 +23,25 @@
   bottom: 0;
   background-size: cover;
   z-index: 1;
+  pointer-events: none;
 
-  @media (max-width: 400px) and (max-height: 860px) {
+  @media (max-width: 400px) or (max-height: 860px) {
     & {
       z-index: 0;
     }
   }
 }
 
-.dataTableContainer {
+.fontStyle{
   font-family: "Jersey 25", sans-serif;
   font-style: normal;
   font-weight: bold;
-  font-size: 22px;
+  font-size: 20px;
+  text-shadow: 2px 2px 5px black;
+  letter-spacing: .6px;
+}
 
+.dataTableContainer {
   margin: 1vh auto;
   width: 360px;
   min-height: 175px;
@@ -63,7 +68,7 @@
 }
 
 .cameraContainer {
-  background: aqua;
+  //background: aqua;
   align-self: center;
 
   z-index: 0;
@@ -78,32 +83,3 @@
     height: 50vh;
   }
 }
-
-/* old
-
-.cameraContainer {
-  position: relative;
-  background: aqua;
-  width: 570px;
-  height: 460px;
-  align-self: center;
-  margin-top: 2vh;
-  margin-left: 4px;
-
-  @media (max-height: 860px) {
-    & {
-      z-index: 0;
-      position: absolute;
-      margin-left: 1vw;
-      margin-top: calc(1vh + 24rem / 2);
-      height: 53vh !important;
-      width: calc(1rem + 125vh / 2) !important;
-    }
-  }
-
-  @media (max-width: 600px) {
-    width: 95vw;
-    height: 50vh;
-  }
-}
- */

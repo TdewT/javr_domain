@@ -5,7 +5,7 @@ const ServerManager = require("@/server/lib/ServerManager.cjs");
 const ServerInstance = require("@/server/lib/ServerInstance.cjs");
 const ServerManagerList = require("@/server/lib/ServerManagerList.cjs");
 const {serverManagers} = require("@/server/lib/globals.js");
-const {ArduinoUtils} = require("@server-lib/Arduino.cjs");
+const {initialiseBoards} = require("@server-utils/arduino-utils.cjs");
 
 // Name of module used for logs
 const logName = "INIT";
@@ -65,7 +65,7 @@ const server = new ServerInstance({
 });
 
 // Arduino initialisation
-ArduinoUtils.initialiseBoards(arduinos);
+initialiseBoards(arduinos);
 
 
 customLog(logName, "Starting the website server");

@@ -1,4 +1,6 @@
-const {events, serverList, arduinoBoards} = require("@server-lib/globals.js");
+const {Events, serverList, arduinoBoards, websiteIO, getWebsiteIO} = require("@server-lib/globals.js");
+const ServerManagerList = require("@server-lib/ServerManagerList.cjs");
+const DiscordBotList = require("@server-lib/DiscordBotList.cjs");
 
 class SocketEvents {
 
@@ -7,17 +9,16 @@ class SocketEvents {
      * @desc Sends status response with all servers over given websocket.
      * @param websocket - Socket.io websocket, over which the data will be sent.
      */
-    static statusResponse(websocket) {
-        const ServerManagerList = require("@server-lib/ServerManagerList.cjs");
-        const DiscordBotList = require("@server-lib/DiscordBotList.cjs");
-        let data = {
-            servers: serverList,
-            discordBots: DiscordBotList.getStatuses(),
-            serverManagers: ServerManagerList.getStatuses(),
-            arduinoBoards: arduinoBoards,
-        };
-
-        websocket.emit(events.STATUS_RESPONSE, data);
+    static statusResponse(websocket = getWebsiteIO()) {
+        if (websocket){
+            let data = {
+                servers: serverList,
+                discordBots: DiscordBotList.getStatuses(),
+                serverManagers: ServerManagerList.getStatuses(),
+                arduinoBoards: arduinoBoards,
+            };
+            websocket.emit(Events.STATUS_RESPONSE, data);
+        }
     }
 
     /**
@@ -26,7 +27,7 @@ class SocketEvents {
      * @param {string} info - What will be displayed to the user.
      */
     static info(websocket, info) {
-        websocket.emit(events.INFO, info);
+        websocket.emit(Events.INFO, info);
     }
 
     /**
@@ -35,7 +36,7 @@ class SocketEvents {
      * @param {string} reason - What will be displayed to the user.
      */
     static requestFailed(websocket, reason) {
-        websocket.emit(events.REQUEST_FAILED, reason);
+        websocket.emit(Events.REQUEST_FAILED, reason);
     }
 
     /**
@@ -44,7 +45,7 @@ class SocketEvents {
      * @param {JSON} data - data from ZeroTier's API.
      */
     static ztResponse(websocket, data) {
-        websocket.emit(events.ZT_RESPONSE, data)
+        websocket.emit(Events.ZT_RESPONSE, data)
     }
 
     /**
@@ -52,7 +53,7 @@ class SocketEvents {
      * @param websocket - Socket. io websocket, over which the request will be sent.
      */
     static statusRequest(websocket) {
-        websocket.emit(events.STATUS_REQUEST);
+        websocket.emit(Events.STATUS_REQUEST);
     }
 
     /**
@@ -62,7 +63,7 @@ class SocketEvents {
      * @param clientSocketID - ID of the socket of the user who sent the request.
      */
     static startServerRequest(websocket, serverID, clientSocketID) {
-        websocket.emit(events.START_SERVER_REQUEST, serverID, clientSocketID);
+        websocket.emit(Events.START_SERVER_REQUEST, serverID, clientSocketID);
     }
 
     /**
@@ -72,7 +73,7 @@ class SocketEvents {
      * @param clientSocketID - ID of the socket of the user who sent the request.
      */
     static stopServerRequest(websocket, serverID, clientSocketID) {
-        websocket.emit(events.STOP_SERVER_REQUEST, serverID, clientSocketID);
+        websocket.emit(Events.STOP_SERVER_REQUEST, serverID, clientSocketID);
     }
 
     /**
@@ -82,7 +83,7 @@ class SocketEvents {
      * @param clientSocketID - ID of the socket of the user who sent the request.
      */
     static startDBotRequest(websocket, botID, clientSocketID) {
-        websocket.emit(events.START_DBOT_REQUEST, botID, clientSocketID);
+        websocket.emit(Events.START_DBOT_REQUEST, botID, clientSocketID);
     }
 
     /**
@@ -92,7 +93,7 @@ class SocketEvents {
      * @param clientSocketID - ID of the socket of the user who sent the request.
      */
     static stopDBotRequest(websocket, botID, clientSocketID) {
-        websocket.emit(events.STOP_DBOT_REQUEST, botID, clientSocketID);
+        websocket.emit(Events.STOP_DBOT_REQUEST, botID, clientSocketID);
     }
 }
 

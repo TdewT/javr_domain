@@ -3,7 +3,7 @@ const {wake} = require("wake_on_lan");
 const ServerList = require("@server-lib/ServerList.cjs");
 const {customLog} = require("@server-utils/custom-utils.cjs");
 const SocketEvents = require("@server-lib/SocketEvents.cjs");
-const {Statuses, events} = require("@server-lib/globals.js");
+const {Statuses, Events} = require("@server-lib/globals.js");
 const DiscordBotList = require("@server-lib/DiscordBotList.cjs");
 
 /**
@@ -44,14 +44,14 @@ class ServerManager {
         setInterval(() => {
             if (!this.#socketOpen) {
                 this.#socketOpen = true;
-                this.socket.once(events.CONNECT, () => {
+                this.socket.once(Events.CONNECT, () => {
                     this.status = Statuses.ONLINE;
                     customLog(this.htmlID, `Connected`);
 
                     customLog(this.htmlID, `Sending status request`);
                     SocketEvents.statusRequest(this.socket);
 
-                    this.socket.on(events.DISCONNECT, () => {
+                    this.socket.on(Events.DISCONNECT, () => {
                         this.status = Statuses.OFFLINE;
                         this.#socketOpen = false;
                         ServerList.updateServers(this.htmlID, []);
@@ -60,7 +60,7 @@ class ServerManager {
                         customLog(this.htmlID, 'Disconnected');
                     });
 
-                    this.socket.on(events.STATUS_RESPONSE, (response) => {
+                    this.socket.on(Events.STATUS_RESPONSE, (response) => {
                         customLog(this.htmlID, `Received status update`);
                         if (response.servers)
                             ServerList.updateServers(this.htmlID, response.servers);
@@ -71,7 +71,7 @@ class ServerManager {
                     });
 
                     // If the request is denied
-                    this.socket.on(events.REQUEST_FAILED, (response) => {
+                    this.socket.on(Events.REQUEST_FAILED, (response) => {
                         customLog(this.htmlID, `Request failed "${response['reason']}"`);
                         SocketEvents.requestFailed(websiteIO.to(response['socket']), response['reason']);
                     });

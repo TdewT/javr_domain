@@ -1,18 +1,18 @@
 import { io } from "socket.io-client";
-import {events} from "@server-lib/globals.js";
+import {Events} from "@server-lib/globals.js";
 
 export const socket = io();
 
 export const initSocket = (setData) => {
-    socket.on(events.STATUS_RESPONSE, (data) => {
+    socket.on(Events.STATUS_RESPONSE, (data) => {
         setData(data);
     });
 
-    socket.on(events.REQUEST_FAILED, (err) => {
+    socket.on(Events.REQUEST_FAILED, (err) => {
         alert('Error: ' + err);
     });
 
-    socket.on(events.INFO, (info) => {
+    socket.on(Events.INFO, (info) => {
         alert(info);
     });
 
@@ -22,7 +22,7 @@ export const initSocket = (setData) => {
 };
 
 export const requestData = () => {
-    socket.emit(events.STATUS_REQUEST);
+    socket.emit(Events.STATUS_REQUEST);
 };
 
 export default socket;

@@ -18,7 +18,7 @@ const ServiceTypes = {
     DISCORD_BOT: "discordBot",
     SERVER_MANAGER: "serverManager",
 };
-const events = {
+const Events = {
     INFO: "info",
     STATUS_RESPONSE: 'status_response',
     STATUS_REQUEST: 'status_request',
@@ -35,6 +35,15 @@ const events = {
     CONNECTION: 'connection',
     CONNECT: 'connect',
     DISCONNECT: 'disconnect',
+    ARDUINO_MODIFY_LIGHT: 'arduino_modify_light',
+};
+const ArduinoEvents = {
+    CONNECT: "connect",
+    MESSAGE_END: "message-end",
+    STATUS_UPDATE: "status-update",
+    TIME_UPDATE_REQUEST: "time-update-request",
+    TIME_UPDATE_RESPONSE: "time-update-response",
+    MODIFY_LIGHT: "modify-light",
 };
 
 // Arduino arrays
@@ -51,10 +60,21 @@ let serverList = [];
 // Server managers
 let serverManagers = [];
 
+// Socket IO for website to user comms
+let websiteIO;
+function getWebsiteIO() {
+    return websiteIO;
+}
+function setWebsiteIO(socket) {
+    websiteIO = socket;
+}
+
 module.exports = {
+    setWebsiteIO,
+    getWebsiteIO,
     Statuses,
     StatusIndicators,
-    events,
+    Events,
     ServiceTypes,
     discordBots,
     discordBotsWithHosts,
@@ -63,4 +83,5 @@ module.exports = {
     serverManagers,
     ServerTypes,
     arduinoBoards,
+    ArduinoEvents
 };

@@ -8,11 +8,14 @@ import DataTable from "@components/layout/DataTable/DataTable.jsx";
 import {useEffect, useState} from "react";
 import {initSocket, requestData} from "@utils/socket-util.js";
 import {arduinoBoards} from "@server-lib/globals.js";
+import LightControls from "@components/misc/LightControls/LightControls.jsx";
+
 
 function MainContent() {
     const [data, setData] = useState({
         arduinoBoards: [
             {
+                id: -1,
                 sensors: {
                     DHT11_0: {
                         temp: 0,
@@ -41,6 +44,10 @@ function MainContent() {
     let sensors;
     if (board) sensors = board.sensors;
 
+    // Try to get product id
+    let productId;
+    if (board) productId = board.id;
+
     if (board && sensors && sensors.DHT11_0 && sensors.DHT11_1) {
         const sensors = data.arduinoBoards[0].sensors;
 
@@ -55,16 +62,15 @@ function MainContent() {
 
         }
     }
-    else{
+    else {
         hotSensor = {temp: "n/a", humidity: "n/a"};
         coldSensor = {temp: "n/a", humidity: "n/a"};
     }
 
-
     return (
-        <div className={styles.bgImgTerra}>
+        <div className={`${styles.bgImgTerra}`}>
             <div className={styles.fgImgTerra}/>
-            <div className={styles.dataTableContainer}>
+            <div className={`${styles.dataTableContainer} ${styles.fontStyle}`}>
                 <div className={styles.innerBorder}>
                     <DataTable
                         columns={["Temperatura:", "Wilgotność:"]}
@@ -81,7 +87,9 @@ function MainContent() {
                     />
                 </div>
             </div>
-            <div className={styles.cameraContainer}></div>
+            <div className={styles.cameraContainer}>
+                <LightControls productId = {productId}/>
+            </div>
         </div>
     )
 }

@@ -1,5 +1,5 @@
 import {socket} from "@utils/socket-util.js";
-import {events, ServiceTypes} from "@server-lib/globals.js";
+import {Events, ServiceTypes} from "@server-lib/globals.js";
 import styles from './service-button.module.scss';
 
 function emitFunction(serviceType, serviceID, requestType){
@@ -7,14 +7,14 @@ function emitFunction(serviceType, serviceID, requestType){
 
     // Grouping events
     const startEvents = {
-        [ServiceTypes.SERVER]: events.START_SERVER_REQUEST,
-        [ServiceTypes.DISCORD_BOT]: events.START_DBOT_REQUEST,
-        [ServiceTypes.SERVER_MANAGER]: events.START_SERVER_MANAGER_REQUEST
+        [ServiceTypes.SERVER]: Events.START_SERVER_REQUEST,
+        [ServiceTypes.DISCORD_BOT]: Events.START_DBOT_REQUEST,
+        [ServiceTypes.SERVER_MANAGER]: Events.START_SERVER_MANAGER_REQUEST
     };
     const stopEvents = {
-        [ServiceTypes.SERVER]: events.STOP_SERVER_REQUEST,
-        [ServiceTypes.DISCORD_BOT]: events.STOP_DBOT_REQUEST,
-        [ServiceTypes.SERVER_MANAGER]: events.STOP_SERVER_MANAGER_REQUEST
+        [ServiceTypes.SERVER]: Events.STOP_SERVER_REQUEST,
+        [ServiceTypes.DISCORD_BOT]: Events.STOP_DBOT_REQUEST,
+        [ServiceTypes.SERVER_MANAGER]: Events.STOP_SERVER_MANAGER_REQUEST
     };
 
     // Pick appropriate event based on request type
