@@ -23,7 +23,7 @@ const fileTemplates = {
             "zerotier": null
         }
     },
-    "discord-bots.json": {},
+    "discord-bots.json": [],
     "website-config.json": {
         name: "JAVR_Domain",
         managers: {},

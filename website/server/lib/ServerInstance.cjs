@@ -397,14 +397,9 @@ class ServerInstance {
 
         // Temporary variable holding local bots
         let discordBots = [];
-        for (const botName in discordBotsConfig) {
-            // Load initial parameters from config
-            let constructorParams = discordBotsConfig[botName];
-            // Add socket info
-            constructorParams['io'] = getWebsiteIO();
-
+        for (const bot of discordBotsConfig) {
             // Create bot instance and add it to the list
-            discordBots.push(new DiscordBot(constructorParams));
+            discordBots.push(new DiscordBot(bot));
         }
         DiscordBotList.updateBots('local', discordBots);
 
