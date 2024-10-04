@@ -62,10 +62,10 @@ Information about the server is gathered live using Minecraft query protocol.
 - List of concurrent players on the server.
 - Option to turn the server off or on from web page.
 - Automatic shutdown if the server gets stuck while saving data.
-- Pick a proper java version for servers minecraft version (currently manually added to look-up file, see template [here](json_templates/minecraft_java_ver.json)).
+- Pick a proper java version for servers minecraft version (currently manually added to look-up file, see template [here](json_templates/minecraft_java_ver)).
 
 > [!IMPORTANT] 
-> Forge servers require different config structure. See [template file](json_templates/servers_info.json) for more information
+> Forge servers require different config structure. See [template file](json_templates/servers_info) for more information
 
 
 ### 2. Arma 3 and Teamspeak
@@ -83,7 +83,7 @@ Server status is determined by listening on port specified in the config.
 <br>
 
 > [!NOTE]
-> If you wish to find out how to properly make a config for a server checkout the template file [here](json_templates/servers_info.json)
+> If you wish to find out how to properly make a config for a server checkout the template file [here](json_templates/servers_info)
 
 
 
@@ -103,7 +103,7 @@ That said, it does works, but is limited to bots launched through the website on
 <br>
 
 > [!NOTE]
-> If you wish to find out how to properly make a config for a Discord bot checkout the template file [here](json_templates/discord_bots.json)
+> If you wish to find out how to properly make a config for a Discord bot checkout the template file [here](json_templates/discord_bots)
 
 
 
