@@ -24,12 +24,12 @@ class ServerManager {
      * @param {number} port - port of the server manager.
      */
     constructor({
-                    name: name,
+                    htmlID: htmlID,
                     mac: mac,
                     ip: ip,
                     port: port
                 }) {
-        this.htmlID = name.replace(' ', '_');
+        this.htmlID = htmlID.replace(' ', '_');
         this.mac = mac;
         this.ip = ip;
         this.port = port;
