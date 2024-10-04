@@ -41,7 +41,7 @@ class ArduinoBoard {
         parser.on('data', (data) => {
 
             // Debug stuff
-            console.log(`ARDUINO BOARD ${this.name} SAYS: ${data}`);
+            // console.log(`ARDUINO BOARD ${this.name} SAYS: ${data}`);
 
             // Get rid of unwanted chars
             data = data.trim();
