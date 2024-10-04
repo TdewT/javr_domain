@@ -1,4 +1,4 @@
-const {Events, serverList, arduinoBoards, websiteIO, getWebsiteIO} = require("@server-lib/globals.js");
+const {Events, serverList, arduinoBoards, getWebsiteIO} = require("@server-lib/globals.js");
 const ServerManagerList = require("@server-lib/ServerManagerList.cjs");
 const DiscordBotList = require("@server-lib/DiscordBotList.cjs");
 
