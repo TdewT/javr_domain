@@ -3,8 +3,12 @@ const {customLog} = require("@server-utils/custom-utils.cjs");
 
 const logName = "Config-Manager";
 
-// Dictionary of supported configs
-const configTypes = {
+
+/**
+ * Dictionary of supported configs
+ * @type {Object.<string, string>}
+ */
+const ConfigTypes = {
     apiTokens: "api-tokens.json",
     discordBots: "discord-bots.json",
     websiteConfig: "website-config.json",
@@ -54,7 +58,7 @@ class ConfigManager {
         }
 
         // Generate empty config files
-        for (const config of Object.values(configTypes)) {
+        for (const config of Object.values(ConfigTypes)) {
             if (!Object.values(allConfigs).includes(config) || ConfigManager.isEmpty(`./configs/${config}`)) {
                 try {
                     // Load template for this config
@@ -77,7 +81,7 @@ class ConfigManager {
         // Iterate through all files in ./configs
         for (const config of allConfigs) {
             // Check if file is supported type of config
-            if (Object.values(configTypes).includes(config)) {
+            if (Object.values(ConfigTypes).includes(config)) {
                 // Load config into the dictionary
                 ConfigManager.loadedConfigs[config] = JSON.parse(readFileSync(`./configs/${config}`, 'utf8'));
 
@@ -112,9 +116,14 @@ class ConfigManager {
         });
     }
 
+    /**
+     * @desc Retrieves loaded config of given type.
+     * @param {string} configType - Item from ConfigTypes, type of config to get.
+     * @returns {Object} - Content of the config
+     */
     static getConfig(configType) {
         return ConfigManager.loadedConfigs[configType];
     }
 }
 
-module.exports = {ConfigManager, configTypes};
+module.exports = {ConfigManager, ConfigTypes};

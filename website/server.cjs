@@ -5,7 +5,7 @@ const ServerInstance = require("@/server/lib/ServerInstance.cjs");
 const ServerManagerList = require("@/server/lib/ServerManagerList.cjs");
 const {initialiseBoards} = require("@server-utils/arduino-utils.cjs");
 const {getWebsiteIO} = require("@server-lib/globals.js");
-const {configTypes} = require("@server-utils/config-manager.cjs");
+const {ConfigTypes} = require("@server-utils/config-manager.cjs");
 
 // Name of module used for logs
 const logName = "INIT";
@@ -15,10 +15,10 @@ customLog(logName, "Loading configs");
 ConfigManager.loadConfigs();
 
 // Website initialisation
-const server = new ServerInstance(ConfigManager.getConfig(configTypes.websiteConfig));
+const server = new ServerInstance(ConfigManager.getConfig(ConfigTypes.websiteConfig));
 
 // Arduino initialisation
-initialiseBoards(ConfigManager.getConfig(configTypes.arduinos));
+initialiseBoards(ConfigManager.getConfig(ConfigTypes.arduinos));
 
 
 customLog(logName, "Starting the website server");

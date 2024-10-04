@@ -10,7 +10,7 @@ const {DiscordBot} = require("./DiscordBot.cjs");
 const DiscordBotList = require("@server-lib/DiscordBotList.cjs");
 const {customLog} = require("@server-utils/custom-utils.cjs");
 const ServerManagerList = require("@server-lib/ServerManagerList.cjs");
-const {ConfigManager, configTypes} = require("@server-utils/config-manager.cjs");
+const {ConfigManager, ConfigTypes} = require("@server-utils/config-manager.cjs");
 const SocketEvents = require("@server-lib/SocketEvents.cjs");
 const {getBoardByPID} = require("@server-utils/arduino-utils.cjs");
 const ServerList = require("@server-lib/ServerList.cjs");
@@ -316,7 +316,7 @@ class ServerInstance {
             // ZeroTier
             //
 
-            const apiTokens = ConfigManager.getConfig(configTypes.apiTokens);
+            const apiTokens = ConfigManager.getConfig(ConfigTypes.apiTokens);
             const zeroTierToken = apiTokens["tokens"]["zerotier"];
 
             //Handling ZeroTier Request
@@ -393,7 +393,7 @@ class ServerInstance {
         customLog(this.name, "Starting Discord bots");
 
         // Get bots and their parameters from config file
-        const discordBotsConfig = ConfigManager.getConfig(configTypes.discordBots);
+        const discordBotsConfig = ConfigManager.getConfig(ConfigTypes.discordBots);
 
         // Temporary variable holding local bots
         let discordBots = [];
