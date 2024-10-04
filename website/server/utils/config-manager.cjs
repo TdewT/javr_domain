@@ -26,7 +26,7 @@ const fileTemplates = {
     "discord-bots.json": [],
     "website-config.json": {
         name: "JAVR_Domain",
-        managers: {},
+        managers: [],
         autostart: {
             discordBots: [],
             servers: []

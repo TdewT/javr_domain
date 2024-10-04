@@ -53,7 +53,7 @@ class ServerInstance {
         ServerInstance.#instance = this;
 
         // Initialise serverManagers
-        for (const manager of Object.values(managers)) {
+        for (const manager of managers) {
             serverManagers.push(new ServerManager(manager));
         }
 
