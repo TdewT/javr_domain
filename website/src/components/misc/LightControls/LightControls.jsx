@@ -6,13 +6,15 @@ import {Events} from "@server-lib/globals.js"
 let updateTimeout = null;
 let overrideState = false;
 
-function setOverride(event) {
+function setOverride(event, setLightParam, productId) {
     overrideState = event.target.checked;
+    changeLightParam(event, setLightParam, productId);
 }
 
 function changeLightParam(event, setLightParam, productId) {
+    const isCheckBox = event.target.type === 'checkbox';
     const param = event.target.id.toLowerCase();
-    const value = event.target.type === 'checkbox' ? event.target.checked : event.target.value;
+    const value = isCheckBox ? event.target.checked : event.target.value;
     setLightParam((lightParams) => {
         let res;
         if (param in lightParams.temp) {
@@ -30,8 +32,12 @@ function changeLightParam(event, setLightParam, productId) {
                 [param]: value
             };
         }
+        res = {
+            ...res,
+            override: Number(overrideState)
+        }
         // If board is defined send updated values to the server
-        if (overrideState && !updateTimeout && productId) {
+        if (overrideState || isCheckBox && !updateTimeout && productId) {
             socket.emit(Events.ARDUINO_MODIFY_LIGHT, productId, res);
 
             updateTimeout = setTimeout(() => {
@@ -61,7 +67,7 @@ function LightControls(data) {
                 <div className="d-flex flex-column mb-3">
                     <label htmlFor="override">Manual light parameters</label>
                     <input type="checkbox" className="form-check-input mt-0" id="override"
-                           onChange={(event) => setOverride(event)}
+                           onChange={(event) => setOverride(event, setLightParams, productId)}
                     />
                 </div>
 
