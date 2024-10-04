@@ -18,6 +18,8 @@ function TableElement(serviceData) {
     const service = serviceData.service;
     const serviceType = serviceData.type;
 
+    const displayName = service.displayName ? service.displayName: service.htmlID.replaceAll('_', ' ');
+
     return (
         <>
             <tr>
@@ -29,7 +31,7 @@ function TableElement(serviceData) {
                         {service.status.charAt(0).toUpperCase() + service.status.slice(1)}
                     </span>
                 </td>
-                <td>{service.htmlID}</td>
+                <td>{displayName}</td>
 
 
                 <td>
@@ -52,7 +54,8 @@ function TableElement(serviceData) {
                     <>
                         <tr>
                             <td colSpan={3} className="p-0 m-0">
-                                <Accordion title={`Current players: ${service.currPlayers.length}/${service.maxPlayers}`}>
+                                <Accordion
+                                    title={`Current players: ${service.currPlayers.length}/${service.maxPlayers}`}>
                                     {/* Check if anyone is online */}
                                     {service.currPlayers.length > 0 ? (
                                         // If yes generate list of players
