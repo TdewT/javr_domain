@@ -4,6 +4,11 @@ import socket from "@utils/socket-util.js";
 import {Events} from "@server-lib/globals.js"
 
 let updateTimeout = null;
+let overrideState = false;
+
+function setOverride(event) {
+    overrideState = event.target.checked;
+}
 
 function changeLightParam(event, setLightParam, productId) {
     const param = event.target.id.toLowerCase();
@@ -26,7 +31,7 @@ function changeLightParam(event, setLightParam, productId) {
             };
         }
         // If board is defined send updated values to the server
-        if (!updateTimeout && productId) {
+        if (overrideState && !updateTimeout && productId) {
             socket.emit(Events.ARDUINO_MODIFY_LIGHT, productId, res);
 
             updateTimeout = setTimeout(() => {
@@ -56,7 +61,7 @@ function LightControls(data) {
                 <div className="d-flex flex-column mb-3">
                     <label htmlFor="override">Manual light parameters</label>
                     <input type="checkbox" className="form-check-input mt-0" id="override"
-                           onChange={(event) => changeLightParam(event, setLightParams, productId)}
+                           onChange={(event) => setOverride(event)}
                     />
                 </div>
 
