@@ -31,7 +31,8 @@ const fileTemplates = {
             discordBots: [],
             servers: []
         },
-        processEnv: "development"
+        processEnv: "development",
+        rules: {}
     },
     "arduinos": {}
 };
