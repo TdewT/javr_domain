@@ -58,7 +58,7 @@ class ServerList {
     /**
      * @desc Extracts htmlIDs from an array of servers.
      * @param {[GenericServer]} servers - Array of server instances.
-     * @returns {[string]} - array of htmlIDs;
+     * @returns {[string]} - array of htmlIDs.
      */
     static getServerHtmlIDs(servers) {
         let names = [];
@@ -67,6 +67,15 @@ class ServerList {
         }
         return names;
     }
+
+    /**
+     * @desc Returns server object with given htmlID.
+     * @param {String} serverID - ID of server to search for.
+     * @returns {*} - server instance of given htmlID.
+     */
+    static getServerByHtmlID = (serverID) => serverList.filter((s) => {
+        return s.htmlID === serverID
+    })[0];
 }
 
 module.exports = ServerList;

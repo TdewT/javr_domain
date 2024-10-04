@@ -10,9 +10,12 @@ function registerBoards(arduinos) {
     // Search for already connected devices
     SerialPort.list().then(ports => {
         for (const port of ports) {
-            const arduino = arduinos[port.productId];
+            const arduino = arduinos[String(port.productId)];
             if (arduino) {
-                const board = new ArduinoBoard(Object.assign({}, arduino, {serialPort: port, productId: port.productId}));
+                const board = new ArduinoBoard(Object.assign({}, arduino, {
+                    serialPort: port,
+                    productId: port.productId
+                }));
                 arduinoBoards.push(board);
                 customLog(logName, `Found board ${board.name} on: ${port.path}`);
                 board.startListening();
@@ -51,7 +54,7 @@ function initialiseBoards(arduinos) {
 
 function getBoardByPID(productId) {
     for (const board of arduinoBoards) {
-        if (board.id === productId){
+        if (board.id === productId) {
             return board;
         }
     }

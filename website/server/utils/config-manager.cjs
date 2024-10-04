@@ -6,7 +6,9 @@ const logName = "Config-Manager";
 // Dictionary of supported configs
 const configTypes = {
     apiTokens: "api-tokens.json",
-    discordBots: "discord-bots.json"
+    discordBots: "discord-bots.json",
+    websiteConfig: "website-config.json",
+    arduinos: "arduinos.json",
 };
 
 // Templates used for config generation
@@ -17,7 +19,17 @@ const fileTemplates = {
             "zerotier": null
         }
     },
-    "discord-bots.json": {}
+    "discord-bots.json": {},
+    "website-config.json": {
+        name: "JAVR_Domain",
+        managers: {},
+        autostart: {
+            discordBots: [],
+            servers: []
+        },
+        processEnv: "development"
+    },
+    "arduinos": {}
 };
 
 class ConfigManager {

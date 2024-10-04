@@ -4,7 +4,7 @@ const axios = require("axios");
 const {createServer} = require("http");
 const next = require("next");
 // Local imports
-const {Statuses, Events, setWebsiteIO, getWebsiteIO} = require("@server-lib/globals.js");
+const {Statuses, Events, setWebsiteIO, getWebsiteIO, serverManagers} = require("@server-lib/globals.js");
 const ApiHandler = require("@server-lib/ApiHandler.cjs");
 const {DiscordBot} = require("./DiscordBot.cjs");
 const DiscordBotList = require("@server-lib/DiscordBotList.cjs");
@@ -13,6 +13,8 @@ const ServerManagerList = require("@server-lib/ServerManagerList.cjs");
 const {ConfigManager, configTypes} = require("@server-utils/config-manager.cjs");
 const SocketEvents = require("@server-lib/SocketEvents.cjs");
 const {getBoardByPID} = require("@server-utils/arduino-utils.cjs");
+const ServerList = require("@server-lib/ServerList.cjs");
+const ServerManager = require("@server-lib/ServerManager.cjs");
 
 /**
  * @class ServerInstance
@@ -29,16 +31,18 @@ class ServerInstance {
 
     /**
      * @constructor
-     * @param {string} siteName - Name of the website.
+     * @param {string} name - Name of the website.
+     * @param {JSON} managers - JSON object containing parameters for serverManagers.
      * @param {number} port - Port on which the website is hosted.
-     * @param {string[]} discordBotAutostart - List of bot names to automatically start with the website.
+     * @param {string[]} autostart - List of bot names to automatically start with the website.
      * @param {string} processEnv - Type of next environment.
      * @returns {this} - If instance is already initialised it returns that instance.
      */
     constructor({
-                    siteName: siteName,
+                    name: name,
+                    managers: managers,
                     port: port,
-                    discordBotAutostart: discordBotAutostart,
+                    autostart: autostart,
                     processEnv: processEnv,
                 }) {
 
@@ -48,10 +52,16 @@ class ServerInstance {
         }
         ServerInstance.#instance = this;
 
+        // Initialise serverManagers
+        for (const manager of Object.values(managers)) {
+            serverManagers.push(new ServerManager(manager));
+        }
+
+
         this.#processEnv = processEnv;
-        this.name = siteName;
+        this.name = name;
         this.port = port;
-        this.discordBotStart = discordBotAutostart;
+        this.autostart = autostart;
     }
 
     /**
@@ -98,7 +108,7 @@ class ServerInstance {
             },
         });
 
-         setWebsiteIO(websiteIO);
+        setWebsiteIO(websiteIO);
 
         // When client connects to the server
         websiteIO.on(Events.CONNECTION, clientSocket => {
@@ -399,13 +409,37 @@ class ServerInstance {
         DiscordBotList.updateBots('local', discordBots);
 
         // Autostart bots
-        for (const name of this.discordBotStart) {
-            const bot = DiscordBotList.getBotByHtmlID(name);
-            if (bot) {
-                bot.start();
+        const botsToStart = this.autostart["discordBots"];
+        if (botsToStart) {
+            customLog(this.name, "Starting discord bots...");
+            for (const name of botsToStart) {
+                const bot = DiscordBotList.getBotByHtmlID(name);
+                if (bot) {
+                    bot.start();
+                }
+                else {
+                    customLog(this.name, `Failed to start ${name}: Bot not defined`);
+                }
             }
-            else {
-                customLog(this.name, `${name} failed to start: Bot not defined`);
+        }
+        // Autostart servers (for future use, currently servers are not supported from website)
+        const serversToStart = this.autostart["servers"];
+        if (serversToStart) {
+            customLog(this.name, "Starting servers...");
+            for (const name of serversToStart) {
+                const server = ServerList.getServerByHtmlID(name);
+                if (server) {
+                    // Check if server can be launched
+                    if (server.startServer) {
+                        server.startServer();
+                    }
+                    else {
+                        customLog(this.name, `Failed to start ${name}: Server not executable`)
+                    }
+                }
+                else {
+                    customLog(this.name, `Failed to start ${name}: Server not defined`);
+                }
             }
         }
     }
