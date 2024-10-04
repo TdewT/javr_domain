@@ -39,6 +39,10 @@ class SocketEvents {
         websocket.emit(Events.REQUEST_FAILED, reason);
     }
 
+    static requestNotAllowed(websocket) {
+        websocket.emit(Events.REQUEST_FAILED, "Ta funkcja została wyłączona w configu");
+    }
+
     /**
      * @desc Sends ZeroTier data to client.
      * @param websocket - Socket. io websocket, over which the data will be sent.

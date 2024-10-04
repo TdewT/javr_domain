@@ -8,7 +8,7 @@ const {
     Statuses,
     Events,
     setWebsiteIO,
-    serverManagers
+    serverManagers, defaultRules
 } = require("@server-lib/globals.js");
 const ApiHandler = require("@server-lib/ApiHandler.cjs");
 const {DiscordBot} = require("./DiscordBot.cjs");
@@ -41,7 +41,8 @@ class ServerInstance {
      * @param {number} port - Port on which the website is hosted.
      * @param {string[]} autostart - List of bot names to automatically start with the website.
      * @param {string} processEnv - Type of next environment.
-     * @returns {this} - If instance is already initialised it returns that instance.
+     * @param {Object.<string, Boolean>} rules - List of rules.
+     * @returns {this} - Initialised instance of this object.
      */
     constructor({
                     name: name,
@@ -49,6 +50,7 @@ class ServerInstance {
                     port: port,
                     autostart: autostart,
                     processEnv: processEnv,
+                    rules: rules = defaultRules
                 }) {
 
         // Ensure that only one instance of the class can be initialised at a time
@@ -67,6 +69,7 @@ class ServerInstance {
         this.name = name;
         this.port = port;
         this.autostart = autostart;
+        this.rules = rules;
     }
 
     /**
@@ -379,13 +382,18 @@ class ServerInstance {
             //
 
             clientSocket.on(Events.ARDUINO_MODIFY_LIGHT, (arduinoPID, lightParams) => {
-                const board = getBoardByPID(arduinoPID);
-                if (board) {
-                    lightParams["override"] = Number(lightParams["override"]);
-                    board.setLight(lightParams);
+                if (this.rules.allowTerrariumLedOverride){
+                    const board = getBoardByPID(arduinoPID);
+                    if (board) {
+                        lightParams["override"] = Number(lightParams["override"]);
+                        board.setLight(lightParams);
+                    }
+                    else {
+                        customLog(this.name, `Failed to forward light update for board ${arduinoPID}: Board not found`)
+                    }
                 }
                 else {
-                    customLog(this.name, `Failed to forward light update for board ${arduinoPID}: Board not found`)
+                    SocketEvents.requestNotAllowed(clientSocket);
                 }
             })
         });
