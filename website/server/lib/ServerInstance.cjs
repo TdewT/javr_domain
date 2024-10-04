@@ -4,7 +4,12 @@ const axios = require("axios");
 const {createServer} = require("http");
 const next = require("next");
 // Local imports
-const {Statuses, Events, setWebsiteIO, getWebsiteIO, serverManagers} = require("@server-lib/globals.js");
+const {
+    Statuses,
+    Events,
+    setWebsiteIO,
+    serverManagers
+} = require("@server-lib/globals.js");
 const ApiHandler = require("@server-lib/ApiHandler.cjs");
 const {DiscordBot} = require("./DiscordBot.cjs");
 const DiscordBotList = require("@server-lib/DiscordBotList.cjs");
