@@ -23,7 +23,6 @@ class ArduinoBoard {
     sendTimeResponse() {
         const date = new Date();
         const time = date.getTime() - (date.getTimezoneOffset() * 60000);
-        console.log(time)
         const message = ArduinoEvents.TIME_UPDATE_RESPONSE + time + ArduinoEvents.MESSAGE_END;
         this.serialPort.write(message, (err) => {
             if (err) {
@@ -43,6 +42,7 @@ class ArduinoBoard {
         parser.on('data', (data) => {
 
             // Debug stuff
+
             // console.log(`ARDUINO BOARD ${this.name} SAYS: ${data}`);
 
             // Get rid of unwanted chars
