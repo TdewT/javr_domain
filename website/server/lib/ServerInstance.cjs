@@ -4,15 +4,22 @@ const axios = require("axios");
 const {createServer} = require("http");
 const next = require("next");
 // Local imports
-const {Statuses, Events, setWebsiteIO, getWebsiteIO} = require("@server-lib/globals.js");
+const {
+    Statuses,
+    Events,
+    setWebsiteIO,
+    serverManagers, defaultRules
+} = require("@server-lib/globals.js");
 const ApiHandler = require("@server-lib/ApiHandler.cjs");
 const {DiscordBot} = require("./DiscordBot.cjs");
 const DiscordBotList = require("@server-lib/DiscordBotList.cjs");
 const {customLog} = require("@server-utils/custom-utils.cjs");
 const ServerManagerList = require("@server-lib/ServerManagerList.cjs");
-const {ConfigManager, configTypes} = require("@server-utils/config-manager.cjs");
+const {ConfigManager, ConfigTypes} = require("@server-utils/config-manager.cjs");
 const SocketEvents = require("@server-lib/SocketEvents.cjs");
 const {getBoardByPID} = require("@server-utils/arduino-utils.cjs");
+const ServerList = require("@server-lib/ServerList.cjs");
+const ServerManager = require("@server-lib/ServerManager.cjs");
 
 /**
  * @class ServerInstance
@@ -29,17 +36,21 @@ class ServerInstance {
 
     /**
      * @constructor
-     * @param {string} siteName - Name of the website.
+     * @param {string} name - Name of the website.
+     * @param {JSON} managers - JSON object containing parameters for serverManagers.
      * @param {number} port - Port on which the website is hosted.
-     * @param {string[]} discordBotAutostart - List of bot names to automatically start with the website.
+     * @param {string[]} autostart - List of bot names to automatically start with the website.
      * @param {string} processEnv - Type of next environment.
-     * @returns {this} - If instance is already initialised it returns that instance.
+     * @param {Object.<string, Boolean>} rules - List of rules.
+     * @returns {this} - Initialised instance of this object.
      */
     constructor({
-                    siteName: siteName,
+                    name: name,
+                    managers: managers,
                     port: port,
-                    discordBotAutostart: discordBotAutostart,
+                    autostart: autostart,
                     processEnv: processEnv,
+                    rules: rules = defaultRules
                 }) {
 
         // Ensure that only one instance of the class can be initialised at a time
@@ -48,10 +59,17 @@ class ServerInstance {
         }
         ServerInstance.#instance = this;
 
+        // Initialise serverManagers
+        for (const manager of managers) {
+            serverManagers.push(new ServerManager(manager));
+        }
+
+
         this.#processEnv = processEnv;
-        this.name = siteName;
+        this.name = name;
         this.port = port;
-        this.discordBotStart = discordBotAutostart;
+        this.autostart = autostart;
+        this.rules = rules;
     }
 
     /**
@@ -98,7 +116,7 @@ class ServerInstance {
             },
         });
 
-         setWebsiteIO(websiteIO);
+        setWebsiteIO(websiteIO);
 
         // When client connects to the server
         websiteIO.on(Events.CONNECTION, clientSocket => {
@@ -306,7 +324,7 @@ class ServerInstance {
             // ZeroTier
             //
 
-            const apiTokens = ConfigManager.getConfig(configTypes.apiTokens);
+            const apiTokens = ConfigManager.getConfig(ConfigTypes.apiTokens);
             const zeroTierToken = apiTokens["tokens"]["zerotier"];
 
             //Handling ZeroTier Request
@@ -364,13 +382,18 @@ class ServerInstance {
             //
 
             clientSocket.on(Events.ARDUINO_MODIFY_LIGHT, (arduinoPID, lightParams) => {
-                const board = getBoardByPID(arduinoPID);
-                if (board) {
-                    lightParams["override"] = Number(lightParams["override"]);
-                    board.setLight(lightParams);
+                if (this.rules.allowTerrariumLedOverride){
+                    const board = getBoardByPID(arduinoPID);
+                    if (board) {
+                        lightParams["override"] = Number(lightParams["override"]);
+                        board.setLight(lightParams);
+                    }
+                    else {
+                        customLog(this.name, `Failed to forward light update for board ${arduinoPID}: Board not found`)
+                    }
                 }
                 else {
-                    customLog(this.name, `Failed to forward light update for board ${arduinoPID}: Board not found`)
+                    SocketEvents.requestNotAllowed(clientSocket);
                 }
             })
         });
@@ -383,29 +406,48 @@ class ServerInstance {
         customLog(this.name, "Starting Discord bots");
 
         // Get bots and their parameters from config file
-        const discordBotsConfig = ConfigManager.getConfig(configTypes.discordBots);
+        const discordBotsConfig = ConfigManager.getConfig(ConfigTypes.discordBots);
 
         // Temporary variable holding local bots
         let discordBots = [];
-        for (const botName in discordBotsConfig) {
-            // Load initial parameters from config
-            let constructorParams = discordBotsConfig[botName];
-            // Add socket info
-            constructorParams['io'] = getWebsiteIO();
-
+        for (const bot of discordBotsConfig) {
             // Create bot instance and add it to the list
-            discordBots.push(new DiscordBot(constructorParams));
+            discordBots.push(new DiscordBot(bot));
         }
         DiscordBotList.updateBots('local', discordBots);
 
         // Autostart bots
-        for (const name of this.discordBotStart) {
-            const bot = DiscordBotList.getBotByHtmlID(name);
-            if (bot) {
-                bot.start();
+        const botsToStart = this.autostart["discordBots"];
+        if (botsToStart) {
+            customLog(this.name, "Starting discord bots...");
+            for (const name of botsToStart) {
+                const bot = DiscordBotList.getBotByHtmlID(name);
+                if (bot) {
+                    bot.start();
+                }
+                else {
+                    customLog(this.name, `Failed to start ${name}: Bot not defined`);
+                }
             }
-            else {
-                customLog(this.name, `${name} failed to start: Bot not defined`);
+        }
+        // Autostart servers (for future use, currently servers are not supported from website)
+        const serversToStart = this.autostart["servers"];
+        if (serversToStart) {
+            customLog(this.name, "Starting servers...");
+            for (const name of serversToStart) {
+                const server = ServerList.getServerByHtmlID(name);
+                if (server) {
+                    // Check if server can be launched
+                    if (server.startServer) {
+                        server.startServer();
+                    }
+                    else {
+                        customLog(this.name, `Failed to start ${name}: Server not executable`)
+                    }
+                }
+                else {
+                    customLog(this.name, `Failed to start ${name}: Server not defined`);
+                }
             }
         }
     }

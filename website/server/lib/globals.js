@@ -69,6 +69,12 @@ function setWebsiteIO(socket) {
     websiteIO = socket;
 }
 
+// Dict with rules
+const defaultRules = {
+    "allowTerrariumLedOverride": false,
+    "displayTerrariumCam": false
+};
+
 module.exports = {
     setWebsiteIO,
     getWebsiteIO,
@@ -83,5 +89,6 @@ module.exports = {
     serverManagers,
     ServerTypes,
     arduinoBoards,
-    ArduinoEvents
+    ArduinoEvents,
+    defaultRules
 };

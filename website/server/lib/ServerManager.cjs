@@ -19,20 +19,20 @@ class ServerManager {
      * @constructor
      * @desc Parameters passed in an object.
      * @param {string} htmlID - Name of the server manager, used for logs and keeping track of what servers are under each manager.
-     * @param {string} serverManagerMac - Mac address of the server manager, used for Wake On Lan feature.
-     * @param {string} serverManagerIP - IP/url that `serverSocket` is going to listen on. String value.
-     * @param {number} serverManagerPort - port of the server manager.
+     * @param {string} mac - Mac address of the server manager, used for Wake On Lan feature.
+     * @param {string} ip - IP/url that `serverSocket` is going to listen on. String value.
+     * @param {number} port - port of the server manager.
      */
     constructor({
-                    serverManagerName: name,
-                    serverManagerMac: serverManagerMac,
-                    serverManagerIP: serverManagerIP,
-                    serverManagerPort: serverManagerPort
+                    htmlID: htmlID,
+                    mac: mac,
+                    ip: ip,
+                    port: port
                 }) {
-        this.htmlID = name.replace(' ', '_');
-        this.mac = serverManagerMac;
-        this.ip = serverManagerIP;
-        this.port = serverManagerPort;
+        this.htmlID = htmlID.replace(' ', '_');
+        this.mac = mac;
+        this.ip = ip;
+        this.port = port;
         this.socket = socketIOClient(`http://${this.ip}:${this.port}`);
     }
 
