@@ -54,20 +54,20 @@ function LightControls(data) {
         <div className={`${styles.lightControls}`}>
             <div className="d-flex flex-column">
                 <div className="d-flex flex-column mb-3">
-                    <label htmlFor="override">Manual light parameters</label>
+                    <label htmlFor="override">Manualna kontrola światła</label>
                     <input type="checkbox" className="form-check-input mt-0" id="override"
                            onChange={(event) => changeLightParam(event, setLightParams, productId)}
                     />
                 </div>
 
                 <div>
-                    <label htmlFor="Brightness" className="form-label">Brightness</label>
+                    <label htmlFor="Brightness" className="form-label">Jasność</label>
                     <input type="range" className="form-range" min="0" max="255" defaultValue="255" id="Brightness"
                            onMouseUp={(event) => changeLightParam(event, setLightParams, productId)}
                     />
                 </div>
 
-                <div>Temperature:</div>
+                <div>Temperatura:</div>
                 <div className={styles.tempParamContainer}>
                     <label htmlFor="Red" className={styles.redLabel}>Red</label>
                     <div className="ms-auto">
