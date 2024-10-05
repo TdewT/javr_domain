@@ -21,7 +21,9 @@ class ArduinoBoard {
     }
 
     sendTimeResponse() {
-        const time = Date.now();
+        const date = new Date();
+        const time = date.getTime() - (date.getTimezoneOffset() * 60000);
+        console.log(time)
         const message = ArduinoEvents.TIME_UPDATE_RESPONSE + time + ArduinoEvents.MESSAGE_END;
         this.serialPort.write(message, (err) => {
             if (err) {
