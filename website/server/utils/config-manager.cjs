@@ -34,7 +34,7 @@ const fileTemplates = {
         processEnv: "development",
         rules: {}
     },
-    "arduinos": {}
+    "arduinos.json": {}
 };
 
 class ConfigManager {
