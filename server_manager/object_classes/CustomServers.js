@@ -4,29 +4,101 @@ const MinecraftStatus = require("minecraft-status");
 const {customLog} = require("../utils/CustomUtils");
 const {ConfigManager, configTypes} = require("../utils/ConfigManager");
 const {serverTypes, statuses} = require('../utils/SharedVars');
+const os = require("node:os");
 
-class GenericServer {
-    constructor({
-                    port,
-                    htmlID,
-                    displayName,
-                    path = '',
-                    status = statuses.OFFLINE,
-                    type = serverTypes.GENERIC,
-                }) {
+class ABaseServer {
+    constructor({port, htmlID, displayName, status = statuses.OFFLINE, type}) {
+        // Ensure that this class is abstract
+        if (this.constructor === ABaseServer) {
+            throw new Error("Abstract classes can't be instantiated.");
+        }
+
         this.port = port;
         this.htmlID = htmlID;
         this.displayName = displayName;
         this.status = status;
+        this.type = type;
+    }
+}
+
+class AExecutableServer extends ABaseServer {
+    constructor({port, htmlID, displayName, path = '', status, type, startArgs}) {
+        super({port, htmlID, displayName, status, type});
+
+        // Ensure that this class is abstract
+        if (this.constructor === ABaseServer) {
+            throw new Error("Abstract classes can't be instantiated.");
+        }
+
         this.path = path;
         this.type = type;
+        this.currProcess = null;
+        this.startArgs = startArgs;
+    }
+
+    startServer() {
+        customLog(this.htmlID, `Starting server`);
+        this.status = statuses.STARTING;
+
+        this.currProcess = execFile(
+            this.path, this.startArgs
+        );
+
+        // Check for process exit
+        this.exitCheck(this.currProcess);
+
+    }
+
+    stopServer() {
+        customLog(this.htmlID, `Stopping server`);
+        this.status = statuses.STOPPING;
+        this.currProcess.kill();
+    }
+
+
+    // For servers with executable linked
+    exitCheck(process) {
+        process.on('error', (error) => {
+            String(error);
+            customLog(this.htmlID, error);
+            this.status = statuses.OFFLINE;
+        });
+
+        process.stderr.on('data', (err) => {
+            customLog(this.htmlID, err)
+        });
+
+        process.on('exit', () => {
+            customLog(this.htmlID, `Server process ended`);
+            this.status = statuses.OFFLINE;
+        })
+    }
+}
+
+class GenericServer extends ABaseServer {
+    constructor({port, htmlID, displayName, status = statuses.OFFLINE,}) {
+        const type = serverTypes.GENERIC
+        super({port, htmlID, displayName, status, type});
     }
 
     // Check if port is being used
     updateStatus() {
-        exec(`netstat -an | find ":${this.port} "`, (error, stdout, stderr) => {
+
+        // Check what os is on the machine
+        let command;
+        if (os.platform() === 'win32') {
+            // Windows command
+            command = `netstat -an | find "LISTENING" | find ":${this.port}"`;
+        }
+        else {
+            // Linux command
+            command = `netstat -tuln | grep ":${this.port}"`;
+        }
+
+        // Check if port is taken
+        exec(command, (error, stdout, stderr) => {
             if (stderr) {
-                customLog(this.htmlID, `netstat failed: ${stderr}`)
+                customLog(this.htmlID, `netstat failed: ${stderr}`);
             }
             if (stdout !== "") {
                 if (stdout.includes("LISTENING") || stdout.includes("*:*"))
@@ -57,43 +129,23 @@ class GenericServer {
         }, 1000);
     }
 
-    // For servers with executable linked
-    exitCheck(server) {
-        server.currProcess.on('error', (error) => {
-            String(error);
-            customLog(server.htmlID, error);
-            server.status = statuses.OFFLINE;
-        });
-
-        server.currProcess.stderr.on('data', (err) => {
-            customLog(server.htmlID, err)
-        });
-
-        server.currProcess.on('exit', () => {
-            customLog(server.htmlID, `Server process ended`);
-            server.status = statuses.OFFLINE;
-        })
-    }
 }
 
-class MinecraftServer extends GenericServer {
+class MinecraftServer extends AExecutableServer {
     static minecraftJavaVer;
 
     constructor({
-                    port, htmlID, displayName, path = '', status = statuses.OFFLINE,
-                    currProcess = null,
+                    port, htmlID, displayName, path = '',
                     currPlayers = [],
                     maxPlayers = 0,
-                    startArgs = ["-jar", "minecraft_server.1.12.2.jar", "nogui"],
+                    startArgs = [],
                     minecraftVersion
                 }) {
-        super({port, htmlID, displayName, path, status});
+        super({port, htmlID, displayName, path, startArgs});
 
         this.type = serverTypes.MINECRAFT;
-        this.currProcess = currProcess;
         this.currPlayers = currPlayers;
         this.maxPlayers = maxPlayers;
-        this.startArgs = startArgs;
         this.minecraftVersion = minecraftVersion;
         this.failedQuery = 0;
         MinecraftServer.minecraftJavaVer = ConfigManager.getConfig(configTypes.minecraftJavaVer);
@@ -196,7 +248,7 @@ class MinecraftServer extends GenericServer {
                 // If after going online server fails to answer query 10 times assume it's offline
                 if (this.status !== statuses.STARTING) {
                     this.failedQuery += 1;
-                    if (this.failedQuery > 10){
+                    if (this.failedQuery > 10) {
                         this.status = statuses.OFFLINE;
                         this.currPlayers = [];
                     }
@@ -221,30 +273,29 @@ class MinecraftServer extends GenericServer {
             this.currPlayers = [];
 
             setTimeout(() => {
-                
-                if(this.status === statuses.STOPPING){
+
+                if (this.status === statuses.STOPPING) {
                     customLog(this.htmlID, `Server not online, forcing automated exit`);
                     if (this.currProcess !== null) {
                         this.currProcess.kill();
                         this.currPlayers = [];
                     }
-                    else{
+                    else {
                         customLog(this.htmlID, `Cannot stop, server not attached to this process`);
                     }
                 }
 
             }, 120_000)
 
-            
 
         }
-        else{
+        else {
             customLog(this.htmlID, `Server not online, forcing manual exit`);
             if (this.currProcess !== null) {
                 this.currProcess.kill();
                 this.currPlayers = [];
             }
-            else{
+            else {
                 customLog(this.htmlID, `Cannot stop, server not attached to this process`);
             }
         }
@@ -259,48 +310,19 @@ class MinecraftServer extends GenericServer {
     }
 }
 
-class ArmaServer extends GenericServer {
-    constructor({
-                    port, htmlID, displayName, path = '', status = statuses.OFFLINE,
-                    startArgs, currProcess = null,
-                }) {
-        super({port, htmlID, displayName, path, status});
+class ArmaServer extends AExecutableServer {
+    constructor({port, htmlID, displayName, path = '', startArgs,}) {
+        super({port, htmlID, displayName, path, startArgs});
 
         this.type = serverTypes.ARMA;
-        this.startArgs = startArgs;
-        this.currProcess = currProcess;
-    }
-
-    startServer() {
-        customLog(this.htmlID, `Starting server`);
-        this.status = statuses.STARTING;
-
-        this.currProcess = execFile(
-            this.path,
-            [this.startArgs]
-        );
-
-        // Check for process exit
-        this.exitCheck(this);
-
-    }
-
-    stopServer() {
-        customLog(this.htmlID, `Stopping server`);
-        this.status = statuses.STOPPING;
-        this.currProcess.kill();
     }
 }
 
-class TeamspeakServer extends GenericServer {
-    constructor({
-                    port, htmlID, displayName, path = '', status = statuses.OFFLINE,
-                    currProcess = null,
-                }) {
-        super({port, htmlID, displayName, path, status});
+class TeamspeakServer extends AExecutableServer {
+    constructor({port, htmlID, displayName, path = ''}) {
+        super({port, htmlID, displayName, path});
 
         this.type = serverTypes.TSSERVER;
-        this.currProcess = currProcess;
     }
 
     startServer() {
