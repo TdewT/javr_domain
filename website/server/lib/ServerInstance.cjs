@@ -37,7 +37,7 @@ class ServerInstance {
     /**
      * @constructor
      * @param {string} name - Name of the website.
-     * @param {JSON} managers - JSON object containing parameters for serverManagers.
+     * @param {Array} managers - JSON object containing parameters for serverManagers.
      * @param {number} port - Port on which the website is hosted.
      * @param {string[]} autostart - List of bot names to automatically start with the website.
      * @param {string} processEnv - Type of next environment.
