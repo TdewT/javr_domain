@@ -324,9 +324,6 @@ class TeamspeakServer extends GenericServer {
             this.currProcess.kill();
             customLog(this.htmlID, "Attached process killed (Not the same as server process!)")
         }
-        else{
-            customLog(this.htmlID, "No attached process found (Not the same as server process!), ignoring")
-        }
 
         this.killServer();
     }
