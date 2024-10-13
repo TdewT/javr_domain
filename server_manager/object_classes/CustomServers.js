@@ -322,6 +322,15 @@ class ArmaServer extends AExecutableServer {
     }
 }
 
+class TmodloaderServer extends AExecutableServer {
+    constructor({port, htmlID, displayName, path = '', startArgs,}) {
+        super({port, htmlID, displayName, path, startArgs});
+
+        this.type = serverTypes.TMODLOADER;
+    }
+}
+
+//TODO: fix process spawning
 class TeamspeakServer extends AExecutableServer {
     constructor({port, htmlID, displayName, path = ''}) {
         super({port, htmlID, displayName, path});
@@ -387,6 +396,7 @@ const serverClasses = {
     "minecraft": MinecraftServer,
     "arma": ArmaServer,
     "tsserver": TeamspeakServer,
+    "tmodloader": TmodloaderServer
 };
 
 module.exports = {
