@@ -5,6 +5,7 @@ const statuses = {
 };
 const serverTypes = {
     "GENERIC": "generic",
+    "GENERIC_EXEC": "generic_exec",
     "MINECRAFT": "minecraft",
     "ARMA": "arma",
     "TSSERVER": "tsserver"

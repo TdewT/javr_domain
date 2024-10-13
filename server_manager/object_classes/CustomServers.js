@@ -55,7 +55,6 @@ class AExecutableServer extends ABaseServer {
         this.currProcess.kill();
     }
 
-
     // For servers with executable linked
     exitCheck(process) {
         process.on('error', (error) => {
@@ -95,40 +94,12 @@ class GenericServer extends ABaseServer {
             command = `netstat -tuln | grep ":${this.port}"`;
         }
 
-        // Check if port is taken
-        exec(command, (error, stdout, stderr) => {
-            if (stderr) {
-                customLog(this.htmlID, `netstat failed: ${stderr}`);
-            }
-            if (stdout !== "") {
-                if (stdout.includes("LISTENING") || stdout.includes("*:*"))
-                    this.status = statuses.ONLINE;
-                else {
-                    if (this.status !== statuses.STARTING)
-                        this.status = statuses.OFFLINE;
-                }
-            }
-            else {
-                if (this.status !== statuses.STARTING)
-                    this.status = statuses.OFFLINE;
-            }
-        })
+class GenericExecutableServer extends AExecutableServer {
+    constructor({port, htmlID, displayName, path = '', startArgs,}) {
+        super({port, htmlID, displayName, path, startArgs});
+
+        this.type = serverTypes.GENERIC_EXEC;
     }
-
-    // Run check periodically to see if the server is still up
-    lastStatus = statuses.OFFLINE;
-
-    statusMonitor(emitFunc, socket, event, servers) {
-        setInterval(() => {
-            if (this.lastStatus !== this.status) {
-                customLog(this.htmlID, `Status changed to "${this.status}"`);
-                emitFunc(socket, event, servers);
-            }
-            this.lastStatus = this.status;
-            this.updateStatus()
-        }, 1000);
-    }
-
 }
 
 class MinecraftServer extends AExecutableServer {
@@ -379,6 +350,7 @@ class TeamspeakServer extends AExecutableServer {
 
 const serverClasses = {
     "generic": GenericServer,
+    "generic_exec": GenericExecutableServer,
     "minecraft": MinecraftServer,
     "arma": ArmaServer,
     "tsserver": TeamspeakServer,
