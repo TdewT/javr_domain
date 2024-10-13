@@ -19,6 +19,52 @@ class ABaseServer {
         this.status = status;
         this.type = type;
     }
+
+    // Run check periodically to see if the server is still up
+    lastStatus = statuses.OFFLINE;
+    updateStatus() {
+
+        // Check what os is on the machine
+        let command;
+        if (os.platform() === 'win32') {
+            // Windows command
+            command = `netstat -an | find "LISTENING" | find ":${this.port}"`;
+        }
+        else {
+            // Linux command
+            command = `netstat -tuln | grep ":${this.port}"`;
+        }
+
+        // Check if port is taken
+        exec(command, (error, stdout, stderr) => {
+            if (stderr) {
+                customLog(this.htmlID, `netstat failed: ${stderr}`);
+            }
+            if (stdout !== "") {
+                if (stdout.includes("LISTENING") || stdout.includes("*:*"))
+                    this.status = statuses.ONLINE;
+                else {
+                    if (this.status !== statuses.STARTING)
+                        this.status = statuses.OFFLINE;
+                }
+            }
+            else {
+                if (this.status !== statuses.STARTING)
+                    this.status = statuses.OFFLINE;
+            }
+        })
+    }
+
+    statusMonitor(emitFunc, socket, event, servers) {
+        setInterval(() => {
+            if (this.lastStatus !== this.status) {
+                customLog(this.htmlID, `Status changed to "${this.status}"`);
+                emitFunc(socket, event, servers);
+            }
+            this.lastStatus = this.status;
+            this.updateStatus()
+        }, 1000);
+    }
 }
 
 class AExecutableServer extends ABaseServer {
@@ -79,20 +125,7 @@ class GenericServer extends ABaseServer {
         const type = serverTypes.GENERIC
         super({port, htmlID, displayName, status, type});
     }
-
-    // Check if port is being used
-    updateStatus() {
-
-        // Check what os is on the machine
-        let command;
-        if (os.platform() === 'win32') {
-            // Windows command
-            command = `netstat -an | find "LISTENING" | find ":${this.port}"`;
-        }
-        else {
-            // Linux command
-            command = `netstat -tuln | grep ":${this.port}"`;
-        }
+}
 
 class GenericExecutableServer extends AExecutableServer {
     constructor({port, htmlID, displayName, path = '', startArgs,}) {
