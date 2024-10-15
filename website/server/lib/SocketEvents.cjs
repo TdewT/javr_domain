@@ -61,6 +61,14 @@ class SocketEvents {
     }
 
     /**
+     * @desc Sends status request on provided websocket
+     * @param websocket - Socket.io websocket, over which the request will be sent.
+     */
+    static stopServerManager(websocket) {
+        websocket.emit(Events.STOP_SERVER_MANAGER_REQUEST);
+    }
+
+    /**
      * @desc Sends a request to start a server to provided server manager's socket.
      * @param websocket - Socket. io websocket, over which the request will be sent.
      * @param serverID - HtmlID of the server.
