@@ -1,9 +1,9 @@
 const {exec, execFile, spawn} = require('child_process');
-const CustomUtils = require('../utils/CustomUtils');
+const CustomUtils = require('../utils/custom-utils.js');
 const MinecraftStatus = require("minecraft-status");
-const {customLog} = require("../utils/CustomUtils");
-const {ConfigManager, configTypes} = require("../utils/ConfigManager");
-const {serverTypes, statuses} = require('../utils/globals.js');
+const {customLog} = require("../utils/custom-utils.js");
+const {ConfigManager, configTypes} = require("../lib/ConfigManager");
+const {serverTypes, statuses} = require('/globals.js');
 const os = require("node:os");
 
 class ABaseServer {

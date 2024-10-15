@@ -1,6 +1,6 @@
 const {spawn} = require('child_process');
-const {customLog} = require("../utils/CustomUtils");
-const {statuses} = require("../utils/globals.js");
+const {customLog} = require("../utils/custom-utils.js");
+const {statuses} = require("./globals.js");
 
 class DiscordBot {
     constructor({

@@ -1,5 +1,5 @@
 const {readdirSync, readFileSync, writeFileSync, mkdirSync, existsSync} = require("node:fs");
-const {customLog} = require("./CustomUtils");
+const {customLog} = require("../utils/custom-utils.js");
 
 const logName = "config-manager";
 

@@ -8,15 +8,15 @@ const {
     statuses,
     serverTypes,
     serverClasses,
-} = require("./object_classes/CustomServers");
+} = require("./src/lib/CustomServers");
 const {
     customLog,
     getElementByHtmlID,
     emitDataGlobal,
     anyServerUsed
-} = require('./utils/CustomUtils');
-const {DiscordBot} = require('./object_classes/DiscordBot');
-const {servers, Events} = require('./utils/globals.js');
+} = require('./src/utils/custom-utils.js');
+const {DiscordBot} = require('./src/lib/DiscordBot.js');
+const {servers, Events} = require('./src/lib/globals.js');
 
 
 //
@@ -24,7 +24,7 @@ const {servers, Events} = require('./utils/globals.js');
 //
 
 // Create ConfigManager instance
-const {ConfigManager, configTypes} = require("./utils/ConfigManager");
+const {ConfigManager, configTypes} = require("./src/lib/ConfigManager.js");
 const os = require("node:os");
 // Load configs
 ConfigManager.loadConfigs();
