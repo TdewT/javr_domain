@@ -245,10 +245,10 @@ function sleepSystem() {
 
     exec(command, (error, stdout, stderr) => {
         if (error) {
-            console.error(`Error putting system to sleep: ${error.message}`);
+            customLog(siteIDName,`Error putting system to sleep: ${error.message}`);
         }
         if (stderr) {
-            console.error(`Error output: ${stderr}`);
+            customLog(siteIDName, `Error output: ${stderr}`);
         }
     });
 }
