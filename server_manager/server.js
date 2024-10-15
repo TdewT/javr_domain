@@ -16,7 +16,7 @@ const {
     anyServerUsed
 } = require('./utils/CustomUtils');
 const {DiscordBot} = require('./object_classes/DiscordBot');
-const {servers} = require('./utils/globals.js');
+const {servers, Events} = require('./utils/globals.js');
 
 
 //
@@ -182,7 +182,7 @@ io.on('connection', socket => {
 
     // Requested server stop
     socket.on('stop_dbot_request', (botID, socketID) => {
-        customLog(botID, `${ip} requested bot stop`);
+        customLog(siteIDName, `${ip} requested bot stop`);
 
         // Search for bot in the list
         const bot = getElementByHtmlID(discordBots, botID);
@@ -209,6 +209,14 @@ io.on('connection', socket => {
             socket.emit('request_failed', {socket: socketID, reason: "Nie znaleziono bota"})
         }
 
+    });
+
+
+    // Request manager stop
+    socket.on(Events.STOP_SERVER_MANAGER_REQUEST, (socketID) => {
+        customLog(siteIDName, `${ip} requested manager stop`);
+
+        sleepSystem(socket, socketID);
     });
 });
 
@@ -239,8 +247,12 @@ function sleepTimer() {
         }
     }, timeToSleep * 60 * 1000);
 }
-// Enter command to sleep
-function sleepSystem() {
+/**
+ * @desc Enter command to sleep
+ * @param socket - Socket.io of the website that forwarded sleep request.
+ * @param clientSocketID - ID of the client's socket with the website.
+ */
+function sleepSystem(socket, clientSocketID) {
     const command = os.platform() === 'win32'
         // Windows command
         ? 'rundll32.exe powrprof.dll, SetSuspendState Sleep'
@@ -250,6 +262,8 @@ function sleepSystem() {
     exec(command, (error, stdout, stderr) => {
         if (error) {
             customLog(siteIDName,`Error putting system to sleep: ${error.message}`);
+            if (socket)
+                socket.emit('request_failed', {socket: clientSocketID, reason: "Manager nie chce spać (coś nie działa)"});
         }
         if (stderr) {
             customLog(siteIDName, `Error output: ${stderr}`);

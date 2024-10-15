@@ -98,7 +98,7 @@ class ServerManager {
     }
 
     sleep(clientSocket) {
-        // TODO
+        SocketEvents.stopServerManager(this.socket, clientSocket.id);
     }
 }
 

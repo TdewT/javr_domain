@@ -122,7 +122,7 @@ class AExecutableServer extends ABaseServer {
 
 class GenericServer extends ABaseServer {
     constructor({port, htmlID, displayName, status = statuses.OFFLINE,}) {
-        const type = serverTypes.GENERIC
+        const type = serverTypes.GENERIC;
         super({port, htmlID, displayName, status, type});
     }
 }

@@ -183,22 +183,20 @@ class ServerInstance {
                 const serverManager = ServerManagerList.getManagerByName(managerID);
                 customLog(this.name, `${ip} requested ${managerID} stop`);
 
-                SocketEvents.requestFailed(clientSocket, "Opcja tymczasowo niedostępna");
-
-                // if (serverManager) {
-                //     if (serverManager.status === Statuses.ONLINE) {
-                //         customLog(this.name, `Sending sleep request to ${managerID}`);
-                //         serverManager.sleep(clientSocket);
-                //     }
-                //     else {
-                //         customLog(this.name, `Request denied, manager is not online`);
-                //         SocketEvents.requestFailed(clientSocket, "Menadżer nie jest online");
-                //     }
-                // }
-                // else {
-                //     customLog(this.name, `Request denied ${managerID} not found`);
-                //     SocketEvents.requestFailed(clientSocket, `Nie znaleziono menadżera ${managerID}`)
-                // }
+                if (serverManager) {
+                    if (serverManager.status === Statuses.ONLINE) {
+                        customLog(this.name, `Sending sleep request to ${managerID}`);
+                        serverManager.sleep(clientSocket);
+                    }
+                    else {
+                        customLog(this.name, `Request denied, manager is not online`);
+                        SocketEvents.requestFailed(clientSocket, "Menadżer nie jest online");
+                    }
+                }
+                else {
+                    customLog(this.name, `Request denied ${managerID} not found`);
+                    SocketEvents.requestFailed(clientSocket, `Nie znaleziono menadżera ${managerID}`)
+                }
             });
 
 
