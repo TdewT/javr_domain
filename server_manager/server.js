@@ -25,6 +25,7 @@ const {servers} = require('./utils/SharedVars');
 
 // Create ConfigManager instance
 const {ConfigManager, configTypes} = require("./utils/ConfigManager");
+const os = require("node:os");
 // Load configs
 ConfigManager.loadConfigs();
 // Get loaded configs
@@ -240,8 +241,11 @@ function sleepTimer() {
 }
 // Enter command to sleep
 function sleepSystem() {
-    // Command for Windows
-    const command = 'rundll32.exe powrprof.dll, SetSuspendState Sleep';
+    const command = os.platform() === 'win32'
+        // Windows command
+        ? 'rundll32.exe powrprof.dll, SetSuspendState Sleep'
+        // Linux command
+        : 'pm-suspend';
 
     exec(command, (error, stdout, stderr) => {
         if (error) {
