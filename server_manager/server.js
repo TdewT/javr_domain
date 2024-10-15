@@ -16,7 +16,7 @@ const {
     anyServerUsed
 } = require('./utils/CustomUtils');
 const {DiscordBot} = require('./object_classes/DiscordBot');
-const {servers} = require('./utils/SharedVars');
+const {servers} = require('./utils/globals.js');
 
 
 //

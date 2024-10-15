@@ -1,6 +1,6 @@
 const {exec} = require('child_process');
 const fs = require("node:fs");
-const {statuses} = require("./SharedVars");
+const {statuses} = require("./globals.js");
 let logStream;
 
 function killTask(name, PID) {

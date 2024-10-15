@@ -3,7 +3,7 @@ const CustomUtils = require('../utils/CustomUtils');
 const MinecraftStatus = require("minecraft-status");
 const {customLog} = require("../utils/CustomUtils");
 const {ConfigManager, configTypes} = require("../utils/ConfigManager");
-const {serverTypes, statuses} = require('../utils/SharedVars');
+const {serverTypes, statuses} = require('../utils/globals.js');
 const os = require("node:os");
 
 class ABaseServer {
