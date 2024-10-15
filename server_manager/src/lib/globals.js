@@ -1,8 +1,18 @@
+// Sockets to all connected websites
+let sockets = [];
+
 /**
- * @desc List of servers from Server Manager
+ * @desc List of servers managed by this manager
  * @type {ABaseServer[]}
  */
 let servers = [];
+
+/**
+ * @desc List of Discord bots managed by this manager
+ * @type {DiscordBot[]}
+ */
+let discordBots = [];
+
 const statuses = {
     "ONLINE": "online", "STARTING": "starting", "BUSY": "busy", "STOPPING": "stopping", "OFFLINE": "offline",
 };
@@ -35,8 +45,9 @@ const Events = {
 };
 
 module.exports = {
+    sockets,
     servers,
     statuses,
     serverTypes,
-    Events
+    Events,
 };

@@ -16,7 +16,7 @@ const {
     anyServerUsed
 } = require('./src/utils/custom-utils.js');
 const {DiscordBot} = require('./src/lib/DiscordBot.js');
-const {servers, Events} = require('./src/lib/globals.js');
+let {servers, Events, sockets} = require('./src/lib/globals.js');
 
 
 //
@@ -95,6 +95,8 @@ const io = socketIO(server);
 
 // When client connects to the server
 io.on('connection', socket => {
+    sockets.push(socket);
+
     let ip = socket.handshake.address.split(':');
     ip = ip[ip.length - 1];
 
@@ -218,6 +220,10 @@ io.on('connection', socket => {
 
         sleepSystem(socket, socketID);
     });
+
+    socket.on(Events.DISCONNECT, () => {
+        sockets = sockets.filter(s => s !== socket);
+    })
 });
 
 
