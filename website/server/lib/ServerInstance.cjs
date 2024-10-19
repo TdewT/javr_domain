@@ -348,8 +348,11 @@ class ServerInstance {
                     })
                     .catch((error) => {
                         customLog(this.name, `Error fetching data from ZeroTier: ${error}`);
+                        SocketEvents.ztErrorResponse(websiteIO, `${error.response.statusText} ${error.response.status}`);
                     });
             });
+
+            
 
             //Sending user edit form to ZeroTier api
             clientSocket.on(Events.ZT_SEND_FORM, (userJSON, idUserJSON, apiUrl) => {

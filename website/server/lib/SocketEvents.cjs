@@ -48,8 +48,15 @@ class SocketEvents {
      * @param websocket - Socket. io websocket, over which the data will be sent.
      * @param {JSON} data - data from ZeroTier's API.
      */
-    static ztResponse(websocket, data) {
-        websocket.emit(Events.ZT_RESPONSE, data)
+    static ztResponse(websocket = getWebsiteIO(), data) {
+        websocket.emit(Events.ZT_RESPONSE, data);
+    }
+
+    /** TODO: fix this
+     * @desc Sends 
+    */
+    static ztErrorResponse(websocket = getWebsiteIO(), error) {
+        websocket.emit(Events.ZT_REQUEST_FAILED, error);
     }
 
     /**
