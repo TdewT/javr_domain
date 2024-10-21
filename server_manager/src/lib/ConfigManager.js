@@ -13,7 +13,7 @@ const configTypes = {
 // Templates used for config generation
 const fileTemplates = {
     "minecraft_java_ver.json": {},
-    "servers_info.json": [],
+    "servers_info.json": {},
     "discord_bots.json": [],
 };
 
