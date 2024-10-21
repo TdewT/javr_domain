@@ -205,7 +205,7 @@ class MinecraftServer extends AExecutableServer {
         }
 
         // Check for process exit
-        this.exitCheck(this);
+        this.exitCheck(this.currProcess);
 
         this.currProcess.stdout.on('data', (data) => {
             // Convert output to string
