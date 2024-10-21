@@ -52,8 +52,10 @@ class SocketEvents {
         websocket.emit(Events.ZT_RESPONSE, data);
     }
 
-    /** TODO: fix this
-     * @desc Sends 
+    /**
+     * @desc Sends code and error message to client.
+     * @param {*} [websocket=getWebsiteIO()] - Socket. io websocket, over which the data will be sent. Default is default websocket.
+     * @param error - error message from ZeroTier's API.
     */
     static ztErrorResponse(websocket = getWebsiteIO(), error) {
         websocket.emit(Events.ZT_REQUEST_FAILED, error);
