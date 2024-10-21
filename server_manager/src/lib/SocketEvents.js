@@ -18,27 +18,30 @@ class SocketEvents {
     /**
      * @desc Sends response with information to client.
      * @param websocket - Socket.io websocket, over which the data will be sent.
-     * @param {string} info - What will be displayed to the user.
+     * @param {string} socketID - ID of the socket that the message is sent to.
+     * @param {string} text - What will be displayed to the user.
      */
-    static info(websocket, info) {
-        websocket.emit(Events.INFO, info);
+    static info(websocket, {socketID, text}) {
+        websocket.emit(Events.INFO, {socketID, text});
     }
 
     /**
      * @desc Sends request failed message along with the reason.
      * @param websocket - Socket.io websocket, over which the data will be sent.
-     * @param {string} reason - What will be displayed to the user.
+     * @param {string} socketID - ID of the socket that the message is sent to.
+     * @param {string} text - What will be displayed to the user.
      */
-    static requestFailed(websocket, reason) {
-        websocket.emit(Events.REQUEST_FAILED, reason);
+    static requestFailed(websocket, {socketID, text}) {
+        websocket.emit(Events.REQUEST_FAILED, {socketID, text});
     }
 
     /**
      * @desc Sends request not allowed message, when feature has been disabled in config
      * @param websocket - Socket.io websocket, over which the data will be sent.
+     * @param {string} socketID - ID of the socket that the message is sent to.
      */
-    static requestNotAllowed(websocket) {
-        websocket.emit(Events.REQUEST_FAILED, "Ta funkcja została wyłączona w configu");
+    static requestNotAllowed(websocket, socketID) {
+        websocket.emit(Events.REQUEST_FAILED, {socketID, text: "Ta funkcja została wyłączona w configu"});
     }
 }
 
