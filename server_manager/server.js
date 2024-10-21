@@ -16,7 +16,7 @@ const {
     anyServerUsed
 } = require('./src/utils/custom-utils.js');
 const {DiscordBot} = require('./src/lib/DiscordBot.js');
-let {servers, Events, sockets, discordBots, getWebsocket, setWebsocket} = require('./src/lib/globals.js');
+let {servers, Events, sockets, discordBots, setWebsocket} = require('./src/lib/globals.js');
 
 
 //
