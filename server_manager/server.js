@@ -16,7 +16,7 @@ const {
     anyServerUsed
 } = require('./src/utils/custom-utils.js');
 const {DiscordBot} = require('./src/lib/DiscordBot.js');
-let {servers, Events, sockets} = require('./src/lib/globals.js');
+let {servers, Events, sockets, discordBots, getWebsocket, setWebsocket} = require('./src/lib/globals.js');
 
 
 //
@@ -43,7 +43,6 @@ sleepConditionDetector();
 //
 
 // Load Discord bots
-const discordBots = [];
 for (const botName in discordBotsConfig) {
     // Load initial parameters from config
     let constructorParams = discordBotsConfig[botName];
