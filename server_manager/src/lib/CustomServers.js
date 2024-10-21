@@ -3,8 +3,9 @@ const CustomUtils = require('../utils/custom-utils.js');
 const MinecraftStatus = require("minecraft-status");
 const {customLog} = require("../utils/custom-utils.js");
 const {ConfigManager, configTypes} = require("../lib/ConfigManager");
-const {serverTypes, statuses} = require('/globals.js');
+const {serverTypes, statuses} = require('./globals.js');
 const os = require("node:os");
+const SocketEvents = require("./SocketEvents.js");
 
 class ABaseServer {
     constructor({port, htmlID, displayName, status = statuses.OFFLINE, type}) {
@@ -55,11 +56,11 @@ class ABaseServer {
         })
     }
 
-    statusMonitor(emitFunc, socket, event, servers) {
+    statusMonitor() {
         setInterval(() => {
             if (this.lastStatus !== this.status) {
                 customLog(this.htmlID, `Status changed to "${this.status}"`);
-                emitFunc(socket, event, servers);
+                SocketEvents.statusResponse();
             }
             this.lastStatus = this.status;
             this.updateStatus()
@@ -160,15 +161,15 @@ class MinecraftServer extends AExecutableServer {
     }
 
 
-    statusMonitor(emitFunc, socket, event, servers) {
+    statusMonitor() {
         setInterval(() => {
             if (this.lastStatus !== this.status) {
                 customLog(this.htmlID, `Status changed to "${this.status}"`);
-                emitFunc(socket, event, servers);
+                SocketEvents.statusResponse();
             }
             if (this.currPlayers.length !== this.lastPlayers.length) {
                 customLog(this.htmlID, `Player Count update sent"`);
-                emitFunc(socket, event, servers);
+                SocketEvents.statusResponse();
             }
             this.lastPlayers = this.currPlayers;
             this.lastStatus = this.status;
@@ -181,7 +182,7 @@ class MinecraftServer extends AExecutableServer {
         this.updateServerInfo()
     }
 
-    startServer(emitFunc, socket, servers) {
+    startServer() {
         customLog(this.htmlID, `Starting server`);
         this.status = statuses.STARTING;
 
@@ -215,7 +216,7 @@ class MinecraftServer extends AExecutableServer {
                 this.updateServerInfo();
 
                 // Send updated servers to client
-                emitFunc(socket, "status_response", servers);
+                SocketEvents.statusResponse();
             }
 
             // Player join event

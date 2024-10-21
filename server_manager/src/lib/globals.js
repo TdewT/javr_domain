@@ -44,10 +44,22 @@ const Events = {
     ARDUINO_MODIFY_LIGHT: 'arduino_modify_light',
 };
 
+let websocket;
+function setWebsocket(socket){
+    websocket = socket;
+}
+function getWebsocket(){
+    return websocket;
+}
+
 module.exports = {
     sockets,
     servers,
     statuses,
     serverTypes,
     Events,
+    discordBots,
+    websocket,
+    setWebsocket,
+    getWebsocket
 };

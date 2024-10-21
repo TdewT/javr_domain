@@ -26,6 +26,7 @@ let {servers, Events, sockets, discordBots, getWebsocket, setWebsocket} = requir
 // Create ConfigManager instance
 const {ConfigManager, configTypes} = require("./src/lib/ConfigManager.js");
 const os = require("node:os");
+const SocketEvents = require("./src/lib/SocketEvents.js");
 // Load configs
 ConfigManager.loadConfigs();
 // Get loaded configs
@@ -84,16 +85,17 @@ const server = app.listen(3001, () => {
     // Start checking ports for every defined server
     for (const server of servers) {
         customLog(server.htmlID, "Starting statusMonitor");
-        server.statusMonitor(emitDataGlobal, io, "status_response", {servers: servers})
+        server.statusMonitor()
     }
 });
 
 // Start socket
 // noinspection JSValidateTypes
 const io = socketIO(server);
+setWebsocket(io);
 
 // When client connects to the server
-io.on('connection', socket => {
+io.on(Events.CONNECTION, socket => {
     sockets.push(socket);
 
     let ip = socket.handshake.address.split(':');
@@ -102,17 +104,17 @@ io.on('connection', socket => {
     customLog(siteIDName, `Established connection with website server`);
 
     // Respond to clients data request
-    socket.on('status_request', () => {
+    socket.on(Events.STATUS_REQUEST, () => {
         // Send back servers statuses
         if (socket) {
             customLog(siteIDName, `Status request received from ${ip}`);
-            socket.emit("status_response", {servers: servers, discordBots: discordBots});
+            SocketEvents.statusResponse();
             customLog(siteIDName, `Status update sent ${ip}`);
         }
     });
 
     // Requested server start
-    socket.on('start_server_request', (serverID, socketID) => {
+    socket.on(Events.START_SERVER_REQUEST, (serverID, socketID) => {
         customLog(serverID, `${ip} requested server start`);
 
         // Get requested server's status
@@ -121,21 +123,21 @@ io.on('connection', socket => {
         if (server) {
             if (server.status === statuses.OFFLINE) {
                 cancelSleepTimer();
-                server.startServer(emitDataGlobal, io, {servers: servers});
+                server.startServer();
             }
             else {
                 customLog(serverID, `Request denied, port is taken`);
-                socket.emit('request_failed', {socket: socketID, reason: "Port jest zajęty"})
+                socket.emit(Events.REQUEST_FAILED, {socket: socketID, reason: "Port jest zajęty"})
             }
         }
         else {
             customLog(serverID, `Request denied, Server not found`);
-            socket.emit('request_failed', {socket: socketID, reason: "Nie znaleziono serwera"})
+            socket.emit(Events.REQUEST_FAILED, {socket: socketID, reason: "Nie znaleziono serwera"})
         }
     });
 
     // Requested server stop
-    socket.on('stop_server_request', (serverID, socketID) => {
+    socket.on(Events.STOP_SERVER_REQUEST, (serverID, socketID) => {
         customLog(serverID, `${ip} requested server stop`);
 
         const server = getElementByHtmlID(servers, serverID);
@@ -146,19 +148,19 @@ io.on('connection', socket => {
             }
             else {
                 customLog(serverID, `Request denied, server is not running`);
-                socket.emit('request_failed', {socket: socketID, reason: 'Serwer nie jest włączony'})
+                socket.Events.REQUEST_FAILED('request_failed', {socket: socketID, reason: 'Serwer nie jest włączony'})
             }
         }
         else {
             customLog(serverID, `Request denied, Server not found`);
-            socket.emit('request_failed', {socket: socketID, reason: "Nie znaleziono serwera"})
+            socket.emit(Events.REQUEST_FAILED, {socket: socketID, reason: "Nie znaleziono serwera"})
         }
 
     });
 
 
     // Request bot start
-    socket.on('start_dbot_request', (botID, socketID) => {
+    socket.on(Events.START_DBOT_REQUEST, (botID, socketID) => {
 
         // Search for bot in the list
         const bot = getElementByHtmlID(discordBots, botID);
@@ -172,17 +174,17 @@ io.on('connection', socket => {
             }
             else {
                 customLog(botID, `Request denied, bot already on`);
-                socket.emit('request_failed', {socket: socketID, reason: "Bot jest już włączony"})
+                socket.emit(Events.REQUEST_FAILED, {socket: socketID, reason: "Bot jest już włączony"})
             }
         }
         else {
             customLog(botID, `Request denied, Bot not found`);
-            socket.emit('request_failed', {socket: socketID, reason: "Nie znaleziono bota"})
+            socket.emit(Events.REQUEST_FAILED, {socket: socketID, reason: "Nie znaleziono bota"})
         }
     });
 
     // Requested server stop
-    socket.on('stop_dbot_request', (botID, socketID) => {
+    socket.on(Events.STOP_DBOT_REQUEST, (botID, socketID) => {
         customLog(siteIDName, `${ip} requested bot stop`);
 
         // Search for bot in the list
@@ -202,12 +204,12 @@ io.on('connection', socket => {
             }
             else {
                 customLog(botID, `Request denied, bot is not online`);
-                socket.emit('request_failed', {socket: socketID, reason: 'bot nie jest w pełni włączony'})
+                socket.emit(Events.REQUEST_FAILED, {socket: socketID, reason: 'bot nie jest w pełni włączony'})
             }
         }
         else {
             customLog(botID, `Request denied, Bot not found`);
-            socket.emit('request_failed', {socket: socketID, reason: "Nie znaleziono bota"})
+            socket.emit(Events.REQUEST_FAILED, {socket: socketID, reason: "Nie znaleziono bota"})
         }
 
     });
@@ -268,7 +270,7 @@ function sleepSystem(socket, clientSocketID) {
         if (error) {
             customLog(siteIDName,`Error putting system to sleep: ${error.message}`);
             if (socket)
-                socket.emit('request_failed', {socket: clientSocketID, reason: "Manager nie chce spać (coś nie działa)"});
+                socket.emit(Events.REQUEST_FAILED, {socket: clientSocketID, reason: "Manager nie chce spać (coś nie działa)"});
         }
         if (stderr) {
             customLog(siteIDName, `Error output: ${stderr}`);
