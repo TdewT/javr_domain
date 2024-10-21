@@ -127,12 +127,12 @@ io.on(Events.CONNECTION, socket => {
             }
             else {
                 customLog(serverID, `Request denied, port is taken`);
-                socket.emit(Events.REQUEST_FAILED, {socket: socketID, reason: "Port jest zajęty"})
+                SocketEvents.requestFailed(socket, {socketID, text: 'Port jest zajęty'});
             }
         }
         else {
             customLog(serverID, `Request denied, Server not found`);
-            socket.emit(Events.REQUEST_FAILED, {socket: socketID, reason: "Nie znaleziono serwera"})
+            SocketEvents.requestFailed(socket, {socketID, text: "Nie znaleziono serwera"});
         }
     });
 
@@ -148,12 +148,12 @@ io.on(Events.CONNECTION, socket => {
             }
             else {
                 customLog(serverID, `Request denied, server is not running`);
-                socket.Events.REQUEST_FAILED('request_failed', {socket: socketID, reason: 'Serwer nie jest włączony'})
+                SocketEvents.requestFailed(socket, {socketID, text: 'Serwer nie jest włączony'});
             }
         }
         else {
             customLog(serverID, `Request denied, Server not found`);
-            socket.emit(Events.REQUEST_FAILED, {socket: socketID, reason: "Nie znaleziono serwera"})
+            SocketEvents.requestFailed(socket, {socketID, text: 'Nie znaleziono serwera'});
         }
 
     });
@@ -174,12 +174,12 @@ io.on(Events.CONNECTION, socket => {
             }
             else {
                 customLog(botID, `Request denied, bot already on`);
-                socket.emit(Events.REQUEST_FAILED, {socket: socketID, reason: "Bot jest już włączony"})
+                SocketEvents.requestFailed(socket, {socketID, text: 'Bot jest już włączony'});
             }
         }
         else {
             customLog(botID, `Request denied, Bot not found`);
-            socket.emit(Events.REQUEST_FAILED, {socket: socketID, reason: "Nie znaleziono bota"})
+            SocketEvents.requestFailed(socket, {socketID, text: 'Nie znaleziono bota'});
         }
     });
 
@@ -204,12 +204,12 @@ io.on(Events.CONNECTION, socket => {
             }
             else {
                 customLog(botID, `Request denied, bot is not online`);
-                socket.emit(Events.REQUEST_FAILED, {socket: socketID, reason: 'bot nie jest w pełni włączony'})
+                SocketEvents.requestFailed(socket, {socketID, text: 'Bot nie jest w pełni włączony'});
             }
         }
         else {
             customLog(botID, `Request denied, Bot not found`);
-            socket.emit(Events.REQUEST_FAILED, {socket: socketID, reason: "Nie znaleziono bota"})
+            SocketEvents.requestFailed(socket, {socketID, text: 'Nie znaleziono bota'});
         }
 
     });
@@ -240,6 +240,7 @@ function sleepConditionDetector() {
         }
     }, 60 * 1000);
 }
+
 // If they are not used for configured time enter sleep
 function sleepTimer() {
     return setTimeout(() => {
@@ -249,11 +250,12 @@ function sleepTimer() {
             cancelSleepTimer();
             sleepSystem();
         }
-        else{
+        else {
             cancelSleepTimer()
         }
     }, timeToSleep * 60 * 1000);
 }
+
 /**
  * @desc Enter command to sleep
  * @param socket - Socket.io of the website that forwarded sleep request.
@@ -268,9 +270,12 @@ function sleepSystem(socket, clientSocketID) {
 
     exec(command, (error, stdout, stderr) => {
         if (error) {
-            customLog(siteIDName,`Error putting system to sleep: ${error.message}`);
+            customLog(siteIDName, `Error putting system to sleep: ${error.message}`);
             if (socket)
-                socket.emit(Events.REQUEST_FAILED, {socket: clientSocketID, reason: "Manager nie chce spać (coś nie działa)"});
+                SocketEvents.requestFailed(socket, {
+                    socketID: clientSocketID,
+                    text: "Manager nie chce spać (coś nie działa)"
+                });
         }
         if (stderr) {
             customLog(siteIDName, `Error output: ${stderr}`);
