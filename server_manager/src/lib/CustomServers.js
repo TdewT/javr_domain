@@ -29,7 +29,7 @@ class ABaseServer {
         let command;
         if (os.platform() === 'win32') {
             // Windows command
-            command = `netstat -an | find "LISTENING" | find ":${this.port}"`;
+            command = `netstat -an | find ":${this.port}"`;
         }
         else {
             // Linux command
