@@ -69,7 +69,7 @@ class ABaseServer {
 }
 
 class AExecutableServer extends ABaseServer {
-    constructor({port, htmlID, displayName, path = '', status, type, startArgs}) {
+    constructor({port, htmlID, displayName, filePath = '', status, type, startArgs, offlineTimer: startingTime = 2}) {
         super({port, htmlID, displayName, status, type});
 
         // Ensure that this class is abstract
@@ -77,23 +77,32 @@ class AExecutableServer extends ABaseServer {
             throw new Error("Abstract classes can't be instantiated.");
         }
 
-        this.path = path;
+        this.filePath =  filePath;
+        this.workingDirectory = path.dirname(filePath); // Get the directory of the file
         this.type = type;
         this.currProcess = null;
         this.startArgs = startArgs;
+        this.startingTime = startingTime; // Timeout in minutes after which the server should be online
     }
 
     startServer() {
         customLog(this.htmlID, `Starting server`);
         this.status = statuses.STARTING;
 
+
         this.currProcess = execFile(
-            this.path, this.startArgs
+            this.filePath, this.startArgs,
+            {cwd: this.workingDirectory},
         );
+
 
         // Check for process exit
         this.exitCheck(this.currProcess);
 
+        setTimeout(()=>{
+            if (this.status === statuses.STARTING)
+                this.status = statuses.OFFLINE;
+        }, this.startingTime * 60 * 1000)
     }
 
     stopServer() {
@@ -129,8 +138,8 @@ class GenericServer extends ABaseServer {
 }
 
 class GenericExecutableServer extends AExecutableServer {
-    constructor({port, htmlID, displayName, path = '', startArgs,}) {
-        super({port, htmlID, displayName, path, startArgs});
+    constructor({port, htmlID, displayName, filePath = '', startArgs,}) {
+        super({port, htmlID, displayName, filePath, startArgs});
 
         this.type = serverTypes.GENERIC_EXEC;
     }
@@ -141,6 +150,7 @@ class MinecraftServer extends AExecutableServer {
 
     constructor({
                     port, htmlID, displayName, path = '',
+                    workingDir,
                     currPlayers = [],
                     maxPlayers = 0,
                     startArgs = [],
@@ -148,6 +158,7 @@ class MinecraftServer extends AExecutableServer {
                 }) {
         super({port, htmlID, displayName, path, startArgs});
 
+        this.workingDir = workingDir;
         this.type = serverTypes.MINECRAFT;
         this.currPlayers = currPlayers;
         this.maxPlayers = maxPlayers;
@@ -192,7 +203,7 @@ class MinecraftServer extends AExecutableServer {
             this.currProcess = spawn(
                 "java",
                 this.startArgs,
-                {cwd: this.path}
+                {cwd: this.workingDir}
             );
         }
         else {
@@ -200,7 +211,7 @@ class MinecraftServer extends AExecutableServer {
             this.currProcess = spawn(
                 MinecraftServer.minecraftJavaVer[this.minecraftVersion],
                 this.startArgs,
-                {cwd: this.path}
+                {cwd: this.workingDir}
             );
         }
 
@@ -316,77 +327,47 @@ class MinecraftServer extends AExecutableServer {
 }
 
 class ArmaServer extends AExecutableServer {
-    constructor({port, htmlID, displayName, path = '', startArgs,}) {
-        super({port, htmlID, displayName, path, startArgs});
+    constructor({port, htmlID, displayName, filePath = '', startArgs,}) {
+        super({port, htmlID, displayName, filePath, startArgs});
 
         this.type = serverTypes.ARMA;
     }
 }
 
 class TmodloaderServer extends AExecutableServer {
-    constructor({port, htmlID, displayName, path = '', startArgs,}) {
-        super({port, htmlID, displayName, path, startArgs});
+    constructor({port, htmlID, displayName, filePath = '', startArgs,}) {
+        super({port, htmlID, displayName, filePath, startArgs});
 
         this.type = serverTypes.TMODLOADER;
-    }
-}
-
-//TODO: fix process spawning
-class TeamspeakServer extends AExecutableServer {
-    constructor({port, htmlID, displayName, path = ''}) {
-        super({port, htmlID, displayName, path});
-
-        this.type = serverTypes.TSSERVER;
     }
 
     startServer() {
         customLog(this.htmlID, `Starting server`);
         this.status = statuses.STARTING;
 
-        this.currProcess = exec(
-            this.path,
+        this.currProcess = spawn(
+            this.filePath, this.startArgs,
+            {cwd: this.workingDirectory, shell: true},
         );
 
-        // Check for process exit
-        this.exitCheck(this);
+        psTree(this.currProcess.pid, (err, children) => {
+            if (err) console.log(err);
+            console.log(children);
+            this.currProcess = children[0].pid;
+        });
 
+        this.currProcess.stdout.on('data', (data) => {
+            String(data);
+            console.log(data)
+        });
     }
+}
 
-    stopServer() {
-        customLog(this.htmlID, `Stopping server`);
-        this.status = statuses.STOPPING;
-        if (this.currProcess) {
-            // This does not kill the server process, just the one starting the server
-            this.currProcess.kill();
-            customLog(this.htmlID, "Attached process killed (Not the same as server process!)")
-        }
+class TeamspeakServer extends AExecutableServer {
+    constructor({port, htmlID, displayName, filePath = ''}) {
+        super({port, htmlID, displayName, filePath});
 
-        this.killServer();
-    }
-
-    killServer() {
-        // Search for the process
-        exec('tasklist | find "ts3server.exe"', (error, stdout, stderr) => {
-            if (error) {
-                customLog(this.htmlID, `${error}`);
-            }
-            if (stderr) {
-                customLog(this.htmlID, `${stderr}`);
-            }
-            if (stdout !== "") {
-                // Get cmd output
-                let tasklistRes = stdout + '';
-
-                // Replace multiple spaces with single spaces
-                tasklistRes = CustomUtils.removeDuplicateSpace(tasklistRes);
-
-                // Split by space and call killTask function
-                CustomUtils.killTask(this.htmlID, tasklistRes.split(' ')[1]);
-            }
-            else {
-                customLog(this.htmlID, `No server process found`);
-            }
-        })
+        this.type = serverTypes.TSSERVER;
     }
 }
 
