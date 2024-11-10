@@ -9,7 +9,19 @@ const SocketEvents = require("./SocketEvents.js");
 const path = require("node:path");
 const psTree = require("ps-tree");
 
+// Abstracts
+
+/**
+ * @desc Abstract base class for all server types.
+ */
 class ABaseServer {
+    /**
+     * @param port - Port of the server.
+     * @param htmlID - HtmlID, unique name used for identification.
+     * @param displayName - Name displayed on the frontend.
+     * @param status - Current status of the server.
+     * @param type - Type of the server from statuses.
+     */
     constructor({port, htmlID, displayName, status = statuses.OFFLINE, type}) {
         // Ensure that this class is abstract
         if (this.constructor === ABaseServer) {
@@ -25,6 +37,7 @@ class ABaseServer {
 
     // Run check periodically to see if the server is still up
     lastStatus = statuses.OFFLINE;
+
     updateStatus() {
 
         // Check what os is on the machine
@@ -70,8 +83,21 @@ class ABaseServer {
     }
 }
 
+/**
+ * @desc Abstract class for executable servers.
+ */
 class AExecutableServer extends ABaseServer {
-    constructor({port, htmlID, displayName, filePath = '', status, type, startArgs, offlineTimer: startingTime = 2}) {
+    /**
+     * @param port - Port of the server.
+     * @param htmlID - HtmlID, unique name used for identification.
+     * @param displayName - Name displayed on the frontend.
+     * @param status - Current status of the server.
+     * @param type - Type of the server from statuses.
+     * @param filePath - Path to the file launching the server.
+     * @param startArgs - Arguments passed when launching the file.
+     * server will be considered offline. Has to be enabled with startServer(`true`).
+     */
+    constructor({port, htmlID, displayName, filePath = '', status, type, startArgs}) {
         super({port, htmlID, displayName, status, type});
 
         // Ensure that this class is abstract
@@ -79,7 +105,7 @@ class AExecutableServer extends ABaseServer {
             throw new Error("Abstract classes can't be instantiated.");
         }
 
-        this.filePath =  filePath;
+        this.filePath = filePath;
         this.workingDirectory = path.dirname(filePath); // Get the directory of the file
         this.type = type;
         this.currProcess = null;
@@ -87,6 +113,9 @@ class AExecutableServer extends ABaseServer {
         this.startingTime = startingTime; // Timeout in minutes after which the server should be online
     }
 
+    /**
+     * @desc Start the server.
+     */
     startServer() {
         customLog(this.htmlID, `Starting server`);
         this.status = statuses.STARTING;
@@ -107,13 +136,16 @@ class AExecutableServer extends ABaseServer {
         }, this.startingTime * 60 * 1000)
     }
 
+    /**
+     * @desc Stop the server.
+     */
     stopServer() {
         customLog(this.htmlID, `Stopping server`);
         this.status = statuses.STOPPING;
         this.currProcess.kill();
     }
 
-    // For servers with executable linked
+    // Check for process exit events
     exitCheck(process) {
         process.on('error', (error) => {
             String(error);
@@ -132,6 +164,9 @@ class AExecutableServer extends ABaseServer {
     }
 }
 
+
+// Generic finals
+
 class GenericServer extends ABaseServer {
     constructor({port, htmlID, displayName, status = statuses.OFFLINE,}) {
         const type = serverTypes.GENERIC;
@@ -146,6 +181,8 @@ class GenericExecutableServer extends AExecutableServer {
         this.type = serverTypes.GENERIC_EXEC;
     }
 }
+
+// Specific finals
 
 class MinecraftServer extends AExecutableServer {
     static minecraftJavaVer;
