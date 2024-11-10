@@ -95,9 +95,10 @@ class AExecutableServer extends ABaseServer {
      * @param type - Type of the server from statuses.
      * @param filePath - Path to the file launching the server.
      * @param startArgs - Arguments passed when launching the file.
+     * @param startingTime - Maximum time the server can be starting in minutes. After that time has passed
      * server will be considered offline. Has to be enabled with startServer(`true`).
      */
-    constructor({port, htmlID, displayName, filePath = '', status, type, startArgs}) {
+    constructor({port, htmlID, displayName, filePath = '', status, type, startArgs, offlineTimer: startingTime = 1}) {
         super({port, htmlID, displayName, status, type});
 
         // Ensure that this class is abstract
@@ -115,8 +116,11 @@ class AExecutableServer extends ABaseServer {
 
     /**
      * @desc Start the server.
+     * @param {boolean} timeout - Whether to use timeout or process events for offline detection.
+     * - `false` = use process events. Default.
+     * - `true` = use timeout.
      */
-    startServer() {
+    startServer(timeout) {
         customLog(this.htmlID, `Starting server`);
         this.status = statuses.STARTING;
 
@@ -127,12 +131,23 @@ class AExecutableServer extends ABaseServer {
         );
 
 
-        // Check for process exit
-        this.exitCheck(this.currProcess);
+        if (timeout) {
+            this.startingTimeout();
+        }
+        else {
+            this.exitCheck(this.currProcess);
+        }
+    }
 
-        setTimeout(()=>{
-            if (this.status === statuses.STARTING)
+    /**
+     * @desc Starts a timeout to check if the server is online after `this.startingTime` minutes.
+     */
+    startingTimeout() {
+        setTimeout(() => {
+            if (this.status === statuses.STARTING) {
+                customLog(this.htmlID, `Server startup timed out, assuming offline`);
                 this.status = statuses.OFFLINE;
+            }
         }, this.startingTime * 60 * 1000)
     }
 
