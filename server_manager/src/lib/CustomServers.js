@@ -96,7 +96,7 @@ class AExecutableServer extends ABaseServer {
      * @param startingTime - Maximum time the server can be starting in minutes. After that time has passed
      * server will be considered offline. Has to be enabled with startServer(`true`).
      */
-    constructor({port, htmlID, displayName, filePath = '', status, type, startArgs, offlineTimer: startingTime = 1}) {
+    constructor({port, htmlID, displayName, filePath = '', status, type, startArgs, startingTime = 1}) {
         super({port, htmlID, displayName, status, type});
 
         // Ensure that this class is abstract
@@ -118,7 +118,7 @@ class AExecutableServer extends ABaseServer {
      * - `false` = use process events. Default.
      * - `true` = use timeout.
      */
-    startServer(timeout) {
+    startServer(timeout = true) {
         customLog(this.htmlID, `Starting server`);
         this.status = statuses.STARTING;
 
@@ -188,8 +188,8 @@ class GenericServer extends ABaseServer {
 }
 
 class GenericExecutableServer extends AExecutableServer {
-    constructor({port, htmlID, displayName, filePath = '', startArgs,}) {
-        super({port, htmlID, displayName, filePath, startArgs});
+    constructor({port, htmlID, displayName, filePath = '', startArgs, startingTime}) {
+        super({port, htmlID, displayName, filePath, startArgs, startingTime});
 
         this.type = serverTypes.GENERIC_EXEC;
     }
@@ -206,9 +206,10 @@ class MinecraftServer extends AExecutableServer {
                     currPlayers = [],
                     maxPlayers = 0,
                     startArgs = [],
-                    minecraftVersion
+                    minecraftVersion,
+                    startingTime
                 }) {
-        super({port, htmlID, displayName, path, startArgs});
+        super({port, htmlID, displayName, path, startArgs, startingTime});
 
         this.workingDir = workingDir;
         this.type = serverTypes.MINECRAFT;
@@ -379,28 +380,28 @@ class MinecraftServer extends AExecutableServer {
 }
 
 class ArmaServer extends AExecutableServer {
-    constructor({port, htmlID, displayName, filePath = '', startArgs,}) {
-        super({port, htmlID, displayName, filePath, startArgs});
+    constructor({port, htmlID, displayName, filePath = '', startArgs, startingTime}) {
+        super({port, htmlID, displayName, filePath, startArgs, startingTime});
 
         this.type = serverTypes.ARMA;
     }
 }
 
 class TmodloaderServer extends AExecutableServer {
-    constructor({port, htmlID, displayName, filePath = '', startArgs,}) {
-        super({port, htmlID, displayName, filePath, startArgs});
+    constructor({port, htmlID, displayName, filePath = '', startArgs, startingTime}) {
+        super({port, htmlID, displayName, filePath, startArgs, startingTime});
 
         this.type = serverTypes.TMODLOADER;
     }
 
-    startServer() {
+    startServer(timeout = true) {
 
     }
 }
 
 class TeamspeakServer extends AExecutableServer {
-    constructor({port, htmlID, displayName, filePath = ''}) {
-        super({port, htmlID, displayName, filePath});
+    constructor({port, htmlID, displayName, filePath = '', startingTime}) {
+        super({port, htmlID, displayName, filePath, startingTime});
 
         this.type = serverTypes.TSSERVER;
     }
