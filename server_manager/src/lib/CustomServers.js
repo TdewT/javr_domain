@@ -1,5 +1,4 @@
 const {exec, execFile, spawn} = require('child_process');
-const CustomUtils = require('../utils/custom-utils.js');
 const MinecraftStatus = require("minecraft-status");
 const {customLog} = require("../utils/custom-utils.js");
 const {ConfigManager, configTypes} = require("../lib/ConfigManager");
@@ -7,7 +6,6 @@ const {serverTypes, statuses} = require('./globals.js');
 const os = require("node:os");
 const SocketEvents = require("./SocketEvents.js");
 const path = require("node:path");
-const psTree = require("ps-tree");
 
 // Abstracts
 
@@ -396,24 +394,7 @@ class TmodloaderServer extends AExecutableServer {
     }
 
     startServer() {
-        customLog(this.htmlID, `Starting server`);
-        this.status = statuses.STARTING;
 
-        this.currProcess = spawn(
-            this.filePath, this.startArgs,
-            {cwd: this.workingDirectory, shell: true},
-        );
-
-        psTree(this.currProcess.pid, (err, children) => {
-            if (err) console.log(err);
-            console.log(children);
-            this.currProcess = children[0].pid;
-        });
-
-        this.currProcess.stdout.on('data', (data) => {
-            String(data);
-            console.log(data)
-        });
     }
 }
 
