@@ -6,6 +6,7 @@ const {serverTypes, statuses} = require('./globals.js');
 const os = require("node:os");
 const SocketEvents = require("./SocketEvents.js");
 const path = require("node:path");
+const treeKill = require("tree-kill");
 
 // Abstracts
 
@@ -14,13 +15,12 @@ const path = require("node:path");
  */
 class ABaseServer {
     /**
-     * @param port - Port of the server.
-     * @param htmlID - HtmlID, unique name used for identification.
-     * @param displayName - Name displayed on the frontend.
-     * @param status - Current status of the server.
-     * @param type - Type of the server from statuses.
+     * @param {number} port - Port of the server.
+     * @param {string} htmlID - HtmlID, unique name used for identification.
+     * @param {string} displayName - Name displayed on the frontend.
+     * @param {keyof serverTypes || string} type - Type of the server from statuses.
      */
-    constructor({port, htmlID, displayName, status = statuses.OFFLINE, type}) {
+    constructor({port, htmlID, displayName, type}) {
         // Ensure that this class is abstract
         if (this.constructor === ABaseServer) {
             throw new Error("Abstract classes can't be instantiated.");
@@ -29,7 +29,7 @@ class ABaseServer {
         this.port = port;
         this.htmlID = htmlID;
         this.displayName = displayName;
-        this.status = status;
+        this.status = statuses.OFFLINE;
         this.type = type;
     }
 
@@ -86,30 +86,51 @@ class ABaseServer {
  */
 class AExecutableServer extends ABaseServer {
     /**
-     * @param port - Port of the server.
-     * @param htmlID - HtmlID, unique name used for identification.
-     * @param displayName - Name displayed on the frontend.
-     * @param status - Current status of the server.
-     * @param type - Type of the server from statuses.
-     * @param filePath - Path to the file launching the server.
-     * @param startArgs - Arguments passed when launching the file.
-     * @param startingTime - Maximum time the server can be starting in minutes. After that time has passed
+     * @param {number} port - Port of the server.
+     * @param {string} htmlID - HtmlID, unique name used for identification.
+     * @param {string} displayName - Name displayed on the frontend.
+     * @param {keyof serverTypes || string} type - Type of the server from statuses.
+     * @param {string} [filePath] - Path to the file launching the server.
+     * Pass this for servers launch from a single file (for multi-file startup use workingDir with overridden serverStart).
+     *
+     * @param {string} [workingDir] - Path to the server folder.
+     * Pass this for servers that require launching multiple files or specific launch procedure.
+     *
+     * @param {string[]} [startArgs] - Arguments passed when launching the file.
+     * @param {number} startingTime - Maximum time the server can be starting in minutes. After that time has passed
      * server will be considered offline. Has to be enabled with startServer(`true`).
      */
-    constructor({port, htmlID, displayName, filePath = '', status, type, startArgs, startingTime = 1}) {
-        super({port, htmlID, displayName, status, type});
+    constructor({
+                    port, htmlID, displayName, type,
+                    filePath, workingDir, startArgs, startingTime = 2,
+                }) {
+        super({port, htmlID, displayName, type});
 
         // Ensure that this class is abstract
         if (this.constructor === ABaseServer) {
             throw new Error("Abstract classes can't be instantiated.");
         }
 
-        this.filePath = filePath;
-        this.workingDirectory = path.dirname(filePath); // Get the directory of the file
+        // Warning when defining both workingDir and filePath
+        if (filePath && workingDir) {
+            customLog(this.htmlID, "Both filePath and workingDir are used in parameters, " +
+                "unless workingDir is different from file's directory it is recommended to use only one.");
+        }
+
+        // For plain runnable files
+        if (filePath) {
+            this.filePath = filePath;
+            this.workingDir = path.dirname(filePath);
+        }
+        // For servers that have complicated startup
+        if (workingDir) {
+            this.filePath = workingDir;
+            this.workingDir = workingDir;
+        }
         this.type = type;
         this.currProcess = null;
         this.startArgs = startArgs;
-        this.startingTime = startingTime; // Timeout in minutes after which the server should be online
+        this.startingTime = startingTime; // Minutes before server is considered to have failed to start
     }
 
     /**
@@ -125,7 +146,7 @@ class AExecutableServer extends ABaseServer {
 
         this.currProcess = execFile(
             this.filePath, this.startArgs,
-            {cwd: this.workingDirectory},
+            {cwd: this.workingDir},
         );
 
 
@@ -158,11 +179,20 @@ class AExecutableServer extends ABaseServer {
         this.currProcess.kill();
     }
 
+    sendCommand(command) {
+        if (this.currProcess !== null) {
+            this.currProcess.stdin.write(command + "\n");
+        }
+        else {
+            customLog(this.htmlID, `"${command}" command failed, server process is null`);
+        }
+    }
+
     // Check for process exit events
     exitCheck(process) {
         process.on('error', (error) => {
-            String(error);
-            customLog(this.htmlID, error);
+            const errorStr = String(error);
+            customLog(this.htmlID, errorStr);
             this.status = statuses.OFFLINE;
         });
 
@@ -181,15 +211,22 @@ class AExecutableServer extends ABaseServer {
 // Generic finals
 
 class GenericServer extends ABaseServer {
-    constructor({port, htmlID, displayName, status = statuses.OFFLINE,}) {
-        const type = serverTypes.GENERIC;
-        super({port, htmlID, displayName, status, type});
+    constructor({port, htmlID, displayName}) {
+        super({port, htmlID, displayName, type: serverTypes.GENERIC});
+
+        this.type = serverTypes.GENERIC;
     }
 }
 
 class GenericExecutableServer extends AExecutableServer {
-    constructor({port, htmlID, displayName, filePath = '', startArgs, startingTime}) {
-        super({port, htmlID, displayName, filePath, startArgs, startingTime});
+    constructor({
+                    port, htmlID, displayName, status,
+                    filePath = '', startArgs, startingTime
+                }) {
+        super({
+            port, htmlID, displayName, status, type: serverTypes.GENERIC_EXEC,
+            filePath, startArgs, startingTime
+        });
 
         this.type = serverTypes.GENERIC_EXEC;
     }
@@ -200,18 +237,29 @@ class GenericExecutableServer extends AExecutableServer {
 class MinecraftServer extends AExecutableServer {
     static minecraftJavaVer;
 
+    /**
+     * @param {number} port - Port of the server.
+     * @param {string} htmlID - HtmlID, unique name used for identification.
+     * @param {string} displayName - Name displayed on the frontend.
+     * @param {keyof statuses || string} status - Current status of the server.
+     * @param {string} workingDir - Path to the server folder.
+     * @param {Array<string>} currPlayers - Current list of players connected to the server.
+     * @param {number} maxPlayers - Maximum number of players allowed on the server.
+     * @param {Array<string>} startArgs - Arguments passed when launching the server.
+     * @param {string} minecraftVersion - Version of Minecraft the server is running.
+     * @param {number} startingTime - Maximum time the server can be starting in minutes. After that time has passed
+     * server will be considered offline. Has to be enabled with startServer(`true`).
+     */
     constructor({
-                    port, htmlID, displayName, path = '',
-                    workingDir,
-                    currPlayers = [],
-                    maxPlayers = 0,
-                    startArgs = [],
-                    minecraftVersion,
-                    startingTime
+                    port, htmlID, displayName,
+                    workingDir, startArgs, startingTime,
+                    currPlayers = [], maxPlayers = 0, minecraftVersion,
                 }) {
-        super({port, htmlID, displayName, path, startArgs, startingTime});
+        super({
+            port, htmlID, displayName, type: serverTypes.MINECRAFT,
+            workingDir, startArgs, startingTime
+        });
 
-        this.workingDir = workingDir;
         this.type = serverTypes.MINECRAFT;
         this.currPlayers = currPlayers;
         this.maxPlayers = maxPlayers;
@@ -246,7 +294,7 @@ class MinecraftServer extends AExecutableServer {
         this.updateServerInfo()
     }
 
-    startServer() {
+    startServer(timeout) {
         customLog(this.htmlID, `Starting server`);
         this.status = statuses.STARTING;
 
@@ -325,15 +373,6 @@ class MinecraftServer extends AExecutableServer {
             })
     }
 
-    sendCommand(command) {
-        if (this.currProcess !== null) {
-            this.currProcess.stdin.write(command + "\n");
-        }
-        else {
-            customLog(this.htmlID, `"${command}" command failed, server process is null`);
-        }
-    }
-
     stopServer() {
         customLog(this.htmlID, `Stopping server`);
         if (this.status === statuses.ONLINE) {
@@ -380,28 +419,147 @@ class MinecraftServer extends AExecutableServer {
 }
 
 class ArmaServer extends AExecutableServer {
-    constructor({port, htmlID, displayName, filePath = '', startArgs, startingTime}) {
-        super({port, htmlID, displayName, filePath, startArgs, startingTime});
+    constructor({
+                    port, htmlID, displayName,
+                    filePath = '', startArgs, startingTime
+                }) {
+        super({
+            port, htmlID, displayName, type: serverTypes.ARMA,
+            filePath, startArgs, startingTime
+        });
 
         this.type = serverTypes.ARMA;
     }
 }
 
 class TmodloaderServer extends AExecutableServer {
-    constructor({port, htmlID, displayName, filePath = '', startArgs, startingTime}) {
-        super({port, htmlID, displayName, filePath, startArgs, startingTime});
+    constructor({
+                    port, htmlID, displayName,
+                    workingDir, startArgs, startingTime,
+                    configPath, useSteam, lobbyType, currPlayers = [], maxPlayers = 0
+                }) {
+        super({
+            port, htmlID, displayName, type: serverTypes.TMODLOADER,
+            workingDir, startArgs, startingTime
+        });
 
         this.type = serverTypes.TMODLOADER;
+        this.currPlayers = currPlayers;
+        this.maxPlayers = maxPlayers;
+
+        // Setup basic args
+        this.startArgs.push("-server", "-start");
+        // Add steam lobby mode if steam is enabled
+        if (useSteam) this.startArgs.push(`-${lobbyType}`);
+        // Add config
+        this.startArgs.push(`-config ${configPath}`);
     }
 
     startServer(timeout = true) {
 
+        if (os.arch() !== "x64") {
+            customLog(this.htmlID, "CPU architecture is not supported. x86 (64bit) required");
+            return
+        }
+
+        // Start the server
+        customLog(this.htmlID, "Starting server");
+        const launchOptions = {
+            cwd: this.workingDir,
+            shell: true
+        };
+
+        // Spawn the server process
+        if (os.platform() !== "linux") {
+            // Unix terminal emulator provided by tmodloader
+            const busyBox = "LaunchUtils\\busybox64.exe";
+
+            // Start server with busybox emulation
+            this.currProcess = spawn(busyBox, ["bash", "./LaunchUtils/ScriptCaller.sh", ...this.startArgs], launchOptions);
+        }
+        else {
+            // Start server
+            customLog(this.htmlID, "Launching server on Linux, currently not tested to work.");
+            this.currProcess = spawn(`"./LaunchUtils/ScriptCaller.sh"`, this.startArgs, launchOptions);
+        }
+        this.status = statuses.STARTING;
+        this.handleOutput(this.currProcess);
+    }
+
+    stopServer() {
+        customLog(this.htmlID, "Stopping server");
+        // this.sendCommand("1");
+
+        treeKill(this.currProcess.pid, 'SIGTERM', (err) => {
+            if (err && this.status !== statuses.OFFLINE) {
+                customLog(this.htmlID, `Error stopping server: ${err}`);
+            }
+            else {
+                this.currProcess.kill();
+            }
+        });
+    }
+
+
+    handleOutput(process) {
+        process.stdout.on("data", dataBuff => {
+            const data = String(dataBuff).trim();
+            // console.log(data);
+            // Add player who joined
+            if (data.includes("has joined")) this.addPlayer(this.getPlayerName(data));
+            // Remove player
+            if (data.includes("has left")) this.removePlayer(this.getPlayerName(data));
+        });
+        // process.stderr.on("data", dataBuff => {
+        //     const data = String(dataBuff).trim();
+        //     console.log(data);
+        // });
+
+        this.exitCheck(this.currProcess);
+    }
+
+    addPlayer(name) {
+        this.currPlayers.push(name);
+        SocketEvents.statusResponse();
+    }
+
+    removePlayer(name) {
+        this.currPlayers = this.currPlayers.filter(player => player !== name);
+        SocketEvents.statusResponse();
+    }
+
+
+    getPlayerName(str) {
+        const toRemove = ['has joined.', 'has left.'];
+        toRemove.forEach(strToRemove => str = str.replace(strToRemove, ""));
+
+        return str;
+    }
+
+    // Check for process exit events
+    exitCheck(process) {
+        process.on('error', (error) => {
+            const errorStr = String(error).trim();
+            customLog(this.htmlID, errorStr);
+            this.status = statuses.OFFLINE;
+        });
+
+        process.on('exit', () => {
+            customLog(this.htmlID, `Server process ended`);
+            this.status = statuses.OFFLINE;
+        })
     }
 }
 
 class TeamspeakServer extends AExecutableServer {
-    constructor({port, htmlID, displayName, filePath = '', startingTime}) {
-        super({port, htmlID, displayName, filePath, startingTime});
+    constructor({
+                    port, htmlID, displayName,
+                    filePath = '', startingTime
+                }) {
+        super({
+            port, htmlID, displayName, type: serverTypes.TSSERVER,
+            filePath, startingTime
+        });
 
         this.type = serverTypes.TSSERVER;
     }
