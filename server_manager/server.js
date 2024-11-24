@@ -267,8 +267,6 @@ function sleepSystem(socket, clientSocketID) {
         ? 'rundll32.exe powrprof.dll, SetSuspendState Sleep'
         // Linux command
         : 'pm-suspend';
-    //TODO: remove before commit
-    return
     exec(command, (error, stdout, stderr) => {
         if (error) {
             customLog(siteIDName, `Error putting system to sleep: ${error.message}`);
