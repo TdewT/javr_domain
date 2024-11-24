@@ -36,6 +36,9 @@ class ABaseServer {
     // Run check periodically to see if the server is still up
     lastStatus = statuses.OFFLINE;
 
+    /**
+     * @desc Updates the status propery of the server.
+     */
     updateStatus() {
 
         // Check what os is on the machine
@@ -69,6 +72,9 @@ class ABaseServer {
         })
     }
 
+    /**
+     * @desc Sets interval checking if server status should be updated.
+     */
     statusMonitor() {
         setInterval(() => {
             if (this.lastStatus !== this.status) {
@@ -84,18 +90,18 @@ class ABaseServer {
 /**
  * @desc Abstract class for executable servers.
  */
-class AExecutableServer extends ABaseServer {
+class AStartableServer extends ABaseServer {
     /**
      * @param {number} port - Port of the server.
      * @param {string} htmlID - HtmlID, unique name used for identification.
      * @param {string} displayName - Name displayed on the frontend.
+     *
+     *
      * @param {keyof serverTypes || string} type - Type of the server from statuses.
      * @param {string} [filePath] - Path to the file launching the server.
-     * Pass this for servers launch from a single file (for multi-file startup use workingDir with overridden serverStart).
-     *
+     * Pass this for servers launching from a single file.
      * @param {string} [workingDir] - Path to the server folder.
      * Pass this for servers that require launching multiple files or specific launch procedure.
-     *
      * @param {string[]} [startArgs] - Arguments passed when launching the file.
      * @param {number} startingTime - Maximum time the server can be starting in minutes. After that time has passed
      * server will be considered offline. Has to be enabled with startServer(`true`).
@@ -135,11 +141,11 @@ class AExecutableServer extends ABaseServer {
 
     /**
      * @desc Start the server.
-     * @param {boolean} timeout - Whether to use timeout or process events for offline detection.
+     * @param {boolean} timeout - Whether to use timeout and port activity for offline detection.
      * - `false` = use process events. Default.
-     * - `true` = use timeout.
+     * - `true` = use timeout and port activity.
      */
-    startServer(timeout = true) {
+    startServer(timeout = false) {
         customLog(this.htmlID, `Starting server`);
         this.status = statuses.STARTING;
 
@@ -171,7 +177,7 @@ class AExecutableServer extends ABaseServer {
     }
 
     /**
-     * @desc Stop the server.
+     * @desc Kill server process and change status.
      */
     stopServer() {
         customLog(this.htmlID, `Stopping server`);
@@ -179,6 +185,10 @@ class AExecutableServer extends ABaseServer {
         this.currProcess.kill();
     }
 
+    /**
+     * @desc Sends command to the server process (only works if processes stdin is available).
+     * @param {string} command - Command that is to be sent to the server.
+     */
     sendCommand(command) {
         if (this.currProcess !== null) {
             this.currProcess.stdin.write(command + "\n");
@@ -188,7 +198,10 @@ class AExecutableServer extends ABaseServer {
         }
     }
 
-    // Check for process exit events
+    /**
+     * @desc Check for process exit events
+     * @param {ChildProcess} process - Process to monitor for exit events.
+     */
     exitCheck(process) {
         process.on('error', (error) => {
             const errorStr = String(error);
@@ -210,6 +223,10 @@ class AExecutableServer extends ABaseServer {
 
 // Generic finals
 
+/**
+ * @desc Generic instance of a BaseServer.
+ * Status is updated based on port activity.
+ */
 class GenericServer extends ABaseServer {
     constructor({port, htmlID, displayName}) {
         super({port, htmlID, displayName, type: serverTypes.GENERIC});
@@ -218,7 +235,11 @@ class GenericServer extends ABaseServer {
     }
 }
 
-class GenericExecutableServer extends AExecutableServer {
+/**
+ * @desc Generic instance of a BaseServer with an option to start the server.
+ * Status can be updated by port activity / process status and port activity.
+ */
+class GenericStartableServer extends AStartableServer {
     constructor({
                     port, htmlID, displayName, status,
                     filePath = '', startArgs, startingTime
@@ -234,26 +255,31 @@ class GenericExecutableServer extends AExecutableServer {
 
 // Specific finals
 
-class MinecraftServer extends AExecutableServer {
-    static minecraftJavaVer;
-
+/**
+ * @desc Class representing Minecraft server instance.
+ * Server status is determined by Minecraft server query response.
+ * Has the ability to track live player list.
+ * Offers support for vanilla and Forge servers, other types may or may not work.
+ */
+class MinecraftServer extends AStartableServer {
     /**
      * @param {number} port - Port of the server.
      * @param {string} htmlID - HtmlID, unique name used for identification.
      * @param {string} displayName - Name displayed on the frontend.
      * @param {keyof statuses || string} status - Current status of the server.
+     *
      * @param {string} workingDir - Path to the server folder.
-     * @param {Array<string>} currPlayers - Current list of players connected to the server.
-     * @param {number} maxPlayers - Maximum number of players allowed on the server.
      * @param {Array<string>} startArgs - Arguments passed when launching the server.
-     * @param {string} minecraftVersion - Version of Minecraft the server is running.
      * @param {number} startingTime - Maximum time the server can be starting in minutes. After that time has passed
      * server will be considered offline. Has to be enabled with startServer(`true`).
+     *
+     * @param {number} maxPlayers - Maximum number of players allowed on the server.
+     * @param {string} minecraftVersion - Version of Minecraft the server is running.
      */
     constructor({
                     port, htmlID, displayName,
                     workingDir, startArgs, startingTime,
-                    currPlayers = [], maxPlayers = 0, minecraftVersion,
+                    maxPlayers = 0, minecraftVersion,
                 }) {
         super({
             port, htmlID, displayName, type: serverTypes.MINECRAFT,
@@ -261,7 +287,7 @@ class MinecraftServer extends AExecutableServer {
         });
 
         this.type = serverTypes.MINECRAFT;
-        this.currPlayers = currPlayers;
+        this.currPlayers = [];
         this.maxPlayers = maxPlayers;
         this.minecraftVersion = minecraftVersion;
         this.failedQuery = 0;
@@ -289,7 +315,6 @@ class MinecraftServer extends AExecutableServer {
         }, 1000);
     }
 
-    // Check if port is busy, update server status
     updateStatus() {
         this.updateServerInfo()
     }
@@ -409,16 +434,22 @@ class MinecraftServer extends AExecutableServer {
         }
     }
 
-    // If you need to compare versions e.g. currVersion > targetVersion
-    // Useful when determining java version that server should run on
-    // Currently not in use
+    /**
+     * @desc Converts string minecraft version to number.
+     * Can be used to determine which version is newer.
+     */
     versionToNumber() {
         let versionInt = this.minecraftVersion.replace(/\./, '');
         return Number(versionInt)
     }
 }
 
-class ArmaServer extends AExecutableServer {
+/**
+ * @desc Class representing Arma server instance.
+ * Currently, offers the same level of support as GenericStartableServer.
+ * Status determined by process events and port activity.
+ */
+class ArmaServer extends AStartableServer {
     constructor({
                     port, htmlID, displayName,
                     filePath = '', startArgs, startingTime
@@ -432,11 +463,31 @@ class ArmaServer extends AExecutableServer {
     }
 }
 
-class TmodloaderServer extends AExecutableServer {
+/**
+ * @desc Class representing TmodLoader server instance.
+ * Offers live player list tracking.
+ * Status determined by port activity.
+ */
+class TmodloaderServer extends AStartableServer {
+    /**
+     * @param {number} port - Port of the server.
+     * @param {string} htmlID - Unique identifier for the server.
+     * @param {string} displayName - Display name of the server.
+     *
+     * @param {string} workingDir - Path to the server folder.
+     * @param {Array<string>} startArgs - Arguments passed when launching the server.
+     * @param {number} startingTime - Maximum time the server can be starting in minutes. After that time has passed,
+     * server will be considered offline. Has to be enabled with startServer(`true`).
+     *
+     * @param {string} configPath - Path to a serverconfig file.
+     * @param {boolean} useSteam - Whether to use steam lobby.
+     * @param {string} lobbyType - What type of steam lobby to use.
+     * @param {number} maxPlayers - Maximum number of players allowed on the server.
+     */
     constructor({
                     port, htmlID, displayName,
                     workingDir, startArgs, startingTime,
-                    configPath, useSteam, lobbyType, currPlayers = [], maxPlayers = 0
+                    configPath, useSteam, lobbyType, maxPlayers = 0
                 }) {
         super({
             port, htmlID, displayName, type: serverTypes.TMODLOADER,
@@ -444,7 +495,7 @@ class TmodloaderServer extends AExecutableServer {
         });
 
         this.type = serverTypes.TMODLOADER;
-        this.currPlayers = currPlayers;
+        this.currPlayers = [];
         this.maxPlayers = maxPlayers;
 
         // Setup basic args
@@ -500,43 +551,6 @@ class TmodloaderServer extends AExecutableServer {
         });
     }
 
-
-    handleOutput(process) {
-        process.stdout.on("data", dataBuff => {
-            const data = String(dataBuff).trim();
-            // console.log(data);
-            // Add player who joined
-            if (data.includes("has joined")) this.addPlayer(this.getPlayerName(data));
-            // Remove player
-            if (data.includes("has left")) this.removePlayer(this.getPlayerName(data));
-        });
-        // process.stderr.on("data", dataBuff => {
-        //     const data = String(dataBuff).trim();
-        //     console.log(data);
-        // });
-
-        this.exitCheck(this.currProcess);
-    }
-
-    addPlayer(name) {
-        this.currPlayers.push(name);
-        SocketEvents.statusResponse();
-    }
-
-    removePlayer(name) {
-        this.currPlayers = this.currPlayers.filter(player => player !== name);
-        SocketEvents.statusResponse();
-    }
-
-
-    getPlayerName(str) {
-        const toRemove = ['has joined.', 'has left.'];
-        toRemove.forEach(strToRemove => str = str.replace(strToRemove, ""));
-
-        return str;
-    }
-
-    // Check for process exit events
     exitCheck(process) {
         process.on('error', (error) => {
             const errorStr = String(error).trim();
@@ -549,9 +563,69 @@ class TmodloaderServer extends AExecutableServer {
             this.status = statuses.OFFLINE;
         })
     }
+
+    /**
+     * @desc Handle output stream for given process
+     * @param {ChildProcess} process
+     */
+    handleOutput(process) {
+        process.stdout.on("data", dataBuff => {
+            const data = String(dataBuff).trim();
+            // Add player who joined
+            if (data.includes("has joined")) this.addPlayer(this.getPlayerName(data));
+            // Remove player
+            if (data.includes("has left")) this.removePlayer(this.getPlayerName(data));
+        });
+
+        // List of expected errors
+        const ignoredErrs = ["bash: 10: unknown operand", "bash: 6: unknown operand"];
+        process.stderr.on("data", dataBuff => {
+            const data = String(dataBuff).trim();
+            // Log any unexpected error
+            if (!ignoredErrs.some(err => data.includes(err))) {
+                customLog(this.htmlID, `Server encountered StdErr: ${data}`);
+            }
+        });
+
+        this.exitCheck(this.currProcess);
+    }
+
+    /**
+     * @desc Adds Player to the player list and sends status update.
+     * @param {string} name - Name of the player to add.
+     */
+    addPlayer(name) {
+        this.currPlayers.push(name);
+        SocketEvents.statusResponse();
+    }
+
+    /**
+     * @desc Removes Player from the player list and sends status update.
+     * @param {string} name - Name of the player to remove.
+     */
+    removePlayer(name) {
+        this.currPlayers = this.currPlayers.filter(player => player !== name);
+        SocketEvents.statusResponse();
+    }
+
+    /**
+     * @desc Extracts player name from the line mentioning the player.
+     * @param {string} str - Whole line sent by server process when player joins or leaves.
+     * @returns {string} - Name of the mentioned player.
+     */
+    getPlayerName(str) {
+        const toRemove = ['has joined.', 'has left.'];
+        toRemove.forEach(strToRemove => str = str.replace(strToRemove, ""));
+
+        return str;
+    }
 }
 
-class TeamspeakServer extends AExecutableServer {
+/**
+ * @desc Class representing Teamspeak server instance.
+ * Status determined by port activity.
+ */
+class TeamspeakServer extends AStartableServer {
     constructor({
                     port, htmlID, displayName,
                     filePath = '', startingTime
@@ -568,7 +642,7 @@ class TeamspeakServer extends AExecutableServer {
 
 const serverClasses = {
     "generic": GenericServer,
-    "generic_exec": GenericExecutableServer,
+    "generic_exec": GenericStartableServer,
     "minecraft": MinecraftServer,
     "arma": ArmaServer,
     "tsserver": TeamspeakServer,
@@ -576,7 +650,7 @@ const serverClasses = {
 };
 
 module.exports = {
-    AExecutableServer,
+    AStartableServer,
     statuses,
     serverClasses,
     serverTypes

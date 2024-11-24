@@ -17,7 +17,7 @@ const {
 } = require('./src/utils/custom-utils.js');
 const {DiscordBot} = require('./src/lib/DiscordBot.js');
 let {servers, Events, sockets, discordBots, setWebsocket} = require('./src/lib/globals.js');
-const {AExecutableServer} = require("./src/lib/CustomServers.js");
+const {AStartableServer} = require("./src/lib/CustomServers.js");
 
 //
 // INIT
@@ -120,7 +120,7 @@ io.on(Events.CONNECTION, socket => {
         // Get requested server's status
         const server = getElementByHtmlID(servers, serverID);
 
-        if (server && server instanceof AExecutableServer) {
+        if (server && server instanceof AStartableServer) {
             if (server.status === statuses.OFFLINE) {
                 cancelSleepTimer();
                 server.startServer();
@@ -142,7 +142,7 @@ io.on(Events.CONNECTION, socket => {
 
         const server = getElementByHtmlID(servers, serverID);
 
-        if (server && server instanceof AExecutableServer) {
+        if (server && server instanceof AStartableServer) {
             if (server.status !== statuses.OFFLINE) {
                 server.stopServer();
             }
