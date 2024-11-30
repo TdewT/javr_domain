@@ -60,9 +60,8 @@ for (const botName in discordBotsConfig) {
 }
 
 // Load servers
-for (const type of Object.values(serverTypes)) {
-    for (const serverName in serversInfo[type]) {
-        const server = (serversInfo[type][serverName]);
+for (const type in serversInfo) {
+    for (const server of serversInfo[type]) {
         servers.push(new serverClasses[type](server))
     }
 }

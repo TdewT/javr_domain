@@ -1,10 +1,8 @@
 # Server Types
 
-> Note: This is considered outdated and will be changed in the future.
-
 ## 1. `"generic"`: `{}`
 
-- `"serverName"`: `string:{}` - unused, marked for removal.
+- `[]` - list of servers.
     - `"port"`: `int` - port on which the server will be hosted.
     - `"htmlID"`: `string` - server's ID, used in logs, frontend, if object has no `displayName` and communication with
       backend.
@@ -26,7 +24,7 @@
 
 ## 2. `"minecraft"`: `{}`
 
-- `"serverName"`: `string:{}` - unused, marked for removal.
+- `[]` - list of servers.
     - `"port"`: `int` - port on which the server will be hosted.
     - `"htmlID"`: `string` - server's ID, used in logs, frontend, if object has no `displayName` and communication with
       backend.
@@ -71,7 +69,7 @@
 
 ## 3. `"arma"`: `{}`
 
-- `"serverName"`: `string:{}` - unused, marked for removal.
+- `[]` - list of servers.
     - `"port"`: `int` - port on which the server will be hosted.
     - `"htmlID"`: `string` - server's ID, used in logs, frontend, if object has no `displayName` and communication with
       backend.
@@ -99,7 +97,7 @@
 
 ## 3. `"tsserver"`: `{}`
 
-- `"serverName"`: `string:{}` - unused, marked for removal.
+- `[]` - list of servers.
     - `"port"`: `int` - port on which the server will be hosted.
     - `"htmlID"`: `string` - server's ID, used in logs, frontend if object has no `displayName` and communication with
       backend.
