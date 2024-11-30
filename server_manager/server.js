@@ -6,7 +6,6 @@ const {exec} = require('child_process');
 // Local imports
 const {
     statuses,
-    serverTypes,
     serverClasses,
 } = require("./src/lib/CustomServers");
 const {
