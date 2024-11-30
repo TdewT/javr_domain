@@ -7,6 +7,7 @@ const os = require("node:os");
 const SocketEvents = require("./SocketEvents.js");
 const path = require("node:path");
 const treeKill = require("tree-kill");
+const fs = require("node:fs");
 
 // Abstracts
 
@@ -479,7 +480,7 @@ class TmodloaderServer extends AStartableServer {
      * @param {number} startingTime - Maximum time the server can be starting in minutes. After that time has passed,
      * server will be considered offline. Has to be enabled with startServer(`true`).
      *
-     * @param {string} configPath - Path to a serverconfig file.
+     * @param {string} config - Path to a serverconfig file.
      * @param {boolean} useSteam - Whether to use steam lobby.
      * @param {string} lobbyType - What type of steam lobby to use.
      * @param {number} maxPlayers - Maximum number of players allowed on the server.
@@ -487,7 +488,7 @@ class TmodloaderServer extends AStartableServer {
     constructor({
                     port, htmlID, displayName,
                     workingDir, startArgs, startingTime,
-                    configPath, useSteam, lobbyType, maxPlayers = 0
+                    config, useSteam, lobbyType, maxPlayers = 0
                 }) {
         super({
             port, htmlID, displayName, type: serverTypes.TMODLOADER,
@@ -496,14 +497,22 @@ class TmodloaderServer extends AStartableServer {
 
         this.type = serverTypes.TMODLOADER;
         this.currPlayers = [];
-        this.maxPlayers = maxPlayers;
+
+        // if config is not given load default
+        this.config = config ? config : "serverconfig.txt";
+        this.configPath = `${workingDir}\\${config}`;
+        // if maxPlayers is not given read from config
+        this.maxPlayers = maxPlayers ? maxPlayers : this.getPlayerLimit(this.configPath);
+
+        this.useSteam = useSteam;
+        this.lobbyType = lobbyType;
 
         // Setup basic args
         this.startArgs.push("-server", "-start");
         // Add steam lobby mode if steam is enabled
         if (useSteam) this.startArgs.push(`-${lobbyType}`);
         // Add config
-        this.startArgs.push(`-config ${configPath}`);
+        this.startArgs.push(`-config ${config}`);
     }
 
     startServer(timeout = true) {
@@ -619,6 +628,46 @@ class TmodloaderServer extends AStartableServer {
 
         return str;
     }
+
+    /**
+     * @desc Get max players from server's config file.
+     * @param pathToConfig {string} - Path to server's config file.
+     * @returns {number} - Max number of players, or `-1` if setting is not found.
+     */
+    getPlayerLimit(pathToConfig) {
+        const config = this.readConfigFile(pathToConfig);
+
+
+        let maxPlayersLine;
+        if (config) {
+            const lines = config.split('\n');
+            maxPlayersLine = lines.find(line => line.trim().startsWith('maxplayers='));
+        }
+
+        if (maxPlayersLine) {
+            return parseInt(maxPlayersLine.split('=')[1].trim(), 10);
+        }
+        else {
+            customLog(this.htmlID, `Max players cannot be read from config`);
+            return -1;
+        }
+    }
+
+    /**
+     * @desc Reads the config at given path.
+     * @param filePath - path to config to read.
+     * @returns {null|string} - returns config content, or null if reading fails.
+     */
+    readConfigFile(filePath) {
+        try {
+            return fs.readFileSync(filePath, 'utf8');
+        }
+        catch (err) {
+            customLog(this.htmlID, `Error reading config file (unable to set maxPlayers automatically): ${err}`);
+            return null;
+        }
+    }
+
 }
 
 /**
