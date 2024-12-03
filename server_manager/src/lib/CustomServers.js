@@ -403,19 +403,11 @@ class MinecraftServer extends AStartableServer {
         if (this.status === statuses.ONLINE) {
             this.status = statuses.STOPPING;
             this.sendCommand('stop');
-            this.currPlayers = [];
 
             setTimeout(() => {
 
                 if (this.status === statuses.STOPPING) {
-                    customLog(this.htmlID, `Server not online, forcing automated exit`);
-                    if (this.currProcess !== null) {
-                        this.currProcess.kill();
-                        this.currPlayers = [];
-                    }
-                    else {
-                        customLog(this.htmlID, `Cannot stop, server not attached to this process`);
-                    }
+                    this.forceQuit();
                 }
 
             }, 120_000)
@@ -423,14 +415,18 @@ class MinecraftServer extends AStartableServer {
 
         }
         else {
-            customLog(this.htmlID, `Server not online, forcing manual exit`);
-            if (this.currProcess !== null) {
-                this.currProcess.kill();
-                this.currPlayers = [];
-            }
-            else {
-                customLog(this.htmlID, `Cannot stop, server not attached to this process`);
-            }
+            this.forceQuit();
+        }
+    }
+
+    forceQuit(){
+        customLog(this.htmlID, `Server not online, forcing manual exit`);
+        if (this.currProcess !== null) {
+            treeKill(this.currProcess.pid)
+            this.currPlayers = [];
+        }
+        else {
+            customLog(this.htmlID, `Cannot stop, server not attached to this process`);
         }
     }
 
