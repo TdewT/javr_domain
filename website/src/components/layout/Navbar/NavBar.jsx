@@ -3,10 +3,16 @@ import {useRouter} from "next/router";
 import styles from "./navbar.module.scss"
 
 const urls = {Home: "/", Services: "/services", ZeroTier: "/zero-tier", TerraMetrics: "/terra-metrics"};
+export const urls = {
+    Home: "/",
+    Services: "/services",
+    ZeroTier: "/zero-tier",
+    TerraMetrics: "/terra-metrics",
+};
 
 function NavList() {
     const router = useRouter();
-    const { pathname } = router;
+    const {pathname} = router;
 
     const navOps = Object.keys(urls).map((page) => {
         // If user is already on the website
