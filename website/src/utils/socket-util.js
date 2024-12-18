@@ -1,4 +1,4 @@
-import { io } from "socket.io-client";
+import {io} from "socket.io-client";
 import {Events} from "@server-lib/globals.js";
 
 export const socket = io();
@@ -24,11 +24,11 @@ export const initServicesSocket = (setData) => {
 
 export const innitZTSocket = (setData, setError) => {
 
-    socket.on(Events.ZT_RESPONSE, (data)=> {
+    socket.on(Events.ZT_RESPONSE, (data) => {
         setData(data)
     });
 
-    socket.on(Events.ZT_REQUEST_FAILED, (err) => {   
+    socket.on(Events.ZT_REQUEST_FAILED, (err) => {
         setError('Error: ' + err);
     });
 
@@ -38,7 +38,7 @@ export const innitZTSocket = (setData, setError) => {
 
 };
 
-export const requestSerivcesData = () => {
+export const requestServicesData = () => {
     socket.emit(Events.STATUS_REQUEST);
 };
 

@@ -7,7 +7,7 @@ import {
     ServerList,
 } from "@/src/components/layout/ServicesLists/ServicesLists.jsx";
 import {createContext, useEffect, useState} from "react";
-import {initServicesSocket, requestSerivcesData} from "@utils/socket-util.js";
+import {initServicesSocket, requestServicesData} from "@utils/socket-util.js";
 import styles from "@/src/styles/services.module.scss"
 import {mainDivClass} from "@styles/global.bootstrap.js";
 
@@ -18,7 +18,7 @@ function MainContent() {
 
     useEffect(() => {
         const cleanup = initServicesSocket(setData);
-        requestSerivcesData();
+        requestServicesData();
         return cleanup;
     }, []);
 

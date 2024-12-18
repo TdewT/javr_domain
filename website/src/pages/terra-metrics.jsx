@@ -6,7 +6,7 @@ import NavBar from "@components/layout/Navbar/NavBar.jsx";
 import Footer from "@components/layout/Footer/Footer.jsx";
 import DataTable from "@components/layout/DataTable/DataTable.jsx";
 import {useEffect, useState} from "react";
-import {initServicesSocket, requestSerivcesData} from "@utils/socket-util.js";
+import {initServicesSocket, requestServicesData} from "@utils/socket-util.js";
 import {arduinoBoards} from "@server-lib/globals.js";
 import LightControls from "@components/misc/LightControls/LightControls.jsx";
 
@@ -32,7 +32,7 @@ function MainContent() {
 
     useEffect(() => {
         const cleanup = initServicesSocket(setData);
-        requestSerivcesData();
+        requestServicesData();
         return cleanup;
     }, []);
 
