@@ -37,6 +37,14 @@ const Events = {
     CONNECT: 'connect',
     DISCONNECT: 'disconnect',
     ARDUINO_MODIFY_LIGHT: 'arduino_modify_light',
+    ADD_GAME_CARD: 'add_game_card',
+    REMOVE_GAME_CARD: 'remove_game_card',
+    MODIFY_GAME_CARD: 'modify_game_card',
+    USERS_GAME_CARDS_UPDATE: 'users_game_cards_update',
+    GAME_CARDS_REQUEST: 'game_cards_request',
+    USERS_GAME_CARDS_REQUEST: 'users_game_cards_request',
+    GAME_CARDS_RESPONSE: 'game_cards_request',
+    USERS_GAME_CARDS_RESPONSE: 'users_game_cards_response',
 };
 const ArduinoEvents = {
     CONNECT: "connect",
@@ -60,6 +68,10 @@ let serverList = [];
 
 // Server managers
 let serverManagers = [];
+
+// GameCards
+let allUsersGameCards = {};
+let gameCards = [];
 
 // Socket IO for website to user comms
 let websiteIO;
@@ -90,6 +102,8 @@ module.exports = {
     serverManagers,
     ServerTypes,
     arduinoBoards,
+    gameCards,
+    allUsersGameCards,
     ArduinoEvents,
     defaultRules
 };
