@@ -1,4 +1,11 @@
-const {Events, serverList, arduinoBoards, getWebsiteIO} = require("@server-lib/globals.js");
+const {
+    Events,
+    serverList,
+    arduinoBoards,
+    getWebsiteIO,
+    gameCards,
+    allUsersGameCards
+} = require("@server-lib/globals.js");
 const ServerManagerList = require("@server-lib/ServerManagerList.cjs");
 const DiscordBotList = require("@server-lib/DiscordBotList.cjs");
 
@@ -10,7 +17,7 @@ class SocketEvents {
      * @param websocket - Socket.io websocket, over which the data will be sent.
      */
     static statusResponse(websocket = getWebsiteIO()) {
-        if (websocket){
+        if (websocket) {
             let data = {
                 servers: serverList,
                 discordBots: DiscordBotList.getStatuses(),
@@ -18,6 +25,26 @@ class SocketEvents {
                 arduinoBoards: arduinoBoards,
             };
             websocket.emit(Events.STATUS_RESPONSE, data);
+        }
+    }
+
+    /**
+     * @desc Sends response with a list of all available game cards.
+     * @param webSocket - Socket.io websocket, over which the data will be sent.
+     */
+    static gameCardsResponse(webSocket = getWebsiteIO()) {
+        if (webSocket) {
+            webSocket.emit(Events.GAME_CARDS_RESPONSE, gameCards)
+        }
+    }
+
+    /**
+     * @desc Sends response with an object containing game card choices of all participating users.
+     * @param webSocket - Socket.io websocket, over which the data will be sent.
+     */
+    static usersGameCardsResponse(webSocket = getWebsiteIO()) {
+        if (webSocket) {
+            webSocket.emit(Events.USERS_GAME_CARDS_RESPONSE, allUsersGameCards)
         }
     }
 
@@ -56,7 +83,7 @@ class SocketEvents {
      * @desc Sends code and error message to client.
      * @param {*} [websocket=getWebsiteIO()] - Socket. io websocket, over which the data will be sent. Default is default websocket.
      * @param error - error message from ZeroTier's API.
-    */
+     */
     static ztErrorResponse(websocket = getWebsiteIO(), error) {
         websocket.emit(Events.ZT_REQUEST_FAILED, error);
     }
