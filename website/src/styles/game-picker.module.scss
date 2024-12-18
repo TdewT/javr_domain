@@ -1,0 +1,13 @@
+@import "variables.module";
+
+// background (copied form index)
+.bgImgMain {
+  background: $color-main url($backgrounds-path + "bg-main.jpg") no-repeat center fixed;
+  background-size: cover;
+}
+
+.min-h-40 {
+  height: 40vh; /* Adjust this value as needed */
+  overflow: auto;
+}
+
