@@ -42,6 +42,14 @@ export const requestServicesData = () => {
     socket.emit(Events.STATUS_REQUEST);
 };
 
+export const requestGameCardsData = () => {
+    socket.emit(Events.GAME_CARDS_REQUEST);
+};
+
+export const requestUsersGameCardsData = () => {
+    socket.emit(Events.USERS_GAME_CARDS_REQUEST);
+};
+
 export const requestZTData = () => {
     socket.emit(Events.ZT_REQUEST);
 };
