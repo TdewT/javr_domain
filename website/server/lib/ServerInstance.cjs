@@ -4,11 +4,11 @@ const axios = require("axios");
 const {createServer} = require("http");
 const next = require("next");
 // Local imports
-const {
+let {
     Statuses,
     Events,
     setWebsiteIO,
-    serverManagers, defaultRules
+    serverManagers, defaultRules, gameCards, allUsersGameCards
 } = require("@server-lib/globals.js");
 const ApiHandler = require("@server-lib/ApiHandler.cjs");
 const {DiscordBot} = require("./DiscordBot.cjs");
@@ -20,6 +20,7 @@ const SocketEvents = require("@server-lib/SocketEvents.cjs");
 const {getBoardByPID} = require("@server-utils/arduino-utils.cjs");
 const ServerList = require("@server-lib/ServerList.cjs");
 const ServerManager = require("@server-lib/ServerManager.cjs");
+const GameCardList = require("@server-lib/GameCardList.js");
 
 /**
  * @class ServerInstance
@@ -385,7 +386,7 @@ class ServerInstance {
             //
 
             clientSocket.on(Events.ARDUINO_MODIFY_LIGHT, (arduinoPID, lightParams) => {
-                if (this.rules.allowTerrariumLedOverride){
+                if (this.rules.allowTerrariumLedOverride) {
                     const board = getBoardByPID(arduinoPID);
                     if (board) {
                         lightParams["override"] = Number(lightParams["override"]);
@@ -398,7 +399,65 @@ class ServerInstance {
                 else {
                     SocketEvents.requestNotAllowed(clientSocket);
                 }
-            })
+            });
+
+            //
+            // GameCards
+            //
+
+            clientSocket.on(Events.GAME_CARDS_REQUEST, () => {
+                SocketEvents.gameCardsResponse(clientSocket);
+            });
+
+            clientSocket.on(Events.USERS_GAME_CARDS_REQUEST, () => {
+                SocketEvents.usersGameCardsResponse(clientSocket);
+            });
+
+            clientSocket.on(Events.ADD_GAME_CARD, (newGameCard) => {
+                if (newGameCard) {
+                    GameCardList.addGameCard(newGameCard);
+                    customLog(this.name, `${ip} has added a new game card`)
+                }
+                else {
+                    SocketEvents.requestFailed(clientSocket, "Serwer nie otrzymał karty do dodania (undefined).");
+                    customLog(this.name, `${ip}'s request to add new game card failed: No card provided`)
+                }
+            });
+
+            clientSocket.on(Events.REMOVE_GAME_CARD, (gameCard) => {
+                if (gameCard) {
+                    GameCardList.removeGameCard(gameCard);
+                    customLog(this.name, `${ip} has removed a game card ${gameCard.name} with id ${gameCard.id}`);
+                }
+                else {
+                    SocketEvents.requestFailed(clientSocket, "Serwer nie otrzymał karty do usunięcia (undefined).");
+                    customLog(this.name, `${ip}'s request to remove a game card failed: No card provided`);
+                }
+            });
+
+            clientSocket.on(Events.USERS_GAME_CARDS_UPDATE, (user, gameCardList) => {
+                customLog(this.name, `${ip} sent game cards update`);
+                if (user) {
+                    SocketEvents.requestFailed(clientSocket, "Serwer nie otrzymał identyfikatora użytkownika.");
+                    customLog(this.name, `Game card list update failed: No user provided`);
+                    return
+                }
+
+                if (gameCardList) {
+                    SocketEvents.requestFailed(clientSocket, "Serwer nie otrzymał listy kart (undefined).");
+                    customLog(this.name, `Game card list update failed: No game cards provided`);
+                    return
+                }
+
+                try {
+                    GameCardList.updateUsersList(user, gameCardList);
+                }
+                catch (err) {
+                    SocketEvents.requestFailed(clientSocket, "Someting went wong TwT.");
+                    customLog(this.name, `Cannot update game card list for ${user}: ${err.message}`);
+                }
+
+            });
         });
     }
 
