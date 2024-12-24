@@ -8,7 +8,8 @@ let {
     Statuses,
     Events,
     setWebsiteIO,
-    serverManagers, defaultRules, gameCards, allUsersGameCards
+    serverManagers,
+    defaultRules
 } = require("@server-lib/globals.js");
 const ApiHandler = require("@server-lib/ApiHandler.cjs");
 const {DiscordBot} = require("./DiscordBot.cjs");
@@ -353,7 +354,6 @@ class ServerInstance {
                     });
             });
 
-            
 
             //Sending user edit form to ZeroTier api
             clientSocket.on(Events.ZT_SEND_FORM, (userJSON, idUserJSON, apiUrl) => {
@@ -413,28 +413,6 @@ class ServerInstance {
                 SocketEvents.usersGameCardsResponse(clientSocket);
             });
 
-            clientSocket.on(Events.ADD_GAME_CARD, (newGameCard) => {
-                if (newGameCard) {
-                    GameCardList.addGameCard(newGameCard);
-                    customLog(this.name, `${ip} has added a new game card`)
-                }
-                else {
-                    SocketEvents.requestFailed(clientSocket, "Serwer nie otrzymał karty do dodania (undefined).");
-                    customLog(this.name, `${ip}'s request to add new game card failed: No card provided`)
-                }
-            });
-
-            clientSocket.on(Events.REMOVE_GAME_CARD, (gameCard) => {
-                if (gameCard) {
-                    GameCardList.removeGameCard(gameCard);
-                    customLog(this.name, `${ip} has removed a game card ${gameCard.name} with id ${gameCard.id}`);
-                }
-                else {
-                    SocketEvents.requestFailed(clientSocket, "Serwer nie otrzymał karty do usunięcia (undefined).");
-                    customLog(this.name, `${ip}'s request to remove a game card failed: No card provided`);
-                }
-            });
-
             clientSocket.on(Events.USERS_GAME_CARDS_UPDATE, (user, gameCardList) => {
                 customLog(this.name, `${ip} sent game cards update`);
                 if (user) {
@@ -458,6 +436,21 @@ class ServerInstance {
                 }
 
             });
+
+            clientSocket.on(Events.GAME_CARDS_UPDATE, ({markedForDelete, changedCards, newCards}) => {
+                // Remove from the list
+                for (const card of markedForDelete) {
+                    GameCardList.removeGameCard(card)
+                }
+                // Update changed
+                for (const card of changedCards) {
+                    GameCardList.updateGameCard(card)
+                }
+                // Add new
+                for (const card of newCards) {
+                    GameCardList.addGameCard(card)
+                }
+            })
         });
     }
 
