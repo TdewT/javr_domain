@@ -182,8 +182,8 @@ class ServerInstance {
 
             // Requested server manager stop
             clientSocket.on(Events.STOP_SERVER_MANAGER_REQUEST, managerID => {
-                const serverManager = ServerManagerList.getManagerByName(managerID);
-                customLog(this.name, `${ip} requested ${managerID} stop`);
+                // const serverManager = ServerManagerList.getManagerByName(managerID);
+                // customLog(this.name, `${ip} requested ${managerID} stop`);
 
                 SocketEvents.requestFailed(clientSocket, "Opcja tymczasowo niedostępna");
 
