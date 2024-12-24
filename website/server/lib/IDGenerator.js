@@ -5,3 +5,5 @@ class IDGenerator {
         return ++IDGenerator.currID;
     }
 }
+
+module.exports = IDGenerator;
