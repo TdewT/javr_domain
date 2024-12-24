@@ -1,0 +1,7 @@
+
+.cardContainer {
+  &:hover {
+    cursor: grab;
+  }
+  cursor: grabbing;
+}
