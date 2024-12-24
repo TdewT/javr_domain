@@ -54,7 +54,7 @@ next-env.d.ts
 
 ### Node ###
 # Logs
-logs
+server_manager/logs
 *.log
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
@@ -279,8 +279,9 @@ fabric.properties
 ### WebStorm+all Patch ###
 # Ignore everything but code style settings and run configurations
 # that are supposed to be shared within teams.
-
 .idea/*
+
+../.idea/shelf
 
 !.idea/codeStyles
 !.idea/runConfigurations
@@ -290,18 +291,7 @@ fabric.properties
 
 # End of https://www.toptal.com/developers/gitignore/api/webstorm,node,nextjs,react,windows,linux
 
-/package-lock.json
-/ts3server.sqlitedb
-/ts3server.sqlitedb-shm
-/ts3server.sqlitedb-wal
-/.ts3server_license_accepted
+*/configs/*
+*/logs/*
 
-# Server manager
-/server_manager/configs/*
-/server_manager/logs/*
-/server_manager/package-lock.json
 
-# Website
-/website/configs/*
-/website/logs/*
-/website/package-lock.json
