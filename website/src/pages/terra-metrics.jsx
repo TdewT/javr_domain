@@ -4,11 +4,11 @@ import styles from "@styles/terra-metrics.module.scss";
 import {mainDivClass} from "@styles/global.bootstrap.js";
 import NavBar from "@components/layout/Navbar/NavBar.jsx";
 import Footer from "@components/layout/Footer/Footer.jsx";
-import DataTable from "@components/layout/DataTable/DataTable.jsx";
+import DataTable from "@components/ui/DataTable/DataTable.jsx";
 import {useEffect, useState} from "react";
 import {initServicesSocket, requestServicesData} from "@utils/socket-util.js";
 import {arduinoBoards} from "@server-lib/globals.js";
-import LightControls from "@components/misc/LightControls/LightControls.jsx";
+import LightControls from "@components/ui/TerraMetrics/LightControls/LightControls.jsx";
 
 
 function MainContent() {

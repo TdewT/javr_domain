@@ -1,15 +1,12 @@
 import UniversalHead from "@components/misc/UniversalHead.jsx";
 import NavBar from "@/src/components/layout/Navbar/NavBar.jsx";
 import Footer from "@/src/components/layout/Footer/Footer.jsx";
-import {
-    DiscordBotList,
-    ManagerList,
-    ServerList,
-} from "@/src/components/layout/ServicesLists/ServicesLists.jsx";
+
 import {createContext, useEffect, useState} from "react";
 import {initServicesSocket, requestServicesData} from "@utils/socket-util.js";
 import styles from "@/src/styles/services.module.scss"
 import {mainDivClass} from "@styles/global.bootstrap.js";
+import {DiscordBotList, ManagerList, ServerList} from "@components/ui/Services/ServicesLists/ServicesLists.jsx";
 
 export const ServicesContext = createContext({servers: [], discordBots: [], serverManagers: []});
 
@@ -30,9 +27,9 @@ function MainContent() {
 
 
                 <ServicesContext.Provider value={data}>
-                        <ManagerList/>
-                        <DiscordBotList/>
-                        <ServerList/>
+                    <ManagerList/>
+                    <DiscordBotList/>
+                    <ServerList/>
                 </ServicesContext.Provider>
             </div>
         </>

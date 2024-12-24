@@ -1,11 +1,11 @@
 import {ServerTypes, ServiceTypes, Statuses, StatusIndicators} from "@server-lib/globals.js";
 import React, {useContext} from "react";
 import {ServicesContext} from '@pages/services.jsx';
-import ServiceButton from "@components/ui/ServicesButtons/ServiceButton.jsx";
 
 import styles from "./ServicesLists.module.scss";
 import Accordion from "@components/ui/Accordion/Accordion.jsx";
 import StripedList from "@components/ui/StripedList/StripedList.jsx";
+import ServiceButton from "@components/ui/Services/ServicesButtons/ServiceButton.jsx";
 
 const tableClasses = `${styles.servicesTable} table table-responsive`;
 const tbodyClasses = "align-middle text-center";
