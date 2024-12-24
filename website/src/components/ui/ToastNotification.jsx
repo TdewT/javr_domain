@@ -1,4 +1,3 @@
-import React, { useState } from 'react';
 import { Toast, ToastContainer } from 'react-bootstrap';
 
 const ToastNotification = ({ show, onClose, headerText, bodyText, delay = 3000 }) => {
