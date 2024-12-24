@@ -3,50 +3,16 @@ const {
     serverList,
     arduinoBoards,
     getWebsiteIO,
-    gameCards,
-    allUsersGameCards
+    allUsersGameCards, getGameCards
 } = require("@server-lib/globals.js");
 const ServerManagerList = require("@server-lib/ServerManagerList.cjs");
 const DiscordBotList = require("@server-lib/DiscordBotList.cjs");
 
 class SocketEvents {
 
-
-    /**
-     * @desc Sends status response with all servers over given websocket.
-     * @param websocket - Socket.io websocket, over which the data will be sent.
-     */
-    static statusResponse(websocket = getWebsiteIO()) {
-        if (websocket) {
-            let data = {
-                servers: serverList,
-                discordBots: DiscordBotList.getStatuses(),
-                serverManagers: ServerManagerList.getStatuses(),
-                arduinoBoards: arduinoBoards,
-            };
-            websocket.emit(Events.STATUS_RESPONSE, data);
-        }
-    }
-
-    /**
-     * @desc Sends response with a list of all available game cards.
-     * @param webSocket - Socket.io websocket, over which the data will be sent.
-     */
-    static gameCardsResponse(webSocket = getWebsiteIO()) {
-        if (webSocket) {
-            webSocket.emit(Events.GAME_CARDS_RESPONSE, gameCards)
-        }
-    }
-
-    /**
-     * @desc Sends response with an object containing game card choices of all participating users.
-     * @param webSocket - Socket.io websocket, over which the data will be sent.
-     */
-    static usersGameCardsResponse(webSocket = getWebsiteIO()) {
-        if (webSocket) {
-            webSocket.emit(Events.USERS_GAME_CARDS_RESPONSE, allUsersGameCards)
-        }
-    }
+    //
+    // Global
+    //
 
     /**
      * @desc Sends response with information to client.
@@ -70,22 +36,25 @@ class SocketEvents {
         websocket.emit(Events.REQUEST_FAILED, "Ta funkcja została wyłączona w configu");
     }
 
-    /**
-     * @desc Sends ZeroTier data to client.
-     * @param websocket - Socket. io websocket, over which the data will be sent.
-     * @param {JSON} data - data from ZeroTier's API.
-     */
-    static ztResponse(websocket = getWebsiteIO(), data) {
-        websocket.emit(Events.ZT_RESPONSE, data);
-    }
+
+    //
+    // Services
+    //
 
     /**
-     * @desc Sends code and error message to client.
-     * @param {*} [websocket=getWebsiteIO()] - Socket. io websocket, over which the data will be sent. Default is default websocket.
-     * @param error - error message from ZeroTier's API.
+     * @desc Sends status response with all servers over given websocket.
+     * @param websocket - Socket.io websocket, over which the data will be sent.
      */
-    static ztErrorResponse(websocket = getWebsiteIO(), error) {
-        websocket.emit(Events.ZT_REQUEST_FAILED, error);
+    static statusResponse(websocket = getWebsiteIO()) {
+        if (websocket) {
+            let data = {
+                servers: serverList,
+                discordBots: DiscordBotList.getStatuses(),
+                serverManagers: ServerManagerList.getStatuses(),
+                arduinoBoards: arduinoBoards,
+            };
+            websocket.emit(Events.STATUS_RESPONSE, data);
+        }
     }
 
     /**
@@ -135,6 +104,67 @@ class SocketEvents {
     static stopDBotRequest(websocket, botID, clientSocketID) {
         websocket.emit(Events.STOP_DBOT_REQUEST, botID, clientSocketID);
     }
+
+
+    //
+    // ZeroTier
+    //
+
+    /**
+     * @desc Sends ZeroTier data to client.
+     * @param websocket - Socket. io websocket, over which the data will be sent.
+     * @param {JSON} data - data from ZeroTier's API.
+     */
+    static ztResponse(websocket = getWebsiteIO(), data) {
+        websocket.emit(Events.ZT_RESPONSE, data);
+    }
+
+    /**
+     * @desc Sends code and error message to client.
+     * @param {*} [websocket=getWebsiteIO()] - Socket. io websocket, over which the data will be sent. Default is default websocket.
+     * @param error - error message from ZeroTier's API.
+     */
+    static ztErrorResponse(websocket = getWebsiteIO(), error) {
+        websocket.emit(Events.ZT_REQUEST_FAILED, error);
+    }
+
+
+    //
+    // Game-picker
+    //
+
+    /**
+     * @desc Sends response with a list of all available game cards.
+     * @param webSocket - Socket.io websocket, over which the data will be sent.
+     */
+    static gameCardsResponse(webSocket = getWebsiteIO()) {
+        if (webSocket) {
+            const gameCards = getGameCards();
+            webSocket.emit(Events.GAME_CARDS_RESPONSE, gameCards)
+        }
+    }
+
+    /**
+     * @desc Sends response with an object containing game card choices of all participating users.
+     * @param webSocket - Socket.io websocket, over which the data will be sent.
+     */
+    static usersGameCardsResponse(webSocket = getWebsiteIO()) {
+        if (webSocket) {
+            webSocket.emit(Events.USERS_GAME_CARDS_RESPONSE, allUsersGameCards)
+        }
+    }
+
+    /**
+     * @desc Sends response with specific user's choices.
+     * @param webSocket - Socket.io websocket, over which the data will be sent.
+     * @param {{string: [GameCard]}} gameCards - list of user's game cards.
+     */
+    static userGamesCardsResponse(webSocket = getWebsiteIO(), gameCards) {
+        if (webSocket) {
+            webSocket.emit(Events.USER_GAME_CARDS_RESPONSE)
+        }
+    }
+
 }
 
 module.exports = SocketEvents;
