@@ -1,6 +1,8 @@
-export default class GameCard {
+const IDGenerator = require("@server-lib/IDGenerator.js");
 
-    constructor(name, optimalPlayers, maxPlayers, minPlayers, icon) {
+class GameCard {
+
+    constructor({name, optimalPlayers, maxPlayers, minPlayers, icon}) {
         this.id = IDGenerator.getID();
         this.name = name;
         this.optimalPlayers = optimalPlayers;
@@ -9,3 +11,5 @@ export default class GameCard {
         this.icon = icon;
     }
 }
+
+module.exports = GameCard;
