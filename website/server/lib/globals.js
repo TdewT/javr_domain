@@ -19,32 +19,37 @@ const ServiceTypes = {
     SERVER_MANAGER: "serverManager",
 };
 const Events = {
+    // Global
     INFO: "info",
+    REQUEST_FAILED: 'request_failed',
+    CONNECTION: 'connection',
+    CONNECT: 'connect',
+    DISCONNECT: 'disconnect',
+    // Services
     STATUS_RESPONSE: 'status_response',
     STATUS_REQUEST: 'status_request',
-    ZT_RESPONSE: "zt_response",
-    ZT_REQUEST: "zt_request",
-    ZT_SEND_FORM: 'zt_send_form',
-    ZT_REQUEST_FAILED: 'zt_request_failed',
-    REQUEST_FAILED: 'request_failed',
     START_SERVER_REQUEST: 'start_server_request',
     STOP_SERVER_REQUEST: 'stop_server_request',
     START_SERVER_MANAGER_REQUEST: 'start_server_manager_request',
     STOP_SERVER_MANAGER_REQUEST: 'stop_server_manager_request',
     START_DBOT_REQUEST: 'start_dbot_request',
     STOP_DBOT_REQUEST: 'stop_dbot_request',
-    CONNECTION: 'connection',
-    CONNECT: 'connect',
-    DISCONNECT: 'disconnect',
+    // Terra Metrics
     ARDUINO_MODIFY_LIGHT: 'arduino_modify_light',
-    ADD_GAME_CARD: 'add_game_card',
-    REMOVE_GAME_CARD: 'remove_game_card',
-    MODIFY_GAME_CARD: 'modify_game_card',
+    // ZeroTier
+    ZT_RESPONSE: "zt_response",
+    ZT_REQUEST: "zt_request",
+    ZT_SEND_FORM: 'zt_send_form',
+    ZT_REQUEST_FAILED: 'zt_request_failed',
+    // Game Picker
+    GAME_CARDS_UPDATE: 'game_cards_update',
     USERS_GAME_CARDS_UPDATE: 'users_game_cards_update',
     GAME_CARDS_REQUEST: 'game_cards_request',
     USERS_GAME_CARDS_REQUEST: 'users_game_cards_request',
-    GAME_CARDS_RESPONSE: 'game_cards_request',
+    GAME_CARDS_RESPONSE: 'game_cards_response',
     USERS_GAME_CARDS_RESPONSE: 'users_game_cards_response',
+    USER_GAME_CARDS_RESPONSE: 'user_game_cards_response',
+    GAME_CARDS_RESULTS: 'game_cards_results',
 };
 const ArduinoEvents = {
     CONNECT: "connect",
