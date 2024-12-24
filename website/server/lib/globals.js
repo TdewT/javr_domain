@@ -76,13 +76,21 @@ let serverManagers = [];
 
 // GameCards
 let allUsersGameCards = {};
-let gameCards = [];
+let gameCards = {gameCards:[]};
+function getGameCards() {
+    return gameCards['gameCards'];
+}
+function setGameCards(cards) {
+    gameCards['gameCards'] = cards;
+}
 
 // Socket IO for website to user comms
 let websiteIO;
+
 function getWebsiteIO() {
     return websiteIO;
 }
+
 function setWebsiteIO(socket) {
     websiteIO = socket;
 }
@@ -94,6 +102,8 @@ const defaultRules = {
 };
 
 module.exports = {
+    getGameCards,
+    setGameCards,
     setWebsiteIO,
     getWebsiteIO,
     Statuses,
@@ -107,7 +117,6 @@ module.exports = {
     serverManagers,
     ServerTypes,
     arduinoBoards,
-    gameCards,
     allUsersGameCards,
     ArduinoEvents,
     defaultRules
