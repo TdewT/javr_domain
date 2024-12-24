@@ -1,6 +1,6 @@
 import React from "react";
 
-const Duplicate = ({count, children}) => {
+const Duplicate = ({count, children, text}) => {
     return (
         <>
             {Array.from({length: count}).map((_, index) => (
