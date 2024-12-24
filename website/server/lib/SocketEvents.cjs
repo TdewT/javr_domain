@@ -161,7 +161,7 @@ class SocketEvents {
      */
     static userGamesCardsResponse(webSocket = getWebsiteIO(), gameCards) {
         if (webSocket) {
-            webSocket.emit(Events.USER_GAME_CARDS_RESPONSE)
+            webSocket.emit(Events.USER_GAME_CARDS_RESPONSE, gameCards)
         }
     }
 
