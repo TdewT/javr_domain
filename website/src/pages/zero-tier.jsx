@@ -2,13 +2,16 @@ import NavBar from '@/src/components/layout/Navbar/NavBar.jsx';
 import UniversalHead from '@components/misc/UniversalHead.jsx'
 import Footer from "@/src/components/layout/Footer/Footer.jsx";
 import styles from '@/src/styles/index.module.scss';
-import { mainDivClass } from "@styles/global.bootstrap.js";
+import {mainDivClass} from "@styles/global.bootstrap.js";
 import StripedList from '../components/ui/StripedList/StripedList';
-import { useEffect, useState } from 'react';
-import { initServicesSocket, innitZTSocket, requestZTData } from '../utils/socket-util';
+import {useEffect, useState} from 'react';
+import {initServicesSocket, innitZTSocket, requestZTData} from '../utils/socket-util';
+import ZeroTier from "@pages/zero-tier";
+import {ZeroTierForm} from "@components/ui/ZeroTierForm/ZeroTierForm";
 
 function MainContent() {
-    const [users, setUsers] = useState();
+    const [users, setUsers] = useState([]);
+
 
     const [usersError, setUsersError] = useState();
 
@@ -18,29 +21,32 @@ function MainContent() {
         return cleanup;
     }, []);
 
-    console.log(usersError);
-    
-    
-    return (
-        <div className="container-sm color-status-bg mt-5 p-5 rounded-4">
 
-            <StripedList>
-                <>
-                    <span className="ZT-name w-25">Nazwa</span>
-                    <span className="ZT-IP me-auto">Komentarz</span>
-                    <span className="ZT-IP ms-auto me-2">Adimg IP</span>
-                </>
-                {users ? users.map((user) => (
+    return (
+        <>
+            <div className="container-sm color-status-bg mt-5 p-5 rounded-4">
+
+                <StripedList>
                     <>
-                        <span className="w-25">{user.name}</span>
-                        <span className="me-auto">{user.description}</span>
-                        <span className="ms-auto">{user.config.ipAssignments[0]}</span>
+                        <span className="ZT-name w-25">Nazwa</span>
+                        <span className="ZT-IP me-auto">Komentarz</span>
+                        <span className="ZT-IP ms-auto me-2">Adimg IP</span>
                     </>
-                )) : <div>{
-                    usersError ? usersError : 'Loading...'
-                }</div>}
-            </StripedList>
-        </div>
+                    {users ? users.map((user) => (
+                        <>
+                            <span className="w-25">{user.name}</span>
+                            <span className="me-auto">{user.description}</span>
+                            <span className="ms-auto">{user.config.ipAssignments[0]}</span>
+                        </>
+                    )) : <div>{
+                        usersError ? usersError : 'Loading...'
+                    }</div>}
+                </StripedList>
+
+                <ZeroTierForm data={users}></ZeroTierForm>
+
+            </div>
+        </>
     );
 }
 
@@ -48,16 +54,16 @@ function Home() {
     return (
         <>
             {/* Head */}
-            <UniversalHead />
+            <UniversalHead/>
 
             {/* Body */}
             <div className={`${styles.bgImgMain} ${mainDivClass}`}>
-                <NavBar />
-                <MainContent />
+                <NavBar/>
+                <MainContent/>
             </div>
 
             {/* Footer */}
-            <Footer />
+            <Footer/>
         </>
     );
 }
