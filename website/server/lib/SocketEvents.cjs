@@ -45,7 +45,7 @@ class SocketEvents {
 
     /**
      * @desc Sends ZeroTier data to client.
-     * @param websocket - Socket. io websocket, over which the data will be sent.
+     * @param {*} [websocket=getWebsiteIO()] - Socket. io websocket, over which the data will be sent. Default is default websocket.
      * @param {JSON} data - data from ZeroTier's API.
      */
     static ztResponse(websocket = getWebsiteIO(), data) {
