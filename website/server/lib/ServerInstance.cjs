@@ -324,15 +324,14 @@ class ServerInstance {
             // ZeroTier
             //
 
-            const apiTokens = ConfigManager.getConfig(ConfigTypes.apiTokens);
-            const zeroTierToken = apiTokens["tokens"]["zerotier"];
+            const zeroTierConfig = ConfigManager.getConfig(ConfigTypes.zeroTierConfig);
+            const zeroTierToken = zeroTierConfig.token;
 
             //Handling ZeroTier Request
             clientSocket.on(Events.ZT_REQUEST, () => {
 
                 customLog(this.name, `${ip} requested ZeroTier information`);
 
-                let zeroTierConfig = ConfigManager.getConfig(ConfigTypes.zeroTierConfig);
 
                 if (zeroTierConfig.network) {
                     let config = {
@@ -353,6 +352,7 @@ class ServerInstance {
                         });
                 } else {
                     customLog(this.name, `No ZeroTier configuration found. Skipping...`);
+                    SocketEvents.ztErrorResponse(websiteIO, `Brak konfiguracji dla ZeroTier.`);
                 }
             });
 
