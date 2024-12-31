@@ -5,8 +5,7 @@ import styles from '@/src/styles/index.module.scss';
 import {mainDivClass} from "@styles/global.bootstrap.js";
 import StripedList from '../components/ui/StripedList/StripedList';
 import {useEffect, useState} from 'react';
-import {initServicesSocket, innitZTSocket, requestZTData} from '../utils/socket-util';
-import ZeroTier from "@pages/zero-tier";
+import {innitZTSocket, requestZTData} from '../utils/socket-util';
 import {ZeroTierForm} from "@components/ui/ZeroTierForm/ZeroTierForm";
 
 function MainContent() {
