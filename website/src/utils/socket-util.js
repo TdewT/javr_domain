@@ -46,4 +46,8 @@ export const requestZTData = () => {
     socket.emit(Events.ZT_REQUEST);
 };
 
+export const ztSendForm = (data, userId) => {
+    socket.emit(Events.ZT_SEND_FORM, data, userId);
+};
+
 export default socket;
