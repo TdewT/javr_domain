@@ -38,6 +38,7 @@ const fileTemplates = {
     "arduinos.json": {},
     "zeroTierConfig.json": {
         "network": null,
+        "token": null,
     },
 };
 
