@@ -332,7 +332,7 @@ class ServerInstance {
 
                 customLog(this.name, `${ip} requested ZeroTier information`);
 
-                let zeroTierConfig = ConfigManager.getConfig(ConfigTypes.zeroTierConfig)
+                let zeroTierConfig = ConfigManager.getConfig(ConfigTypes.zeroTierConfig);
 
                 if (zeroTierConfig.network) {
                     let config = {
@@ -374,7 +374,7 @@ class ServerInstance {
                 };
 
                 //Sending data to zero tier
-                let zeroTierConfig = ConfigManager.getConfig(ConfigTypes.zeroTierConfig)
+                let zeroTierConfig = ConfigManager.getConfig(ConfigTypes.zeroTierConfig);
 
                 if (zeroTierConfig.network) {
                     let postConfig = {
