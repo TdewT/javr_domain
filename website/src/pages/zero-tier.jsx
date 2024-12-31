@@ -13,7 +13,7 @@ function MainContent() {
     const [users, setUsers] = useState([]);
 
 
-    const [usersError, setUsersError] = useState();
+    const [usersError, setUsersError] = useState("");
 
     useEffect(() => {
         const cleanup = innitZTSocket(setUsers, setUsersError);
@@ -22,6 +22,17 @@ function MainContent() {
     }, []);
 
 
+    if (usersError && usersError !== "") {
+        return (
+            <div className="container-sm color-status-bg mt-5 p-5 rounded-4">
+                <StripedList>
+                    <p>
+                        {usersError}
+                    </p>
+                </StripedList>
+            </div>
+        )
+    }
     return (
         <>
             <div className="container-sm color-status-bg mt-5 p-5 rounded-4">
@@ -32,15 +43,16 @@ function MainContent() {
                         <span className="ZT-IP me-auto">Komentarz</span>
                         <span className="ZT-IP ms-auto me-2">Adimg IP</span>
                     </>
-                    {users ? users.map((user) => (
-                        <>
-                            <span className="w-25">{user.name}</span>
-                            <span className="me-auto">{user.description}</span>
-                            <span className="ms-auto">{user.config.ipAssignments[0]}</span>
-                        </>
-                    )) : <div>{
-                        usersError ? usersError : 'Loading...'
-                    }</div>}
+                    {
+                        users ? users.map((user) => (
+                                <>
+                                    <span className="w-25">{user.name}</span>
+                                    <span className="me-auto">{user.description}</span>
+                                    <span className="ms-auto">{user.config.ipAssignments[0]}</span>
+                                </>))
+                            :
+                            <div>{'Loading...'}</div>
+                    }
                 </StripedList>
 
                 <ZeroTierForm data={users}></ZeroTierForm>
