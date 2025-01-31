@@ -1,0 +1,16 @@
+﻿services:
+  tests:
+    image: tests
+    build:
+      context: .
+      dockerfile: tests/Dockerfile
+  servermanager:
+    image: servermanager
+    build:
+      context: .
+      dockerfile: src/ServerManager/Dockerfile
+  webbackend:
+    image: webbackend
+    build:
+      context: .
+      dockerfile: src/WebBackend/Dockerfile

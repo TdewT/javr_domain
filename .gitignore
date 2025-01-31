@@ -303,3 +303,4 @@ fabric.properties
 # Website
 /website/configs/*
 /website/logs/*
+/legacy/*

@@ -1,0 +1,27 @@
+{
+  "name": "JAVR_Domain",
+  "port": 3002,
+  "managers": [
+    {
+      "htmlID": "Test_Server_Manager",
+      "mac": "00:D8:61:2F:E2:D7",
+      "ip": "192.168.233.50",
+      "port": 3001
+    },
+    {
+      "htmlID": "JAVR_Server_Manager",
+      "mac": "80:FA:5B:83:12:46",
+      "ip": "192.168.233.52",
+      "port": 3001
+    }
+  ],
+  "autostart": {
+    "discordBots": [],
+    "servers": []
+  },
+  "processEnv": "development",
+  "rules": {
+    "allowTerrariumLedOverride": false,
+    "displayTerrariumCam": false
+  }
+}
