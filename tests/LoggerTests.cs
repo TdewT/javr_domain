@@ -17,7 +17,7 @@ namespace tests
         public void CreateLogger_ReturnsValidLogger()
         {
             // Act
-            var logger = Logger.CreateLogger();
+            var logger = Logger.GetLogger();
 
             // Assert
             Assert.NotNull(logger);
@@ -31,7 +31,7 @@ namespace tests
             var logOutput = new StringWriter(); // Capture console output
             Console.SetOut(logOutput);
 
-            var logger = Logger.CreateLogger();
+            var logger = Logger.GetLogger();
             Log.Logger = logger;
 
             // Act
@@ -51,7 +51,7 @@ namespace tests
         {
             // Arrange
             var logMessage = "This is a test log message.";
-            var logger = Logger.CreateLogger();
+            var logger = Logger.GetLogger();
             Log.Logger = logger;
 
             // Act
@@ -83,7 +83,7 @@ namespace tests
             var logOutput = new StringWriter(); // Capture console output
             Console.SetOut(logOutput);
 
-            var logger = Logger.CreateLogger();
+            var logger = Logger.GetLogger();
             Log.Logger = logger;
 
             // Act
@@ -102,7 +102,7 @@ namespace tests
         {
             // Arrange
             var logMessage = "This is a debug log message.";
-            var logger = Logger.CreateLogger();
+            var logger = Logger.GetLogger();
             Log.Logger = logger;
 
             // Act
@@ -131,7 +131,7 @@ namespace tests
         public void Logger_RetainsLogsFor7Days()
         {
             // Arrange
-            var logger = Logger.CreateLogger();
+            var logger = Logger.GetLogger();
             Log.Logger = logger;
 
             // Act
