@@ -1,12 +1,7 @@
-using System;
-using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading;
 using Core.Logging;
 using Microsoft.Extensions.Configuration;
 using Serilog;
-using Xunit;
 using Xunit.Abstractions;
 
 namespace tests
