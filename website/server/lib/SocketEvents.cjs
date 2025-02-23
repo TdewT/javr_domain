@@ -45,11 +45,20 @@ class SocketEvents {
 
     /**
      * @desc Sends ZeroTier data to client.
-     * @param websocket - Socket. io websocket, over which the data will be sent.
+     * @param websocket - Socket. io websocket, over which the data will be sent. Default is default websocket.
      * @param {JSON} data - data from ZeroTier's API.
      */
-    static ztResponse(websocket, data) {
-        websocket.emit(Events.ZT_RESPONSE, data)
+    static ztResponse(websocket = getWebsiteIO(), data) {
+        websocket.emit(Events.ZT_RESPONSE, data);
+    }
+
+    /**
+     * @desc Sends code and error message to client.
+     * @param websocket - Socket. io websocket, over which the data will be sent. Default is default websocket.
+     * @param error - error message from ZeroTier's API.
+    */
+    static ztErrorResponse(websocket = getWebsiteIO(), error) {
+        websocket.emit(Events.ZT_REQUEST_FAILED, error);
     }
 
     /**
