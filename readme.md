@@ -6,7 +6,7 @@
 
 
 # Welcome to JAVR Domain
-Functionality of the website is now divided between to webservers, one for managing servers ([Server_Manager](/Server_Manager)) and another that hosts only the website ([Website](/Website)). <br>
+Functionality of the website is now divided between to webservers, one for managing servers ([Server_Manager](/server_manager)) and another that hosts only the website ([Website](/website)). <br>
 This way, the more powerful server can be left offline until it's needed, keeping main site available on another. It will wake up on request from the main website. Once they establish connection with each other you will be able to use the web interface to manage servers the way same as the main branch.
 
 
@@ -62,10 +62,10 @@ Information about the server is gathered live using Minecraft query protocol.
 - List of concurrent players on the server.
 - Option to turn the server off or on from web page.
 - Automatic shutdown if the server gets stuck while saving data.
-- Pick a proper java version for servers minecraft version (currently manually added to look-up file, see template [here](json_templates/minecraft_java_ver.json)).
+- Pick a proper java version for servers minecraft version (currently manually added to look-up file, see template [here](json_templates/minecraft_java_ver)).
 
 > [!IMPORTANT] 
-> Forge servers require different config structure. See [template file](json_templates/servers_info.json) for more information
+> Forge servers require different config structure. See [template file](json_templates/servers_info) for more information
 
 
 ### 2. Arma 3 and Teamspeak
@@ -83,7 +83,7 @@ Server status is determined by listening on port specified in the config.
 <br>
 
 > [!NOTE]
-> If you wish to find out how to properly make a config for a server checkout the template file [here](json_templates/servers_info.json)
+> If you wish to find out how to properly make a config for a server checkout the template file [here](json_templates/servers_info)
 
 
 
@@ -103,7 +103,7 @@ That said, it does works, but is limited to bots launched through the website on
 <br>
 
 > [!NOTE]
-> If you wish to find out how to properly make a config for a Discord bot checkout the template file [here](json_templates/discord_bots.json)
+> If you wish to find out how to properly make a config for a Discord bot checkout the template file [here](json_templates/discord_bots)
 
 
 
@@ -120,11 +120,12 @@ For now, you need to make due with comments in code.
 
 To use site's api you need to get yourself a token, which will be generated after sending GET request on `http://website.address/api/token`.
 
+> [!Warning]
+> Currently API is temporarily disabled.
+
 > [!NOTE]
 > If you send token request while already having one assigned, you will get a new one.
 
-> [!IMPORTANT]
-> Current API is temporary and will eventually be replaced.
 
 ### Python example
 

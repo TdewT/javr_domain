@@ -1,0 +1,54 @@
+@import "../../../styles/variables.module";
+
+.lightControls {
+  font-family: "Jersey 25", sans-serif;
+  font-style: normal;
+  font-weight: bold;
+  font-size: 20px;
+  text-shadow: 2px 2px 5px black;
+  letter-spacing: .6px;
+
+  position: relative;
+
+  width: 80%;
+  padding: 20px 40px;
+  margin: auto;
+  bottom: -20%;
+
+  display: flex;
+  z-index: 1;
+
+  background: linear-gradient($color-main, lighten($color-main, 6%));
+  border-radius: 20px;
+  border: solid 3px $color-aux;
+  box-shadow: 0 0 22px 1px $color-aux;
+
+  .tempParamContainer {
+    display: flex;
+    flex-direction: row;
+  }
+
+  .redLabel {
+    color: darkred;
+  }
+
+  .greenLabel {
+    color: green;
+  }
+
+  .blueLabel {
+    color: cornflowerblue;
+  }
+
+  @media (max-width: 400px) {
+    & {
+      width: 100%;
+      padding: 20px;
+
+      .tempParamContainer {
+        display: flex;
+        flex-direction: column;
+      }
+    }
+  }
+}

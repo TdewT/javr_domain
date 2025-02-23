@@ -1,0 +1,20 @@
+@import "variables.module";
+
+// background
+.bgImgMain {
+  background: $color-main url($backgrounds-path + "bg-main.jpg") no-repeat center fixed;
+  background-size: cover;
+}
+
+.styleMainTile {
+  //Display Settings
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  padding: 0 0 50px 0;
+  text-align: center;
+}
+
+.styleMainTile > * {
+  text-shadow: $text-border;
+}

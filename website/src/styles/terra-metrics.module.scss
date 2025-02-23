@@ -1,0 +1,85 @@
+@import "variables.module";
+
+.main {
+  background: $color-aux-2;
+  height: 100vh;
+  display: flex;
+}
+
+.bgImgTerra {
+  height: 100%;
+  width: 100%;
+  background: url($backgrounds-path + "bg-terra.jpg") no-repeat center fixed;
+  background-size: cover;
+  display: flex;
+  flex-direction: column;
+}
+
+.fgImgTerra {
+  position: absolute;
+  height: 30%;
+  width: 100%;
+  background: url($backgrounds-path + "fg-terra.png") no-repeat fixed center;
+  bottom: 0;
+  background-size: cover;
+  z-index: 1;
+  pointer-events: none;
+
+  @media (max-width: 400px) or (max-height: 860px) {
+    & {
+      z-index: 0;
+    }
+  }
+}
+
+.fontStyle{
+  font-family: "Jersey 25", sans-serif;
+  font-style: normal;
+  font-weight: bold;
+  font-size: 20px;
+  text-shadow: 2px 2px 5px black;
+  letter-spacing: .6px;
+}
+
+.dataTableContainer {
+  margin: 1vh auto;
+  width: 360px;
+  min-height: 175px;
+
+  display: flex;
+  z-index: 1;
+
+  background: linear-gradient($color-main, lighten($color-main, 6%));
+  border-radius: 20px;
+  border: solid 3px $color-aux;
+  box-shadow: 0 0 22px 1px $color-aux;
+
+  .innerBorder {
+    border: solid 2px darken($color-main, 20%);
+    border-radius: 20px;
+  }
+
+  @media (max-width: 400px) {
+    & {
+      width: 100%;
+      min-height: 10rem;
+    }
+  }
+}
+
+.cameraContainer {
+  //background: aqua;
+  align-self: center;
+
+  z-index: 0;
+  position: absolute;
+  margin-left: calc(.5vh + .5vw / 2);
+  margin-top: calc(24vh + .5vw / 2);
+  height: 53vh;
+  width: calc(1rem + 125vh / 2);
+
+  @media (max-width: 600px) {
+    width: 95vw;
+    height: 50vh;
+  }
+}

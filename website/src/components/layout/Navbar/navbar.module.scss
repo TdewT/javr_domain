@@ -1,0 +1,27 @@
+@import "../../../styles/variables.module";
+
+// Styles for navigation options
+.customNavLink {
+  color: white;
+}
+
+.customNavLink.inactive {
+  color: #d2d1dc !important;
+}
+
+// Navbar container
+.styleNavbar {
+  // So that it is always visible
+  z-index: 4;
+
+  // Font
+  font-family: Helvetica, sans-serif;
+  font-size: large;
+
+  // border
+  border-bottom: 2px solid $color-aux;
+
+  // Background
+  background-color: $color-main;
+  background-image: $linear-gradient-top;
+}

@@ -1,0 +1,33 @@
+@import "../../../styles/variables.module";
+
+.accordion {
+  padding: .5rem 1rem .2rem 1rem;
+}
+
+.accordionHeader {
+  font-size: 18px;
+  padding-bottom: 4px;
+  margin: 0 1rem;
+  user-select: none;
+
+  &:hover{
+    cursor: pointer;
+  }
+}
+
+.accordionButton {
+  float: right;
+  display: block;
+  background: url("../../../../public/img/accordion.svg") no-repeat center center;
+  margin-top: 2px;
+  width: 20px;
+  height: 20px;
+  transform: rotate(90deg);
+}
+
+.accordionContent {
+  border-radius: 2px;
+  padding-top: 10px;
+  border-top: 2px solid $color-aux;
+  margin: 0 2rem;
+}

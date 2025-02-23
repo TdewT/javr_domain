@@ -1,0 +1,31 @@
+@import "variables.module";
+
+// Background
+.bgImgServices {
+  background: $color-main url($backgrounds-path + "bg-services.jpg") no-repeat center fixed;
+  background-size: cover;
+}
+
+// Main list of services
+#service-list {
+  --bs-list-group-border-radius: 0;
+}
+
+// Content of a list child
+#service-list > li > span {
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+// Status indicator and status text
+#service-list > li > div {
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+
+// Buttons to start/stop service
+.servicesButton {
+  margin-left: 2vw;
+  min-width: 60px;
+}

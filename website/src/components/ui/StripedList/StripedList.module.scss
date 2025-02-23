@@ -1,0 +1,12 @@
+@import "../../../styles/variables.module.scss";
+
+// List styling
+.stripedList {
+  li{
+    background-color: $list-color-background;
+    border-color: $color_aux;
+  }
+  li:nth-of-type(odd){
+    background-color: $list-color-background-nth;
+  }
+}
