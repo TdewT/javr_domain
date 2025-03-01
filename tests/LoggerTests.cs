@@ -46,7 +46,10 @@ namespace tests
                       ""Application"": ""Tests""
                     }
                   }
-                }".Replace("{LogFilePathPattern}", LogFilePathPattern.Replace("-*", "-"));
+                }"
+            .Replace("{LogFilePathPattern}", 
+            LogFilePathPattern.Replace("-*", "-")
+            );
 
         private static readonly MemoryStream ConfigStream = new MemoryStream(Encoding.UTF8.GetBytes(ConfigStr));
 
