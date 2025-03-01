@@ -6,9 +6,9 @@ using Xunit.Abstractions;
 
 namespace tests
 {
-    public class LoggerTests : IDisposable
+    public class LoggerTests(ITestOutputHelper testOutputHelper) : IDisposable
     {
-        private readonly ITestOutputHelper _testOutputHelper;
+        private readonly ITestOutputHelper _testOutputHelper = testOutputHelper;
         private const string LogFilePattern = "tests-*.log";
         private const string LogPath = "logs";
         private const string LogFilePathPattern = $"{LogPath}/{LogFilePattern}";
@@ -51,11 +51,6 @@ namespace tests
         private static readonly MemoryStream ConfigStream = new MemoryStream(Encoding.UTF8.GetBytes(ConfigStr));
 
         private static readonly IConfiguration Config = new ConfigurationBuilder().AddJsonStream(ConfigStream).Build();
-
-        public LoggerTests(ITestOutputHelper testOutputHelper)
-        {
-            _testOutputHelper = testOutputHelper;
-        }
 
         [Fact]
         public void GetLogger_BeforeInitialisation()
