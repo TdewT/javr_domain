@@ -22,4 +22,10 @@
       <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
     </ItemGroup>
 
+    <ItemGroup>
+        <Content Include="Localization\locales\*.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
+    
 </Project>
