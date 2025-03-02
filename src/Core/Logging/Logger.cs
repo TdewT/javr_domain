@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System.Text;
+using Microsoft.Extensions.Configuration;
 using Serilog;
 
 namespace Core.Logging
@@ -9,6 +10,8 @@ namespace Core.Logging
 
         public static void Initialize(string configPath = "serilog.json")
         {
+            Console.OutputEncoding = Encoding.UTF8;
+            
             if (_isInitialized) return;
 
             if (!Path.Exists("logs"))
