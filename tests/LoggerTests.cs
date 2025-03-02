@@ -8,7 +8,6 @@ namespace tests
 {
     public class LoggerTests(ITestOutputHelper testOutputHelper) : IDisposable
     {
-        private readonly ITestOutputHelper _testOutputHelper = testOutputHelper;
         private const string LogFilePattern = "tests-*.log";
         private const string LogPath = "logs";
         private const string LogFilePathPattern = $"{LogPath}/{LogFilePattern}";
