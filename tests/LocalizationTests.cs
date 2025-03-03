@@ -20,6 +20,7 @@ public class LocalesFixture : IDisposable
     // Cleanup after tests are concluded
     public void Dispose()
     {
+        Directory.Delete(_localizationFolder, true);
     }
 }
 
