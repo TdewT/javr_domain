@@ -22,13 +22,13 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Content Include="..\.dockerignore">
-        <Link>.dockerignore</Link>
-      </Content>
+        <Content Include="..\.dockerignore">
+            <Link>.dockerignore</Link>
+        </Content>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\src\Core\Core.csproj" />
+        <ProjectReference Include="..\src\Core\Core.csproj"/>
     </ItemGroup>
 
 </Project>
