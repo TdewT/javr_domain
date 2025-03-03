@@ -1,12 +1,14 @@
-﻿using Core.Localization.Enums;
+﻿using System.Runtime.CompilerServices;
+using Core.Localization.Enums;
 using Serilog;
 
 namespace Core.Localization;
 
 public static class Localization
 {
-    private static readonly Dictionary<LanguageCode, LanguagePackage> Languages = new();
-    public static readonly LanguageCode DefaultLanguage;
+    private static Dictionary<LanguageCode, LanguagePackage> _languages = new();
+    // TODO: Change to readonly once config is implemented
+    public readonly static LanguageCode DefaultLanguage;
     private static LanguagePackage? _currentLanguage;
 
     static Localization()
@@ -41,11 +43,11 @@ public static class Localization
                 path
             );
 
-            Languages[languagePackage.LanguageCode] = languagePackage;
+            _languages[languagePackage.LanguageCode] = languagePackage;
         }
 
         // If no languages were error to logs
-        if (Languages.Count == 0)
+        if (_languages.Count == 0)
         {
             Log.Error($"No language pack files found");
         }
@@ -59,7 +61,7 @@ public static class Localization
     public static void SetLanguage(LanguageCode language)
     {
         // Try to get loaded language
-        if (!Languages.TryGetValue(language, out var loadedLanguage))
+        if (!_languages.TryGetValue(language, out var loadedLanguage))
         {
             Log.Warning($"Language '{language}' is not loaded.");
         }
@@ -78,5 +80,12 @@ public static class Localization
         
         // Get string value and format
         return string.Format(_currentLanguage.GetString(key), args);
+    }
+
+    public static void ResetToDefaults()
+    {
+        SetLanguage(DefaultLanguage);
+        _languages = new Dictionary<LanguageCode, LanguagePackage>();
+        RuntimeHelpers.RunClassConstructor(typeof(Localization).TypeHandle);
     }
 }
