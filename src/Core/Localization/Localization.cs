@@ -4,14 +4,20 @@ using Serilog;
 
 namespace Core.Localization;
 
+// TODO: Change to singleton pattern
 public static class Localization
 {
     private static Dictionary<LanguageCode, LanguagePackage> _languages = new();
     // TODO: Change to readonly once config is implemented
-    public readonly static LanguageCode DefaultLanguage;
+    private static LanguageCode _defaultLanguage;
     private static LanguagePackage? _currentLanguage;
 
     static Localization()
+    {
+        LoadPackages();
+    }
+
+    private static void LoadPackages()
     {
         var baseDir = AppDomain.CurrentDomain.BaseDirectory;
         var localesPath = Path.Combine(baseDir, "Localization", "locales");
@@ -53,9 +59,9 @@ public static class Localization
         }
 
         // TODO: Read from config when config handling is implemented
-        DefaultLanguage = LanguageCode.en_US;
+        _defaultLanguage = LanguageCode.en_US;
 
-        SetLanguage(DefaultLanguage);
+        SetLanguage(_defaultLanguage);
     }
     
     public static void SetLanguage(LanguageCode language)
@@ -82,10 +88,18 @@ public static class Localization
         return string.Format(_currentLanguage.GetString(key), args);
     }
 
-    public static void ResetToDefaults()
+    public static void Reset()
     {
-        SetLanguage(DefaultLanguage);
         _languages = new Dictionary<LanguageCode, LanguagePackage>();
-        RuntimeHelpers.RunClassConstructor(typeof(Localization).TypeHandle);
+        LoadPackages();
+        SetLanguage(_defaultLanguage);
+    }
+
+    public static void ReloadPackages()
+    {
+        // Clear old packages
+        _languages = new Dictionary<LanguageCode, LanguagePackage>();
+        // Load new packages
+        LoadPackages();
     }
 }
