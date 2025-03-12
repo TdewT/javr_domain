@@ -77,7 +77,7 @@ class ServerInstance {
      */
     async startWebsite() {
         // Server setup
-        const dev = process.env.NODE_ENV !== this.#processEnv;
+        const dev = this.#processEnv !== "production";
         this.#app = next({dev});
         const handle = this.#app.getRequestHandler();
 
