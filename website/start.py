@@ -6,6 +6,60 @@ import time
 import platform
 import threading
 
+
+def run_nextjs_build():
+    """Run Next.js build process and wait for it to complete"""
+    print("Starting Next.js build process...")
+
+    # Use shell=True on Windows to handle process creation properly
+    if platform.system() == 'Windows':
+        build_process = subprocess.Popen(
+            'npx next build',
+            shell=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            bufsize=1,
+            universal_newlines=True
+        )
+    else:
+        build_process = subprocess.Popen(
+            ['npx', 'next', 'build'],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            bufsize=1,
+            universal_newlines=True
+        )
+
+    # Start output reader threads for the build process
+    stdout_thread = threading.Thread(
+        target=output_reader,
+        args=(build_process.stdout, 'BUILD: ')
+    )
+    stderr_thread = threading.Thread(
+        target=output_reader,
+        args=(build_process.stderr, 'BUILD ERROR: ')
+    )
+
+    stdout_thread.daemon = True
+    stderr_thread.daemon = True
+    stdout_thread.start()
+    stderr_thread.start()
+
+    # Wait for build process to complete
+    return_code = build_process.wait()
+
+    # Wait for output threads to finish
+    stdout_thread.join(timeout=1)
+    stderr_thread.join(timeout=1)
+
+    if return_code == 0:
+        print("Next.js build completed successfully")
+        return True
+    else:
+        print(f"Next.js build failed with code {return_code}")
+        return False
+
+
 def launch_node_server(max_memory_mb):
     # Use shell=True on Windows to handle process creation properly
     if platform.system() == 'Windows':
@@ -29,10 +83,12 @@ def launch_node_server(max_memory_mb):
         )
     return process
 
+
 def output_reader(pipe, prefix=''):
     """Read output from pipe and print it with optional prefix"""
     for line in iter(pipe.readline, ''):
         print(f"{prefix}{line}", end='', flush=True)
+
 
 def sigint_handler(signum, frame):
     global should_run
@@ -47,6 +103,7 @@ def sigint_handler(signum, frame):
     should_run = False
     sys.exit(0)
 
+
 if __name__ == "__main__":
     # Configuration
     node_max_mem = 4096  # Memory limit in MB
@@ -54,6 +111,13 @@ if __name__ == "__main__":
 
     signal.signal(signal.SIGINT, sigint_handler)
     node_process = None
+
+    # Run Next.js build before starting server
+    build_success = run_nextjs_build()
+
+    if not build_success:
+        print("Build failed, not starting server")
+        sys.exit(1)
 
     while should_run:
         try:
